@@ -50,16 +50,16 @@ AppStatus Player::Initialise()
 		sprite->AddKeyFrame((int)PlayerAnim::WALKING_LEFT, { (float)i * nw, 0, -nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::FALLING_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::FALLING_RIGHT, { 2 * nw, 5 * nh, nw, nh });
-	sprite->AddKeyFrame((int)PlayerAnim::FALLING_RIGHT, { 3 * nw, 5 * nh, nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::FALLING_RIGHT, { 6 * nw, 0, nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::FALLING_RIGHT, { 7 * nw, 0, nw, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::FALLING_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::FALLING_LEFT, { 2 * nw, 5 * nh, -nw, nh });
-	sprite->AddKeyFrame((int)PlayerAnim::FALLING_LEFT, { 3 * nw, 5 * nh, -nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::FALLING_LEFT, { 6 * nw, 0, -nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::FALLING_LEFT, { 7 * nw, 0, -nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::JUMPING_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_RIGHT, { 0, 5 * nh, nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_RIGHT, { 4 * nw, 0, nw, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::JUMPING_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_LEFT, { 0, 5 * nh, -nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_LEFT, { 4 * nw, 0, -nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::CLIMBING, ANIM_LADDER_DELAY);
 	for (i = 0; i < 4; ++i)
@@ -207,15 +207,9 @@ void Player::MoveX()
 	//We can only go up and down while climbing
 	if (state == State::CLIMBING)	return;
 
-	if (IsKeyDown(KEY_DOWN)) {
-		state = State::CROUCHING;
-		if (IsLookingLeft()) ChangeAnimLeft();
-		else ChangeAnimRight();
-	}
-
 	if (IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT))
 	{
-		pos.x += -PLAYER_SPEED;
+		if (state != State::CROUCHING) pos.x += -PLAYER_SPEED;
 		if (state == State::IDLE) StartWalkingLeft();
 		else
 		{
@@ -231,7 +225,7 @@ void Player::MoveX()
 	}
 	else if (IsKeyDown(KEY_RIGHT))
 	{
-		pos.x += PLAYER_SPEED;
+		if (state != State::CROUCHING) pos.x += PLAYER_SPEED;
 		if (state == State::IDLE) StartWalkingRight();
 		else
 		{
@@ -266,6 +260,7 @@ void Player::MoveY()
 	{
 		pos.y += PLAYER_SPEED;
 		box = GetHitbox();
+
 		if (map->TestCollisionGround(box, &pos.y))
 		{
 			if (state == State::FALLING) Stop();
@@ -278,6 +273,11 @@ void Player::MoveY()
 			}
 			else if (IsKeyDown(KEY_DOWN))
 			{
+				//To Crouch
+				state = State::CROUCHING;
+				if (IsLookingLeft()) ChangeAnimLeft();
+				else ChangeAnimRight();
+
 				//To climb up the ladder, we need to check the control point (x, y)
 				//To climb down the ladder, we need to check pixel below (x, y+1) instead
 				box = GetHitbox();
@@ -292,6 +292,11 @@ void Player::MoveY()
 			else if (IsKeyPressed(KEY_SPACE))
 			{
 				StartJumping();
+			}
+			else
+			{
+				//To stop Crouching
+				if (state == State::CROUCHING) Stop();
 			}
 		}
 		//To Climb the stairs in the air
