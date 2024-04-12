@@ -6,7 +6,7 @@
 #include <raymath.h>
 
 Player::Player(const Point& p, State s, Look view) :
-	Entity(p, PLAYER_PHYSICAL_WIDTH, PLAYER_PHYSICAL_HEIGHT, PLAYER_FRAME_SIZE, PLAYER_FRAME_SIZE)
+	Entity(p, PLAYER_PHYSICAL_WIDTH, PLAYER_PHYSICAL_HEIGHT, PLAYER_FRAME_SIZE_WIDTH, PLAYER_FRAME_SIZE_HEIGHT)
 {
 	state = s;
 	look = view;
@@ -19,7 +19,7 @@ Player::~Player()
 AppStatus Player::Initialise()
 {
 	int i;
-	const int n = PLAYER_FRAME_SIZE;
+	const int nw = PLAYER_FRAME_SIZE_WIDTH, nh = PLAYER_FRAME_SIZE_HEIGHT;
 
 	ResourceManager& data = ResourceManager::Instance();
 	if (data.LoadTexture(Resource::IMG_PLAYER, "images/Simon.png") != AppStatus::OK)
@@ -38,40 +38,42 @@ AppStatus Player::Initialise()
 	sprite->SetNumberAnimations((int)PlayerAnim::NUM_ANIMATIONS);
 
 	sprite->SetAnimationDelay((int)PlayerAnim::IDLE_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::IDLE_RIGHT, { 0, 0, n, n });
+	sprite->AddKeyFrame((int)PlayerAnim::IDLE_RIGHT, { 0, 0, nw, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::IDLE_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::IDLE_LEFT, { 0, 0, -n, n });
+	sprite->AddKeyFrame((int)PlayerAnim::IDLE_LEFT, { 0, 0, -nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::WALKING_RIGHT, ANIM_DELAY);
 	for (i = 0; i < 3; ++i)
-		sprite->AddKeyFrame((int)PlayerAnim::WALKING_RIGHT, { (float)i * n, 4 * n, n, n });
+		sprite->AddKeyFrame((int)PlayerAnim::WALKING_RIGHT, { (float)i * nw, 0, nw, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::WALKING_LEFT, ANIM_DELAY);
 	for (i = 0; i < 3; ++i)
-		sprite->AddKeyFrame((int)PlayerAnim::WALKING_LEFT, { (float)i * n, 4 * n, -n, n });
+		sprite->AddKeyFrame((int)PlayerAnim::WALKING_LEFT, { (float)i * nw, 0, -nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::FALLING_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::FALLING_RIGHT, { 2 * n, 5 * n, n, n });
-	sprite->AddKeyFrame((int)PlayerAnim::FALLING_RIGHT, { 3 * n, 5 * n, n, n });
+	sprite->AddKeyFrame((int)PlayerAnim::FALLING_RIGHT, { 2 * nw, 5 * nh, nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::FALLING_RIGHT, { 3 * nw, 5 * nh, nw, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::FALLING_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::FALLING_LEFT, { 2 * n, 5 * n, -n, n });
-	sprite->AddKeyFrame((int)PlayerAnim::FALLING_LEFT, { 3 * n, 5 * n, -n, n });
+	sprite->AddKeyFrame((int)PlayerAnim::FALLING_LEFT, { 2 * nw, 5 * nh, -nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::FALLING_LEFT, { 3 * nw, 5 * nh, -nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::JUMPING_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_RIGHT, { 0, 5 * n, n, n });
+	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_RIGHT, { 0, 5 * nh, nw, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::JUMPING_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_LEFT, { 0, 5 * n, -n, n });
-	sprite->SetAnimationDelay((int)PlayerAnim::LEVITATING_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::LEVITATING_RIGHT, { n, 5 * n, n, n });
-	sprite->SetAnimationDelay((int)PlayerAnim::LEVITATING_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::LEVITATING_LEFT, { n, 5 * n, -n, n });
+	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_LEFT, { 0, 5 * nh, -nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::CLIMBING, ANIM_LADDER_DELAY);
 	for (i = 0; i < 4; ++i)
-		sprite->AddKeyFrame((int)PlayerAnim::CLIMBING, { (float)i * n, 6 * n, n, n });
+		sprite->AddKeyFrame((int)PlayerAnim::CLIMBING, { (float)i * nw, 6 * nh, nw, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::CLIMBING_PRE_TOP, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CLIMBING_PRE_TOP, { 4 * n, 6 * n, n, n });
+	sprite->AddKeyFrame((int)PlayerAnim::CLIMBING_PRE_TOP, { 4 * nw, 6 * nh, nw, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::CLIMBING_TOP, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CLIMBING_TOP, { 5 * n, 6 * n, n, n });
+	sprite->AddKeyFrame((int)PlayerAnim::CLIMBING_TOP, { 5 * nw, 6 * nh, nw, nh });
+
+	sprite->SetAnimationDelay((int)PlayerAnim::CROUCHING_LEFT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::CROUCHING_LEFT, { 3 * nw, 0, -nw, nh });
+
+	sprite->SetAnimationDelay((int)PlayerAnim::CROUCHING_RIGHT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::CROUCHING_RIGHT, { 3 * nw, 0, nw, nh });
 
 	sprite->SetAnimation((int)PlayerAnim::IDLE_RIGHT);
 
@@ -92,10 +94,6 @@ bool Player::IsLookingLeft() const
 bool Player::IsAscending() const
 {
 	return dir.y < -PLAYER_LEVITATING_SPEED;
-}
-bool Player::IsLevitating() const
-{
-	return abs(dir.y) <= PLAYER_LEVITATING_SPEED;
 }
 bool Player::IsDescending() const
 {
@@ -172,10 +170,11 @@ void Player::ChangeAnimRight()
 	look = Look::RIGHT;
 	switch (state)
 	{
-	case State::IDLE:	 SetAnimation((int)PlayerAnim::IDLE_RIGHT);    break;
-	case State::WALKING: SetAnimation((int)PlayerAnim::WALKING_RIGHT); break;
-	case State::JUMPING: SetAnimation((int)PlayerAnim::JUMPING_RIGHT); break;
-	case State::FALLING: SetAnimation((int)PlayerAnim::FALLING_RIGHT); break;
+	case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_RIGHT);    break;
+	case State::WALKING:	SetAnimation((int)PlayerAnim::WALKING_RIGHT); break;
+	case State::JUMPING:	SetAnimation((int)PlayerAnim::JUMPING_RIGHT); break;
+	case State::FALLING:	SetAnimation((int)PlayerAnim::FALLING_RIGHT); break;
+	case State::CROUCHING:	SetAnimation((int)PlayerAnim::CROUCHING_RIGHT); break;
 	}
 }
 void Player::ChangeAnimLeft()
@@ -183,10 +182,11 @@ void Player::ChangeAnimLeft()
 	look = Look::LEFT;
 	switch (state)
 	{
-	case State::IDLE:	 SetAnimation((int)PlayerAnim::IDLE_LEFT);    break;
-	case State::WALKING: SetAnimation((int)PlayerAnim::WALKING_LEFT); break;
-	case State::JUMPING: SetAnimation((int)PlayerAnim::JUMPING_LEFT); break;
-	case State::FALLING: SetAnimation((int)PlayerAnim::FALLING_LEFT); break;
+	case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_LEFT);    break;
+	case State::WALKING:	SetAnimation((int)PlayerAnim::WALKING_LEFT); break;
+	case State::JUMPING:	SetAnimation((int)PlayerAnim::JUMPING_LEFT); break;
+	case State::FALLING:	SetAnimation((int)PlayerAnim::FALLING_LEFT); break;
+	case State::CROUCHING:	SetAnimation((int)PlayerAnim::CROUCHING_LEFT); break;
 	}
 }
 void Player::Update()
@@ -206,6 +206,12 @@ void Player::MoveX()
 
 	//We can only go up and down while climbing
 	if (state == State::CLIMBING)	return;
+
+	if (IsKeyDown(KEY_DOWN)) {
+		state = State::CROUCHING;
+		if (IsLookingLeft()) ChangeAnimLeft();
+		else ChangeAnimRight();
+	}
 
 	if (IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT))
 	{
@@ -345,11 +351,6 @@ void Player::LogicJumping()
 			{
 				if (IsLookingRight())	SetAnimation((int)PlayerAnim::JUMPING_RIGHT);
 				else					SetAnimation((int)PlayerAnim::JUMPING_LEFT);
-			}
-			else if (IsLevitating())
-			{
-				if (IsLookingRight())	SetAnimation((int)PlayerAnim::LEVITATING_RIGHT);
-				else					SetAnimation((int)PlayerAnim::LEVITATING_LEFT);
 			}
 			else if (IsDescending())
 			{

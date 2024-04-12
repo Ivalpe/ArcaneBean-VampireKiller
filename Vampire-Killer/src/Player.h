@@ -3,7 +3,8 @@
 #include "TileMap.h"
 
 //Representation model size: 32x32
-#define PLAYER_FRAME_SIZE		32
+#define PLAYER_FRAME_SIZE_WIDTH		16
+#define PLAYER_FRAME_SIZE_HEIGHT	32
 
 //Logical model size: 12x28
 #define PLAYER_PHYSICAL_WIDTH	12
@@ -31,7 +32,7 @@
 #define GRAVITY_FORCE			1
 
 //Logic states
-enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD };
+enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING};
 enum class Look { RIGHT, LEFT };
 
 //Rendering states
@@ -39,11 +40,9 @@ enum class PlayerAnim {
 	IDLE_LEFT, IDLE_RIGHT,
 	WALKING_LEFT, WALKING_RIGHT,
 	JUMPING_LEFT, JUMPING_RIGHT,
-	LEVITATING_LEFT, LEVITATING_RIGHT,
 	FALLING_LEFT, FALLING_RIGHT,
 	CLIMBING, CLIMBING_PRE_TOP, CLIMBING_TOP,
-	SHOCK_LEFT, SHOCK_RIGHT,
-	TELEPORT_LEFT, TELEPORT_RIGHT,
+	CROUCHING_LEFT, CROUCHING_RIGHT, 
 	NUM_ANIMATIONS
 };
 
@@ -84,7 +83,6 @@ private:
 
 	//Jump steps
 	bool IsAscending() const;
-	bool IsLevitating() const;
 	bool IsDescending() const;
 
 	//Ladder get in/out steps
