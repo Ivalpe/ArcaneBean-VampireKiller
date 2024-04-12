@@ -22,7 +22,7 @@ AppStatus Player::Initialise()
 	const int nw = PLAYER_FRAME_SIZE_WIDTH, nh = PLAYER_FRAME_SIZE_HEIGHT;
 
 	ResourceManager& data = ResourceManager::Instance();
-	if (data.LoadTexture(Resource::IMG_PLAYER, "images/Simon.png") != AppStatus::OK)
+	if (data.LoadTexture(Resource::IMG_PLAYER, "Assets/Sprites/Simon.png") != AppStatus::OK)
 	{
 		return AppStatus::ERROR;
 	}
