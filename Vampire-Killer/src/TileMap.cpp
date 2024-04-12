@@ -75,6 +75,36 @@ void TileMap::InitTileDictionary()
 	dict_rect[(int)Tile::BLOCK_FENCE4] = { 0,  n * 8, n, n };
 	dict_rect[(int)Tile::BLOCK_FENCE5] = { n,  n * 8, n, n };
 
+	dict_rect[(int)Tile::CASTLE1] = { n * 4,  n * 3, n, n };
+	dict_rect[(int)Tile::CASTLE2] = { n * 5,  n * 3, n, n };
+	dict_rect[(int)Tile::CASTLE3] = { n * 6,  n * 3, n, n };
+	dict_rect[(int)Tile::CASTLE4] = { n * 4,  n * 4, n, n };
+	dict_rect[(int)Tile::CASTLE5] = { n * 5,  n * 4, n, n };
+	dict_rect[(int)Tile::CASTLE6] = { n * 6,  n * 4, n, n };
+	dict_rect[(int)Tile::CASTLE7] = { n * 7,  n * 4, n, n };
+	dict_rect[(int)Tile::CASTLE8] = { n * 8,  n * 4, n, n };
+	dict_rect[(int)Tile::CASTLE9] = { n * 4,  n * 5, n, n };
+	dict_rect[(int)Tile::CASTLE10] = { n * 5,  n * 5, n, n };
+	dict_rect[(int)Tile::CASTLE11] = { n * 6,  n * 5, n, n };
+	dict_rect[(int)Tile::CASTLE12] = { n * 7,  n * 5, n, n };
+	dict_rect[(int)Tile::CASTLE13] = { n * 8,  n * 5, n, n };
+	dict_rect[(int)Tile::CASTLE14] = { n * 4,  n * 6, n, n };
+	dict_rect[(int)Tile::CASTLE15] = { n * 5,  n * 6, n, n };
+	dict_rect[(int)Tile::CASTLE16] = { n * 6,  n * 6, n, n };
+	dict_rect[(int)Tile::CASTLE17] = { n * 7,  n * 6, n, n };
+	dict_rect[(int)Tile::CASTLE18] = { n * 8,  n * 6, n, n };
+	dict_rect[(int)Tile::CASTLE19] = { n * 5,  n * 7, n, n };
+	dict_rect[(int)Tile::CASTLE20] = { n * 6,  n * 7, n, n };
+	dict_rect[(int)Tile::CASTLE21] = { n * 7,  n * 7, n, n };
+	dict_rect[(int)Tile::CASTLE22] = { n * 8,  n * 7, n, n };
+	dict_rect[(int)Tile::CASTLE23] = { n * 4,  n * 8, n, n };
+	dict_rect[(int)Tile::CASTLE24] = { n * 5,  n * 8, n, n };
+	dict_rect[(int)Tile::CASTLE25] = { n * 6,  n * 8, n, n };
+	dict_rect[(int)Tile::CASTLE26] = { n * 7,  n * 8, n, n };
+	dict_rect[(int)Tile::CASTLE27] = { n * 8,  n * 8, n, n };
+	dict_rect[(int)Tile::CASTLE28] = { n * 4,  n * 9, n, n };
+	dict_rect[(int)Tile::CASTLE29] = { n * 5,  n * 9, n, n };
+
 	dict_rect[(int)Tile::BLOCK_GROUND] = { 0,  n * 9, n, n };
 	dict_rect[(int)Tile::AIR] = { n,  n * 9, n, n };
 
