@@ -5,9 +5,11 @@
 
 Game::Game()
 {
-    state = GameState::MAIN_MENU;
+    state = GameState::MAIN_SCREEN;
     scene = nullptr;
     img_menu = nullptr;
+    img_mscreen = nullptr;
+   
 
     target = {};
     src = {};
@@ -65,9 +67,18 @@ AppStatus Game::LoadResources()
         return AppStatus::ERROR;
     }
     img_menu = data.GetTexture(Resource::IMG_MENU);
-    
+
+    if (data.LoadTexture(Resource::IMG_MSCREEN, "Assets/MainScreen.png") != AppStatus::OK)
+    {
+        return AppStatus::ERROR;
+    }
+    img_mscreen = data.GetTexture(Resource::IMG_MSCREEN);
+
     return AppStatus::OK;
 }
+    
+
+
 AppStatus Game::BeginPlay()
 {
     scene = new Scene();
@@ -92,11 +103,40 @@ void Game::FinishPlay()
 }
 AppStatus Game::Update()
 {
+    frameCount++;
     //Check if user attempts to close the window, either by clicking the close button or by pressing Alt+F4
     if(WindowShouldClose()) return AppStatus::QUIT;
 
     switch (state)
     {
+        case GameState::MAIN_SCREEN:
+            
+            if (frameCount <= FADE_TIME) {
+                int alpha = (frameCount * 255) / FADE_TIME;
+                DrawTexturePro(*img_mscreen, { 0, 0, static_cast<float>(img_mscreen->width), static_cast<float>(img_mscreen->height) }, dst, { 0, 0 }, 0.0f, Fade(WHITE, alpha));
+            }
+            else if (frameCount <= FADE_TIME + HOLD_FRAMES) {
+                // Mostrar completamente opaco después del fade in durante el tiempo de espera
+                DrawTexture(*img_mscreen, 0, 0, WHITE);
+            }
+            else if (frameCount <= FADE_TIME * 2 + HOLD_FRAMES) {
+                // Fade Out
+                int fadeOutFrame = frameCount - FADE_TIME - HOLD_FRAMES;
+                int alpha = ((FADE_TIME - fadeOutFrame) * 255) / FADE_TIME;
+                DrawTexturePro(*img_mscreen, { 0, 0, static_cast<float>(img_mscreen->width), static_cast<float>(img_mscreen->height) }, dst, { 0, 0 }, 0.0f, Fade(WHITE, alpha));
+            }
+            else {
+                // Reiniciar el contador de fotogramas y cambiar al estado MAIN_MENU
+                state = GameState::MAIN_MENU;
+                frameCount = 0;
+            }
+
+            /*if (frameCount >= HOLD_FRAMES) {
+                state = GameState::MAIN_MENU;
+                frameCount = 0; // Reiniciar el contador de fotogramas
+            }*/
+
+            break;
         case GameState::MAIN_MENU: 
             if (IsKeyPressed(KEY_ESCAPE)) return AppStatus::QUIT;
             if (IsKeyPressed(KEY_SPACE))
@@ -123,12 +163,18 @@ AppStatus Game::Update()
 }
 void Game::Render()
 {
+
+   
     //Draw everything in the render texture, note this will not be rendered on screen, yet
     BeginTextureMode(target);
     ClearBackground(BLACK);
     
     switch (state)
     {
+        case GameState::MAIN_SCREEN:
+            DrawTexture(*img_mscreen, 0, 0, WHITE);
+            break;
+
         case GameState::MAIN_MENU:
             DrawTexture(*img_menu, 0, 0, WHITE);
             break;
@@ -154,6 +200,7 @@ void Game::UnloadResources()
 {
     ResourceManager& data = ResourceManager::Instance();
     data.ReleaseTexture(Resource::IMG_MENU);
+    data.ReleaseTexture(Resource::IMG_MSCREEN);
 
     UnloadRenderTexture(target);
 }
