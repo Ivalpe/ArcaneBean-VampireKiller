@@ -217,7 +217,7 @@ void Player::MoveX()
 		}
 
 		box = GetHitbox();
-		if (map->TestCollisionWallLeft(box))
+		if (map->TestCollisionWallLeft(box) || pos.x <= 0)
 		{
 			pos.x = prev_x;
 			if (state == State::WALKING) Stop();
@@ -233,7 +233,7 @@ void Player::MoveX()
 		}
 
 		box = GetHitbox();
-		if (map->TestCollisionWallRight(box))
+		if (map->TestCollisionWallRight(box) || pos.x >= WINDOW_WIDTH - PLAYER_PHYSICAL_WIDTH)
 		{
 			pos.x = prev_x;
 			if (state == State::WALKING) Stop();
