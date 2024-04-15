@@ -53,6 +53,7 @@ AppStatus Game::Initialise(float scale)
 
     //Set the target frame rate for the application
     SetTargetFPS(60);
+    SetBlendMode(BLEND_ALPHA); // Enable alpha blending
     //Disable the escape key to quit functionality
     SetExitKey(0);
 
@@ -111,30 +112,11 @@ AppStatus Game::Update()
     {
         case GameState::MAIN_SCREEN:
             
-            if (frameCount <= FADE_TIME) {
-                int alpha = (frameCount * 255) / FADE_TIME;
-                DrawTexturePro(*img_mscreen, { 0, 0, static_cast<float>(img_mscreen->width), static_cast<float>(img_mscreen->height) }, dst, { 0, 0 }, 0.0f, Fade(WHITE, alpha));
-            }
-            else if (frameCount <= FADE_TIME + HOLD_FRAMES) {
-                // Mostrar completamente opaco después del fade in durante el tiempo de espera
-                DrawTexture(*img_mscreen, 0, 0, WHITE);
-            }
-            else if (frameCount <= FADE_TIME * 2 + HOLD_FRAMES) {
-                // Fade Out
-                int fadeOutFrame = frameCount - FADE_TIME - HOLD_FRAMES;
-                int alpha = ((FADE_TIME - fadeOutFrame) * 255) / FADE_TIME;
-                DrawTexturePro(*img_mscreen, { 0, 0, static_cast<float>(img_mscreen->width), static_cast<float>(img_mscreen->height) }, dst, { 0, 0 }, 0.0f, Fade(WHITE, alpha));
-            }
-            else {
-                // Reiniciar el contador de fotogramas y cambiar al estado MAIN_MENU
+            if (frameCount >= FADE_TIME * 2 + HOLD_FRAMES) {
                 state = GameState::MAIN_MENU;
                 frameCount = 0;
             }
 
-            /*if (frameCount >= HOLD_FRAMES) {
-                state = GameState::MAIN_MENU;
-                frameCount = 0; // Reiniciar el contador de fotogramas
-            }*/
 
             break;
         case GameState::MAIN_MENU: 
@@ -163,7 +145,7 @@ AppStatus Game::Update()
 }
 void Game::Render()
 {
-
+    
    
     //Draw everything in the render texture, note this will not be rendered on screen, yet
     BeginTextureMode(target);
@@ -172,7 +154,18 @@ void Game::Render()
     switch (state)
     {
         case GameState::MAIN_SCREEN:
-            DrawTexture(*img_mscreen, 0, 0, WHITE);
+            if (frameCount <= FADE_TIME) {
+                int alpha = (frameCount * 255) / FADE_TIME;
+                DrawTexturePro(*img_mscreen, { 0, 0, static_cast<float>(img_mscreen->width), static_cast<float>(img_mscreen->height) }, dst, { 0, 0 }, 0.0f, Fade(WHITE, alpha));
+            }
+            else if (frameCount <= FADE_TIME + HOLD_FRAMES) {
+                DrawTexture(*img_mscreen, 0, 0, WHITE);
+            }
+            else if (frameCount <= FADE_TIME * 2 + HOLD_FRAMES) {
+                int fadeOutFrame = frameCount - FADE_TIME - HOLD_FRAMES;
+                int alpha = ((FADE_TIME - fadeOutFrame) * 255) / FADE_TIME;
+                DrawTexturePro(*img_mscreen, { 0, 0, static_cast<float>(img_mscreen->width), static_cast<float>(img_mscreen->height) }, dst, { 0, 0 }, 0.0f, Fade(WHITE, alpha));
+            }
             break;
 
         case GameState::MAIN_MENU:

@@ -21,7 +21,8 @@ void log(const char file[], int line, const char* text, ...);
 #define LEVEL_HEIGHT	11
 
 #define HOLD_FRAMES		60 * 5
-#define FADE_TIME		120
+#define FADE_TIME		60 * 3
+
 
 //Window size
 #define WINDOW_WIDTH    256
