@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "ResourceManager.h"
 #include <stdio.h>
+#include "raylib.h"
 
 Game::Game()
 {
