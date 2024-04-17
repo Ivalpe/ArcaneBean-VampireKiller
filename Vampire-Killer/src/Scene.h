@@ -2,6 +2,7 @@
 #include <raylib.h>
 #include "Player.h"
 #include "TileMap.h"
+#include "Object.h"
 
 enum class DebugMode { OFF, SPRITES_AND_HITBOXES, ONLY_HITBOXES, SIZE };
 
@@ -19,10 +20,16 @@ public:
 private:
     AppStatus LoadLevel(int stage);
 
-    Player *player;
-    TileMap *level;
+    void CheckCollisions();
+
+    void RenderObjects() const;
+    void RenderObjectsDebug(const Color& col) const;
+
+    void RenderGUI() const;
+    Player* player;
+    TileMap* level;
+    std::vector<Object*> objects;
     Camera2D camera;
 
     DebugMode debug;
 };
-

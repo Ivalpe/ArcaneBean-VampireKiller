@@ -32,7 +32,7 @@
 #define GRAVITY_FORCE			1
 
 //Logic states
-enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING};
+enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING };
 enum class Look { RIGHT, LEFT };
 
 //Rendering states
@@ -42,21 +42,25 @@ enum class PlayerAnim {
 	JUMPING_LEFT, JUMPING_RIGHT,
 	FALLING_LEFT, FALLING_RIGHT,
 	CLIMBING, CLIMBING_PRE_TOP, CLIMBING_TOP,
-	CROUCHING_LEFT, CROUCHING_RIGHT, 
+	CROUCHING_LEFT, CROUCHING_RIGHT,
 	NUM_ANIMATIONS
 };
 
-class Player: public Entity
+class Player : public Entity
 {
 public:
 	Player(const Point& p, State s, Look view);
 	~Player();
-	
+
 	AppStatus Initialise();
 	void SetTileMap(TileMap* tilemap);
 	void Update();
 	void DrawDebug(const Color& col) const;
 	void Release();
+
+	void InitScore();
+	void IncrScore(int n);
+	int GetScore();
 
 private:
 	bool IsLookingRight() const;
@@ -93,6 +97,7 @@ private:
 	Look look;
 	int jump_delay;
 
-	TileMap *map;
-};
+	TileMap* map;
 
+	int score;
+};
