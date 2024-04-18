@@ -12,6 +12,7 @@ Player::Player(const Point& p, State s, Look view) :
 	look = view;
 	jump_delay = PLAYER_JUMP_DELAY;
 	map = nullptr;
+	attack = StateAttack::NO_ATTACK;
 }
 Player::~Player()
 {
@@ -71,9 +72,43 @@ AppStatus Player::Initialise()
 
 	sprite->SetAnimationDelay((int)PlayerAnim::CROUCHING_LEFT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::CROUCHING_LEFT, { 3 * nw, 0, -nw, nh });
-
 	sprite->SetAnimationDelay((int)PlayerAnim::CROUCHING_RIGHT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::CROUCHING_RIGHT, { 3 * nw, 0, nw, nh });
+
+	//Charging
+	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_GROUND_LEFT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_GROUND_LEFT, { 0, nw, -nw, nh * 2 });
+	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_GROUND_LEFT, { 5 * nw, nw, -nw, nh * 2 });
+	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_GROUND_RIGHT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_GROUND_RIGHT, { 0, nw, nw, nh * 2 });
+	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_GROUND_RIGHT, { 5 * nw, nw, nw, nh * 2 });
+
+	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_AIR_LEFT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_AIR_LEFT, { 3 * nw, 0, nw, nh });
+	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_AIR_RIGHT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_AIR_RIGHT, { 3 * nw, 0, nw, nh });
+
+	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_CROUCH_LEFT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_CROUCH_LEFT, { 3 * nw, 0, nw, nh });
+	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_CROUCH_RIGHT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_CROUCH_RIGHT, { 3 * nw, 0, nw, nh });
+
+	//Atacking
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_LEFT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { 3 * nw, 0, nw, nh });
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_RIGHT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { 3 * nw, 0, nw, nh });
+
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_LEFT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { 3 * nw, 0, nw, nh });
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_RIGHT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { 3 * nw, 0, nw, nh });
+
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_LEFT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { 3 * nw, 0, nw, nh });
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { 3 * nw, 0, nw, nh });
+
 
 	sprite->SetAnimation((int)PlayerAnim::IDLE_RIGHT);
 
@@ -168,31 +203,36 @@ void Player::StartClimbingDown()
 void Player::ChangeAnimRight()
 {
 	look = Look::RIGHT;
-	switch (state)
-	{
-	case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_RIGHT);    break;
-	case State::WALKING:	SetAnimation((int)PlayerAnim::WALKING_RIGHT); break;
-	case State::JUMPING:	SetAnimation((int)PlayerAnim::JUMPING_RIGHT); break;
-	case State::FALLING:	SetAnimation((int)PlayerAnim::FALLING_RIGHT); break;
-	case State::CROUCHING:	SetAnimation((int)PlayerAnim::CROUCHING_RIGHT); break;
+	if (attack == StateAttack::NO_ATTACK) {
+		switch (state)
+		{
+		case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_RIGHT);    break;
+		case State::WALKING:	SetAnimation((int)PlayerAnim::WALKING_RIGHT); break;
+		case State::JUMPING:	SetAnimation((int)PlayerAnim::JUMPING_RIGHT); break;
+		case State::FALLING:	SetAnimation((int)PlayerAnim::FALLING_RIGHT); break;
+		case State::CROUCHING:	SetAnimation((int)PlayerAnim::CROUCHING_RIGHT); break;
+		}
 	}
 }
 void Player::ChangeAnimLeft()
 {
 	look = Look::LEFT;
-	switch (state)
-	{
-	case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_LEFT);    break;
-	case State::WALKING:	SetAnimation((int)PlayerAnim::WALKING_LEFT); break;
-	case State::JUMPING:	SetAnimation((int)PlayerAnim::JUMPING_LEFT); break;
-	case State::FALLING:	SetAnimation((int)PlayerAnim::FALLING_LEFT); break;
-	case State::CROUCHING:	SetAnimation((int)PlayerAnim::CROUCHING_LEFT); break;
+	if (attack == StateAttack::NO_ATTACK) {
+		switch (state)
+		{
+		case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_LEFT);    break;
+		case State::WALKING:	SetAnimation((int)PlayerAnim::WALKING_LEFT); break;
+		case State::JUMPING:	SetAnimation((int)PlayerAnim::JUMPING_LEFT); break;
+		case State::FALLING:	SetAnimation((int)PlayerAnim::FALLING_LEFT); break;
+		case State::CROUCHING:	SetAnimation((int)PlayerAnim::CROUCHING_LEFT); break;
+		}
 	}
 }
 void Player::Update()
 {
 	//Player doesn't use the "Entity::Update() { pos += dir; }" default behaviour.
 	//Instead, uses an independent behaviour for each axis.
+	Attack();
 	MoveX();
 	MoveY();
 
@@ -326,6 +366,11 @@ void Player::MoveY()
 		{
 			if (state != State::FALLING) StartFalling();
 		}
+	}
+}
+void Player::Attack() {
+	if (IsKeyDown(KEY_F)) {
+		attack = StateAttack::CHARGING_GROUND;
 	}
 }
 void Player::LogicJumping()
