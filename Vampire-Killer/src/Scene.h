@@ -18,7 +18,7 @@ public:
     void Release();
 
 private:
-    AppStatus LoadLevel(int stage);
+    AppStatus LoadLevel(int stage, int direction);
 
     void CheckCollisions();
 

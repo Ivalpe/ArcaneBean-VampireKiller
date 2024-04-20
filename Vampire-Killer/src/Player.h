@@ -34,6 +34,7 @@
 //Logic states
 enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING };
 enum class Look { RIGHT, LEFT };
+enum class StateAttack { NO_ATTACK, CHARGING_GROUND, CHARGING_AIR, CHARGING_CROUCH, ATTACKING_GROUND, ATTACKING_AIR, ATTACKING_CROUCH };
 
 //Rendering states
 enum class PlayerAnim {
@@ -69,6 +70,7 @@ private:
 	//Player mechanics
 	void MoveX();
 	void MoveY();
+	void Attack();
 	void LogicJumping();
 	void LogicClimbing();
 
@@ -94,6 +96,7 @@ private:
 	bool IsInSecondHalfTile() const;
 
 	State state;
+	StateAttack attack;
 	Look look;
 	int jump_delay;
 

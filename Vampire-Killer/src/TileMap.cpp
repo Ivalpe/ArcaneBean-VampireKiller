@@ -9,7 +9,6 @@ TileMap::TileMap()
 	width = 0;
 	height = 0;
 	img_tiles = nullptr;
-
 	InitTileDictionary();
 }
 TileMap::~TileMap()
@@ -126,11 +125,15 @@ AppStatus TileMap::Initialise()
 
 	return AppStatus::OK;
 }
-AppStatus TileMap::Load(int data[], int w, int h)
+AppStatus TileMap::Load(int data[], int w, int h, int u, int r, int d, int l)
 {
 	size = w * h;
 	width = w;
 	height = h;
+	up = u;
+	right = r;
+	down = d;
+	left = l;
 
 	if (map != nullptr)	delete[] map;
 
@@ -286,6 +289,23 @@ bool TileMap::TestOnLadderTop(const AABB& box, int* px) const
 		return true;
 	}
 	return false;
+}
+int TileMap::GetTpMap(int direction) const {
+	switch (direction)
+	{
+	case 1:
+		return up;
+		break;
+	case 2:
+		return right;
+		break;
+	case 3:
+		return down;
+		break;
+	case 4:
+		return left;
+		break;
+	}
 }
 int TileMap::GetLadderCenterPos(int pixel_x, int pixel_y) const
 {

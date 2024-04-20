@@ -34,7 +34,7 @@ enum class Tile {
 	LADDER_L = 120, LADDER_R, LADDER_TOP_L, LADDER_TOP_R,
 
 	// id >= 100: entities' initial locations
-	PLAYER = 100,
+	PLAYERUP = 100, PLAYERRIGHT, PLAYERDOWN, PLAYERLEFT,
 
 	STATIC_FIRST = BLOCK_GROUND,
 	STATIC_LAST = BLOCK_GROUND,
@@ -53,7 +53,7 @@ public:
 	~TileMap();
 
 	AppStatus Initialise();
-	AppStatus Load(int data[], int w, int h);
+	AppStatus Load(int data[], int w, int h, int up, int right, int down, int left);
 	void Update();
 	void Render();
 	void Release();
@@ -76,6 +76,8 @@ public:
 	//Test if box is on ladder top and update 'px' with the x-center position of the ladder
 	bool TestOnLadderTop(const AABB& box, int* px) const;
 
+	int GetTpMap(int direction) const;
+
 private:
 	void InitTileDictionary();
 
@@ -91,8 +93,8 @@ private:
 	Tile* map;
 
 	//Size of the tile map
-	int size, width, height;
-
+	int size, width, height, up, right, down, left;
+	
 	//Dictionary of tile frames
 	std::unordered_map<int, Rectangle> dict_rect;
 
