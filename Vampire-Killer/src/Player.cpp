@@ -74,39 +74,6 @@ AppStatus Player::Initialise()
 	sprite->SetAnimationDelay((int)PlayerAnim::CROUCHING_RIGHT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::CROUCHING_RIGHT, { 3 * nw, 0, nw, nh });
 
-	//Charging
-	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_GROUND_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_GROUND_LEFT, { 0, nw, -nw, nh * 2 });
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_GROUND_LEFT, { 5 * nw, nw, -nw, nh * 2 });
-	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_GROUND_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_GROUND_RIGHT, { 0, nw, nw, nh * 2 });
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_GROUND_RIGHT, { 5 * nw, nw, nw, nh * 2 });
-
-	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_AIR_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_AIR_LEFT, { 3 * nw, 0, nw, nh });
-	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_AIR_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_AIR_RIGHT, { 3 * nw, 0, nw, nh });
-
-	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_CROUCH_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_CROUCH_LEFT, { 3 * nw, 0, nw, nh });
-	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_CROUCH_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_CROUCH_RIGHT, { 3 * nw, 0, nw, nh });
-
-	//Atacking
-	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { 3 * nw, 0, nw, nh });
-	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { 3 * nw, 0, nw, nh });
-
-	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { 3 * nw, 0, nw, nh });
-	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { 3 * nw, 0, nw, nh });
-
-	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { 3 * nw, 0, nw, nh });
-	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { 3 * nw, 0, nw, nh });
 
 
 	sprite->SetAnimation((int)PlayerAnim::IDLE_RIGHT);
