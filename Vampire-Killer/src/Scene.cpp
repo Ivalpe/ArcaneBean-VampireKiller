@@ -75,6 +75,8 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 	int x, y, i;
 	Tile tile;
 	Point pos;
+	int* map = nullptr;
+	Object* obj;
 
 	if (stage == 1)
 	{
@@ -101,12 +103,13 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
-				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
-				0 ,103,0,0 ,0 ,0 ,0 ,0, 0 ,0 ,0 ,0 ,0 ,0 ,101 ,0,
+				0 ,0 ,0 ,0 ,140 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+				0 ,103,0,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,101 ,0,
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
 		};
-		//Entities
+		player->InitScore();
+			//Entities
 		i = 0;
 		for (y = 0; y < LEVEL_HEIGHT; ++y)
 		{
@@ -121,6 +124,22 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 					pos.x = x * TILE_SIZE;
 					pos.y = y * TILE_SIZE + TILE_SIZE - 1;
 					player->SetPos(pos);
+				}
+				else if (tile == Tile::ITEM_BIG_HEART)
+				{
+					pos.x = x * TILE_SIZE;
+					pos.y = y * TILE_SIZE + TILE_SIZE - 1;
+					obj = new Object(pos, ObjectType::BIG_HEART);
+					objects.push_back(obj);
+					entities[i] = 0;
+				}
+				else if (tile == Tile::ITEM_SMALL_HEART)
+				{
+					pos.x = x * TILE_SIZE;
+					pos.y = y * TILE_SIZE + TILE_SIZE - 1;
+					obj = new Object(pos, ObjectType::SMALL_HEART);
+					objects.push_back(obj);
+					entities[i] = 0;
 				}
 				++i;
 			}
@@ -276,6 +295,12 @@ void Scene::Update()
 
 	level->Update();
 	player->Update();
+
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		objects[i]->Update();
+	}
+	CheckCollisions();
 }
 void Scene::Render()
 {
@@ -288,15 +313,61 @@ void Scene::Render()
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		player->DrawDebug(GREEN);
 
-	/*
-	DrawText("Score: " + player->getScore() , 10, -30, 2, WHITE);
-	DrawText("Lives: " + player->getLives() , 110, -30, 2, WHITE);
-	DrawText("Hearts: " + player->getHearts() , 210, -30, 2, WHITE);
-	*/
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		objects[i]->Draw();
+	}
+
 	EndMode2D();
+
+	RenderGUI();
 }
 void Scene::Release()
 {
 	level->Release();
 	player->Release();
+}
+void Scene::CheckCollisions()
+{
+	AABB player_box, obj_box;
+
+	player_box = player->GetHitbox();
+	auto it = objects.begin();
+	while (it != objects.end())
+	{
+		obj_box = (*it)->GetHitbox();
+		if (player_box.TestAABB(obj_box))
+		{
+			player->IncrScore((*it)->Points());
+
+			//Delete the object
+			delete* it;
+			//Erase the object from the vector and get the iterator to the next valid element
+			it = objects.erase(it);
+		}
+		else
+		{
+			//Move to the next object
+			++it;
+		}
+	}
+}
+void Scene::RenderObjects() const
+{
+	for (Object* obj : objects)
+	{
+		obj->Draw();
+	}
+}
+void Scene::RenderObjectsDebug(const Color& col) const
+{
+	for (Object* obj : objects)
+	{
+		obj->DrawDebug(col);
+	}
+}
+void Scene::RenderGUI() const
+{
+	//Temporal approach
+	DrawText(TextFormat("SCORE : %d", player->GetScore()), 10, 10, 8, WHITE);
 }

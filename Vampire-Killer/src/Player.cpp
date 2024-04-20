@@ -1,4 +1,3 @@
-
 #include "Player.h"
 #include "Sprite.h"
 #include "TileMap.h"
@@ -99,6 +98,18 @@ AppStatus Player::Initialise()
 	sprite->SetAnimation((int)PlayerAnim::IDLE_RIGHT);
 
 	return AppStatus::OK;
+}
+void Player::InitScore()
+{
+	score = 0;
+}
+void Player::IncrScore(int n)
+{
+	score += n;
+}
+int Player::GetScore()
+{
+	return score;
 }
 void Player::SetTileMap(TileMap* tilemap)
 {

@@ -49,17 +49,21 @@ enum class PlayerAnim {
 	NUM_ANIMATIONS
 };
 
-class Player: public Entity
+class Player : public Entity
 {
 public:
 	Player(const Point& p, State s, Look view);
 	~Player();
-	
+
 	AppStatus Initialise();
 	void SetTileMap(TileMap* tilemap);
 	void Update();
 	void DrawDebug(const Color& col) const;
 	void Release();
+
+	void InitScore();
+	void IncrScore(int n);
+	int GetScore();
 
 private:
 	bool IsLookingRight() const;
@@ -96,9 +100,9 @@ private:
 	State state;
 	Look look;
 	int jump_delay;
-
 	int attacking;
 
 	TileMap *map;
 };
-
+	int score;
+};
