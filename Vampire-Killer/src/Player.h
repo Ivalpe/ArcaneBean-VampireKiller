@@ -32,9 +32,8 @@
 #define GRAVITY_FORCE			1
 
 //Logic states
-enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING };
+enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING, ATTACKING};
 enum class Look { RIGHT, LEFT };
-enum class StateAttack { NO_ATTACK, CHARGING_GROUND, CHARGING_AIR, CHARGING_CROUCH, ATTACKING_GROUND, ATTACKING_AIR, ATTACKING_CROUCH };
 
 //Rendering states
 enum class PlayerAnim {
@@ -44,6 +43,9 @@ enum class PlayerAnim {
 	FALLING_LEFT, FALLING_RIGHT,
 	CLIMBING, CLIMBING_PRE_TOP, CLIMBING_TOP,
 	CROUCHING_LEFT, CROUCHING_RIGHT,
+	ATTACKING_GROUND_LEFT, ATTACKING_GROUND_RIGHT,
+	ATTACKING_AIR_LEFT, ATTACKING_AIR_RIGHT,
+	ATTACKING_CROUCH_LEFT, ATTACKING_CROUCH_RIGHT,
 	NUM_ANIMATIONS
 };
 
@@ -96,11 +98,11 @@ private:
 	bool IsInSecondHalfTile() const;
 
 	State state;
-	StateAttack attack;
 	Look look;
 	int jump_delay;
+	int attacking;
 
-	TileMap* map;
-
+	TileMap *map;
+};
 	int score;
 };

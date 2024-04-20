@@ -144,6 +144,7 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 				++i;
 			}
 		}
+
 		//Tile map
 		level->Load(map, LEVEL_WIDTH, LEVEL_HEIGHT, 0, 2, 0, 0);
 	}
