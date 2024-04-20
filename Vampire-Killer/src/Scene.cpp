@@ -165,6 +165,12 @@ void Scene::Update()
 
 	level->Update();
 	player->Update();
+
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		objects[i]->Update();
+	}
+	CheckCollisions();
 }
 void Scene::Render()
 {
@@ -177,7 +183,14 @@ void Scene::Render()
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		player->DrawDebug(GREEN);
 
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		objects[i]->Draw();
+	}
+
 	EndMode2D();
+
+	RenderGUI();
 }
 void Scene::Release()
 {
@@ -226,5 +239,5 @@ void Scene::RenderObjectsDebug(const Color& col) const
 void Scene::RenderGUI() const
 {
 	//Temporal approach
-	DrawText(TextFormat("SCORE : %d", player->GetScore()), 10, 10, 8, LIGHTGRAY);
+	DrawText(TextFormat("SCORE : %d", player->GetScore()), 10, 10, 8, WHITE);
 }
