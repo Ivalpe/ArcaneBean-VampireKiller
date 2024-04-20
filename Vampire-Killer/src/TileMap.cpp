@@ -107,6 +107,11 @@ void TileMap::InitTileDictionary()
 	dict_rect[(int)Tile::BLOCK_GROUND] = { 0,  n * 9, n, n };
 	dict_rect[(int)Tile::AIR] = { n,  n * 9, n, n };
 
+	dict_rect[(int)Tile::ITEM_BIG_HEART] = { 0,  n * 10, n, n };
+	dict_rect[(int)Tile::ITEM_SMALL_HEART] = { n,  n * 10, n, n };
+
+
+
 }
 AppStatus TileMap::Initialise()
 {
