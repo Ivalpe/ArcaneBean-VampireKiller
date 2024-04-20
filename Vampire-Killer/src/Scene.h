@@ -17,7 +17,7 @@ public:
     void Release();
 
 private:
-    AppStatus LoadLevel(int stage);
+    AppStatus LoadLevel(int stage, int direction);
 
     Player *player;
     TileMap *level;
