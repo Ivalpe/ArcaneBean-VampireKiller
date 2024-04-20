@@ -103,6 +103,5 @@ private:
 	int attacking;
 
 	TileMap *map;
-};
 	int score;
 };
