@@ -125,6 +125,7 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 				++i;
 			}
 		}
+
 		//Tile map
 		level->Load(map, LEVEL_WIDTH, LEVEL_HEIGHT, 0, 2, 0, 0);
 	}
@@ -287,6 +288,11 @@ void Scene::Render()
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		player->DrawDebug(GREEN);
 
+	/*
+	DrawText("Score: " + player->getScore() , 10, -30, 2, WHITE);
+	DrawText("Lives: " + player->getLives() , 110, -30, 2, WHITE);
+	DrawText("Hearts: " + player->getHearts() , 210, -30, 2, WHITE);
+	*/
 	EndMode2D();
 }
 void Scene::Release()

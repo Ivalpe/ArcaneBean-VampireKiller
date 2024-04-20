@@ -12,13 +12,14 @@ Player::Player(const Point& p, State s, Look view) :
 	look = view;
 	jump_delay = PLAYER_JUMP_DELAY;
 	map = nullptr;
-	attack = StateAttack::NO_ATTACK;
 }
 Player::~Player()
 {
 }
 AppStatus Player::Initialise()
 {
+	attacking = 0;
+
 	int i;
 	const int nw = PLAYER_FRAME_SIZE_WIDTH, nh = PLAYER_FRAME_SIZE_HEIGHT;
 
@@ -76,28 +77,14 @@ AppStatus Player::Initialise()
 	sprite->AddKeyFrame((int)PlayerAnim::CROUCHING_RIGHT, { 3 * nw, 0, nw, nh });
 
 	//Charging
-	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_GROUND_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_GROUND_LEFT, { 0, nw, -nw, nh * 2 });
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_GROUND_LEFT, { 5 * nw, nw, -nw, nh * 2 });
-	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_GROUND_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_GROUND_RIGHT, { 0, nw, nw, nh * 2 });
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_GROUND_RIGHT, { 5 * nw, nw, nw, nh * 2 });
-
-	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_AIR_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_AIR_LEFT, { 3 * nw, 0, nw, nh });
-	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_AIR_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_AIR_RIGHT, { 3 * nw, 0, nw, nh });
-
-	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_CROUCH_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_CROUCH_LEFT, { 3 * nw, 0, nw, nh });
-	sprite->SetAnimationDelay((int)PlayerAnim::CHARGING_CROUCH_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CHARGING_CROUCH_RIGHT, { 3 * nw, 0, nw, nh });
-
-	//Atacking
-	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { 3 * nw, 0, nw, nh });
-	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { 3 * nw, 0, nw, nh });
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_LEFT, 0);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { 0,	nw * 2,	-nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { nw * 4, nw * 2, -nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { nw * 8, nw * 2, -nw * 4, nh });
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_RIGHT, 0);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { 0,	nw * 2,	nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { nw * 4, nw * 2, nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { nw * 8, nw * 2, nw * 4, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_LEFT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { 3 * nw, 0, nw, nh });
@@ -108,7 +95,6 @@ AppStatus Player::Initialise()
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { 3 * nw, 0, nw, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { 3 * nw, 0, nw, nh });
-
 
 	sprite->SetAnimation((int)PlayerAnim::IDLE_RIGHT);
 
@@ -203,7 +189,7 @@ void Player::StartClimbingDown()
 void Player::ChangeAnimRight()
 {
 	look = Look::RIGHT;
-	if (attack == StateAttack::NO_ATTACK) {
+	if (state != State::ATTACKING) {
 		switch (state)
 		{
 		case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_RIGHT);    break;
@@ -217,7 +203,7 @@ void Player::ChangeAnimRight()
 void Player::ChangeAnimLeft()
 {
 	look = Look::LEFT;
-	if (attack == StateAttack::NO_ATTACK) {
+	if (state != State::ATTACKING) {
 		switch (state)
 		{
 		case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_LEFT);    break;
@@ -232,9 +218,24 @@ void Player::Update()
 {
 	//Player doesn't use the "Entity::Update() { pos += dir; }" default behaviour.
 	//Instead, uses an independent behaviour for each axis.
-	Attack();
+	if (IsKeyDown(KEY_F))
+	{
+		if (look == Look::LEFT) {
+			SetAnimation((int)PlayerAnim::ATTACKING_GROUND_LEFT);
+
+		}
+		else {
+			SetAnimation((int)PlayerAnim::ATTACKING_GROUND_RIGHT);
+		}
+		state = State::ATTACKING;
+		Sprite* sprite = dynamic_cast<Sprite*>(render);
+		sprite->SetManualMode();
+	}
+
 	MoveX();
 	MoveY();
+	if (state == State::ATTACKING)
+		Attack();
 
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
 	sprite->Update();
@@ -249,7 +250,7 @@ void Player::MoveX()
 
 	if (IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT))
 	{
-		if (state != State::CROUCHING) pos.x += -PLAYER_SPEED;
+		if (state != State::CROUCHING && state != State::ATTACKING) pos.x += -PLAYER_SPEED;
 		if (state == State::IDLE) StartWalkingLeft();
 		else
 		{
@@ -265,7 +266,7 @@ void Player::MoveX()
 	}
 	else if (IsKeyDown(KEY_RIGHT))
 	{
-		if (state != State::CROUCHING) pos.x += PLAYER_SPEED;
+		if (state != State::CROUCHING && state != State::ATTACKING) pos.x += PLAYER_SPEED;
 		if (state == State::IDLE) StartWalkingRight();
 		else
 		{
@@ -369,8 +370,25 @@ void Player::MoveY()
 	}
 }
 void Player::Attack() {
-	if (IsKeyDown(KEY_F)) {
-		attack = StateAttack::CHARGING_GROUND;
+	Sprite* sprite = dynamic_cast<Sprite*>(render);
+	if (attacking == 10)
+	{
+		sprite->NextFrame();
+		attacking++;
+	}
+	else if (attacking == 20)
+	{
+		sprite->NextFrame();
+		attacking++;
+	}
+	else if (attacking == 30) {
+		Stop();
+		sprite->SetAutomaticMode();
+		attacking = 0;
+		state = State::IDLE;
+	}
+	else {
+		attacking++;
 	}
 }
 void Player::LogicJumping()
@@ -485,7 +503,9 @@ void Player::DrawDebug(const Color& col) const
 {
 	Entity::DrawHitbox(pos.x, pos.y, width, height, col);
 
-	DrawText(TextFormat("Position: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 18 * 16, 0, 8, LIGHTGRAY);
+	DrawText(TextFormat("Position: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 8 * 16, 0, 8, LIGHTGRAY);
+	DrawText(TextFormat("Attack: %d", attacking), 8 * 16, 16 * 4, 8, LIGHTGRAY);
+
 	DrawPixel(pos.x, pos.y, WHITE);
 }
 void Player::Release()
