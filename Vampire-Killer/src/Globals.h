@@ -20,8 +20,7 @@ void log(const char file[], int line, const char* text, ...);
 #define LEVEL_WIDTH		16
 #define LEVEL_HEIGHT	11
 
-#define HOLD_FRAMES		60 * 5
-#define FADE_TIME		60 * 3
+#define HOLD_FRAMES		60 * 4
 
 
 //Window size
