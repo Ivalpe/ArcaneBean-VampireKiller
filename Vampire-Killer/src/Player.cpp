@@ -1,4 +1,3 @@
-
 #include "Player.h"
 #include "Sprite.h"
 #include "TileMap.h"
@@ -18,6 +17,8 @@ Player::~Player()
 }
 AppStatus Player::Initialise()
 {
+	attacking = 0;
+
 	int i;
 	const int nw = PLAYER_FRAME_SIZE_WIDTH, nh = PLAYER_FRAME_SIZE_HEIGHT;
 
@@ -71,13 +72,44 @@ AppStatus Player::Initialise()
 
 	sprite->SetAnimationDelay((int)PlayerAnim::CROUCHING_LEFT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::CROUCHING_LEFT, { 3 * nw, 0, -nw, nh });
-
 	sprite->SetAnimationDelay((int)PlayerAnim::CROUCHING_RIGHT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::CROUCHING_RIGHT, { 3 * nw, 0, nw, nh });
+
+	//Charging
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_LEFT, 0);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { 0,	nw * 2,	-nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { nw * 4, nw * 2, -nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { nw * 8, nw * 2, -nw * 4, nh });
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_RIGHT, 0);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { 0,	nw * 2,	nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { nw * 4, nw * 2, nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { nw * 8, nw * 2, nw * 4, nh });
+
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_LEFT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { 3 * nw, 0, nw, nh });
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_RIGHT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { 3 * nw, 0, nw, nh });
+
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_LEFT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { 3 * nw, 0, nw, nh });
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { 3 * nw, 0, nw, nh });
 
 	sprite->SetAnimation((int)PlayerAnim::IDLE_RIGHT);
 
 	return AppStatus::OK;
+}
+void Player::InitScore()
+{
+	score = 0;
+}
+void Player::IncrScore(int n)
+{
+	score += n;
+}
+int Player::GetScore()
+{
+	return score;
 }
 void Player::SetTileMap(TileMap* tilemap)
 {
@@ -168,33 +200,53 @@ void Player::StartClimbingDown()
 void Player::ChangeAnimRight()
 {
 	look = Look::RIGHT;
-	switch (state)
-	{
-	case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_RIGHT);    break;
-	case State::WALKING:	SetAnimation((int)PlayerAnim::WALKING_RIGHT); break;
-	case State::JUMPING:	SetAnimation((int)PlayerAnim::JUMPING_RIGHT); break;
-	case State::FALLING:	SetAnimation((int)PlayerAnim::FALLING_RIGHT); break;
-	case State::CROUCHING:	SetAnimation((int)PlayerAnim::CROUCHING_RIGHT); break;
+	if (state != State::ATTACKING) {
+		switch (state)
+		{
+		case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_RIGHT);    break;
+		case State::WALKING:	SetAnimation((int)PlayerAnim::WALKING_RIGHT); break;
+		case State::JUMPING:	SetAnimation((int)PlayerAnim::JUMPING_RIGHT); break;
+		case State::FALLING:	SetAnimation((int)PlayerAnim::FALLING_RIGHT); break;
+		case State::CROUCHING:	SetAnimation((int)PlayerAnim::CROUCHING_RIGHT); break;
+		}
 	}
 }
 void Player::ChangeAnimLeft()
 {
 	look = Look::LEFT;
-	switch (state)
-	{
-	case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_LEFT);    break;
-	case State::WALKING:	SetAnimation((int)PlayerAnim::WALKING_LEFT); break;
-	case State::JUMPING:	SetAnimation((int)PlayerAnim::JUMPING_LEFT); break;
-	case State::FALLING:	SetAnimation((int)PlayerAnim::FALLING_LEFT); break;
-	case State::CROUCHING:	SetAnimation((int)PlayerAnim::CROUCHING_LEFT); break;
+	if (state != State::ATTACKING) {
+		switch (state)
+		{
+		case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_LEFT);    break;
+		case State::WALKING:	SetAnimation((int)PlayerAnim::WALKING_LEFT); break;
+		case State::JUMPING:	SetAnimation((int)PlayerAnim::JUMPING_LEFT); break;
+		case State::FALLING:	SetAnimation((int)PlayerAnim::FALLING_LEFT); break;
+		case State::CROUCHING:	SetAnimation((int)PlayerAnim::CROUCHING_LEFT); break;
+		}
 	}
 }
 void Player::Update()
 {
 	//Player doesn't use the "Entity::Update() { pos += dir; }" default behaviour.
 	//Instead, uses an independent behaviour for each axis.
+	if (IsKeyDown(KEY_F))
+	{
+		if (look == Look::LEFT) {
+			SetAnimation((int)PlayerAnim::ATTACKING_GROUND_LEFT);
+
+		}
+		else {
+			SetAnimation((int)PlayerAnim::ATTACKING_GROUND_RIGHT);
+		}
+		state = State::ATTACKING;
+		Sprite* sprite = dynamic_cast<Sprite*>(render);
+		sprite->SetManualMode();
+	}
+
 	MoveX();
 	MoveY();
+	if (state == State::ATTACKING)
+		Attack();
 
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
 	sprite->Update();
@@ -209,7 +261,7 @@ void Player::MoveX()
 
 	if (IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT))
 	{
-		if (state != State::CROUCHING) pos.x += -PLAYER_SPEED;
+		if (state != State::CROUCHING && state != State::ATTACKING) pos.x += -PLAYER_SPEED;
 		if (state == State::IDLE) StartWalkingLeft();
 		else
 		{
@@ -217,7 +269,7 @@ void Player::MoveX()
 		}
 
 		box = GetHitbox();
-		if (map->TestCollisionWallLeft(box))
+		if (map->TestCollisionWallLeft(box) || pos.x <= 0)
 		{
 			pos.x = prev_x;
 			if (state == State::WALKING) Stop();
@@ -225,7 +277,7 @@ void Player::MoveX()
 	}
 	else if (IsKeyDown(KEY_RIGHT))
 	{
-		if (state != State::CROUCHING) pos.x += PLAYER_SPEED;
+		if (state != State::CROUCHING && state != State::ATTACKING) pos.x += PLAYER_SPEED;
 		if (state == State::IDLE) StartWalkingRight();
 		else
 		{
@@ -233,7 +285,7 @@ void Player::MoveX()
 		}
 
 		box = GetHitbox();
-		if (map->TestCollisionWallRight(box))
+		if (map->TestCollisionWallRight(box) || pos.x >= WINDOW_WIDTH - PLAYER_PHYSICAL_WIDTH)
 		{
 			pos.x = prev_x;
 			if (state == State::WALKING) Stop();
@@ -326,6 +378,28 @@ void Player::MoveY()
 		{
 			if (state != State::FALLING) StartFalling();
 		}
+	}
+}
+void Player::Attack() {
+	Sprite* sprite = dynamic_cast<Sprite*>(render);
+	if (attacking == 10)
+	{
+		sprite->NextFrame();
+		attacking++;
+	}
+	else if (attacking == 20)
+	{
+		sprite->NextFrame();
+		attacking++;
+	}
+	else if (attacking == 30) {
+		Stop();
+		sprite->SetAutomaticMode();
+		attacking = 0;
+		state = State::IDLE;
+	}
+	else {
+		attacking++;
 	}
 }
 void Player::LogicJumping()
@@ -440,7 +514,9 @@ void Player::DrawDebug(const Color& col) const
 {
 	Entity::DrawHitbox(pos.x, pos.y, width, height, col);
 
-	DrawText(TextFormat("Position: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 18 * 16, 0, 8, LIGHTGRAY);
+	DrawText(TextFormat("Position: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 8 * 16, 0, 8, LIGHTGRAY);
+	DrawText(TextFormat("Attack: %d", attacking), 8 * 16, 16 * 4, 8, LIGHTGRAY);
+
 	DrawPixel(pos.x, pos.y, WHITE);
 }
 void Player::Release()
