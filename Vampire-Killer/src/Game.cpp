@@ -54,7 +54,7 @@ AppStatus Game::Initialise(float scale)
 
     //Set the target frame rate for the application
     SetTargetFPS(60);
-    SetBlendMode(BLEND_ALPHA); // Enable alpha blending
+    
     //Disable the escape key to quit functionality
     SetExitKey(0);
 
@@ -154,20 +154,24 @@ void Game::Render()
     
     switch (state)
     {
-        case GameState::MAIN_SCREEN:
-            if (frameCount <= FADE_TIME) {
-                int alpha = (frameCount * 255) / FADE_TIME;
-                DrawTexturePro(*img_mscreen, { 0, 0, static_cast<float>(img_mscreen->width), static_cast<float>(img_mscreen->height) }, dst, { 0, 0 }, 0.0f, Fade(WHITE, alpha));
-            }
-            else if (frameCount <= FADE_TIME + HOLD_FRAMES) {
-                DrawTexture(*img_mscreen, 0, 0, WHITE);
-            }
-            else if (frameCount <= FADE_TIME * 2 + HOLD_FRAMES) {
-                int fadeOutFrame = frameCount - FADE_TIME - HOLD_FRAMES;
-                int alpha = ((FADE_TIME - fadeOutFrame) * 255) / FADE_TIME;
-                DrawTexturePro(*img_mscreen, { 0, 0, static_cast<float>(img_mscreen->width), static_cast<float>(img_mscreen->height) }, dst, { 0, 0 }, 0.0f, Fade(WHITE, alpha));
-            }
-            break;
+    case GameState::MAIN_SCREEN:
+        if (frameCount <= FADE_TIME)
+        {
+            int alpha = (frameCount * 255) / FADE_TIME;
+            DrawTexturePro(*img_mscreen, { 0, 0, static_cast<float>(img_mscreen->width), static_cast<float>(img_mscreen->height) }, dst, { 0, 0 }, 0.0f, Fade(WHITE, alpha));
+        }
+        else if (frameCount <= FADE_TIME + HOLD_FRAMES)
+        {
+            // Redimensiona y dibuja la imagen mainscreen en la pantalla con filtro bilineal
+            DrawTexturePro(*img_mscreen, { 0, 0, static_cast<float>(img_mscreen->width), static_cast<float>(img_mscreen->height) }, { 0, 0}, { 0, 0 }, 0.0f, WHITE);
+        }
+        else if (frameCount <= FADE_TIME * 2 + HOLD_FRAMES)
+        {
+            int fadeOutFrame = frameCount - FADE_TIME - HOLD_FRAMES;
+            int alpha = ((FADE_TIME - fadeOutFrame) * 255) / FADE_TIME;
+            DrawTexturePro(*img_mscreen, { 0, 0, static_cast<float>(img_mscreen->width), static_cast<float>(img_mscreen->height) }, dst, { 0, 0 }, 0.0f, Fade(WHITE, alpha));
+        }
+        break;
 
         case GameState::MAIN_MENU:
             DrawTexture(*img_menu, 0, 0, WHITE);
