@@ -16,28 +16,27 @@ Members:
 
 ------------------------------------
 
-"Vampire Killer" es un juego de acción y aventuras con elementos de plataformas, desarrollado en un entorno de desplazamiento lateral. El jugador asume el papel de un hábil cazador de vampiros equipado con armas y habilidades especiales para enfrentarse a hordas de enemigos no muertos. A través de niveles diseñados con detalle, el jugador debe explorar ambientes variados mientras combate contra jefes desafiantes y resuelve acertijos para avanzar en la trama. Con una combinación de mecánicas de juego fluidas y una narrativa envolvente, "Vampire Killer" ofrece una experiencia inmersiva en la que la destreza del jugador y la estrategia son fundamentales para triunfar en la lucha contra las fuerzas del mal.
+"Vampire Killer" is an action-adventure game with platform elements, developed in a side-scrolling environment. The player takes on the role of a skilled vampire hunter equipped with special weapons and abilities to take on hordes of undead enemies. Through carefully designed levels, the player must explore varied environments while fighting challenging bosses and solving puzzles to advance the plot. With a combination of fluid gameplay mechanics and an immersive narrative, “Vampire Killer” offers an immersive experience where player skill and strategy are essential to succeed in the fight against the forces of evil.
 
 -----------------------------------
 
 Controls:
 
-- Flecha arriba: Saltar.
-- Flecha abajo: Agacharse.
-- Flecha derecha: Moverse a la derecha.
-- Flecha izquierda: Moverse a la izquierda.
-- Espacio: Ataque.
+- Up arrow: Jump.
+- Down arrow: Crouch.
+- Right arrow: Move right.
+- Left arrow: Move left.
+- Space: Attack.
 
-Para jugar, moverse por la pantalla recogiendo objetos y aracando a enemigos, hasta llegar a los bosses.
+To play, move around the screen collecting objects.
 
 ------------------------------------
 
-Features implementadas: 
-- Pantalla de inicio.
-- Movimiento en horizontal.
-- Salto. 
-- Agacharse.
-- Ataque.
-- Cambio de pantalla.
-- Items, y recogida de los mismos.
-
+Features implemented:
+- Starting screen.
+- Horizontal movement.
+- Leap.
+- Crouch.
+- Stroke.
+- Screen change.
+- Items, and collection thereof.
