@@ -6,6 +6,7 @@ Scene::Scene()
 {
 	player = nullptr;
 	level = nullptr;
+	levelOver = false;
 
 	camera.target = { 0, 0 };				//Center of the screen
 	camera.offset = { 0, MARGIN_GUI_Y };	//Offset from the target (center of the screen)
@@ -109,7 +110,6 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
 		};
 		player->InitScore();
-			//Entities
 		i = 0;
 		for (y = 0; y < LEVEL_HEIGHT; ++y)
 		{
@@ -193,6 +193,22 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 					pos.y = y * TILE_SIZE + TILE_SIZE - 1;
 					player->SetPos(pos);
 				}
+				else if (tile == Tile::ITEM_BIG_HEART)
+				{
+					pos.x = x * TILE_SIZE;
+					pos.y = y * TILE_SIZE + TILE_SIZE - 1;
+					obj = new Object(pos, ObjectType::BIG_HEART);
+					objects.push_back(obj);
+					entities[i] = 0;
+				}
+				else if (tile == Tile::ITEM_SMALL_HEART)
+				{
+					pos.x = x * TILE_SIZE;
+					pos.y = y * TILE_SIZE + TILE_SIZE - 1;
+					obj = new Object(pos, ObjectType::SMALL_HEART);
+					objects.push_back(obj);
+					entities[i] = 0;
+				}
 				++i;
 			}
 		}
@@ -245,13 +261,30 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 					pos.y = y * TILE_SIZE + TILE_SIZE - 1;
 					player->SetPos(pos);
 				}
+				else if (tile == Tile::ITEM_BIG_HEART)
+				{
+					pos.x = x * TILE_SIZE;
+					pos.y = y * TILE_SIZE + TILE_SIZE - 1;
+					obj = new Object(pos, ObjectType::BIG_HEART);
+					objects.push_back(obj);
+					entities[i] = 0;
+				}
+				else if (tile == Tile::ITEM_SMALL_HEART)
+				{
+					pos.x = x * TILE_SIZE;
+					pos.y = y * TILE_SIZE + TILE_SIZE - 1;
+					obj = new Object(pos, ObjectType::SMALL_HEART);
+					objects.push_back(obj);
+					entities[i] = 0;
+				}
 				++i;
 			}
+
 		}
 		//Tile map
 		level->Load(map, LEVEL_WIDTH, LEVEL_HEIGHT, 0, 0, 0, 2);
 
-		}
+	}
 	else
 	{
 		//Error level doesn't exist or incorrect level number
@@ -266,6 +299,29 @@ void Scene::Update()
 	AABB box;
 
 	//Change level if player gets off the screen
+	LoadNextLevel();
+
+	//Switch between the different debug modes: off, on (sprites & hitboxes), on (hitboxes) 
+	if (IsKeyPressed(KEY_F1))
+	{
+		debug = (DebugMode)(((int)debug + 1) % (int)DebugMode::SIZE);
+	}
+
+	if (IsKeyPressed(KEY_F2))
+	{
+		levelOver = true;
+	}
+
+	level->Update();
+	player->Update();
+
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		objects[i]->Update();
+	}
+	CheckCollisions();
+}
+void Scene::LoadNextLevel() {
 	if (player->GetPos().x >= WINDOW_WIDTH - TILE_SIZE)
 	{
 		int lvl = level->GetTpMap(2);
@@ -286,21 +342,6 @@ void Scene::Update()
 		int lvl = level->GetTpMap(3);
 		if (lvl != 0)	LoadLevel(lvl, 100);
 	}
-
-	//Switch between the different debug modes: off, on (sprites & hitboxes), on (hitboxes) 
-	if (IsKeyPressed(KEY_F1))
-	{
-		debug = (DebugMode)(((int)debug + 1) % (int)DebugMode::SIZE);
-	}
-
-	level->Update();
-	player->Update();
-
-	for (size_t i = 0; i < objects.size(); i++)
-	{
-		objects[i]->Update();
-	}
-	CheckCollisions();
 }
 void Scene::Render()
 {
@@ -370,4 +411,7 @@ void Scene::RenderGUI() const
 {
 	//Temporal approach
 	DrawText(TextFormat("SCORE : %d", player->GetScore()), 10, 10, 8, WHITE);
+}
+bool Scene::getLevelOver() {
+	return levelOver;
 }

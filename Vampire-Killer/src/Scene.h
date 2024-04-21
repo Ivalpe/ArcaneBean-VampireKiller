@@ -16,6 +16,7 @@ public:
     void Update();
     void Render();
     void Release();
+    bool getLevelOver();
 
 private:
     AppStatus LoadLevel(int stage, int direction);
@@ -24,6 +25,7 @@ private:
 
     void RenderObjects() const;
     void RenderObjectsDebug(const Color& col) const;
+    void LoadNextLevel();
 
     void RenderGUI() const;
     Player* player;
@@ -32,4 +34,6 @@ private:
     Camera2D camera;
 
     DebugMode debug;
+
+    bool levelOver;
 };

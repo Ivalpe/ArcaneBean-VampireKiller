@@ -10,6 +10,7 @@ Game::Game()
 	scene = nullptr;
 	img_menu = nullptr;
 	img_mscreen = nullptr;
+	img_gameover = nullptr;
 
 
 	target = {};
@@ -76,6 +77,12 @@ AppStatus Game::LoadResources()
 	}
 	img_mscreen = data.GetTexture(Resource::IMG_MSCREEN);
 
+	if (data.LoadTexture(Resource::IMG_GAMEOVER, "Assets/GameOver.png") != AppStatus::OK)
+	{
+		return AppStatus::ERROR;
+	}
+	img_gameover = data.GetTexture(Resource::IMG_GAMEOVER);
+
 	return AppStatus::OK;
 }
 
@@ -105,20 +112,19 @@ void Game::FinishPlay()
 }
 AppStatus Game::Update()
 {
-	frameCount++;
+	//Only sum if there is in the main screen or the game over the screen
+	if (state == GameState::MAIN_SCREEN || state == GameState::GAME_OVER)	frameCount++;
+	
 	//Check if user attempts to close the window, either by clicking the close button or by pressing Alt+F4
 	if (WindowShouldClose()) return AppStatus::QUIT;
 
 	switch (state)
 	{
 	case GameState::MAIN_SCREEN:
-
 		if (frameCount >= HOLD_FRAMES) {
 			state = GameState::MAIN_MENU;
 			frameCount = 0;
 		}
-
-
 		break;
 	case GameState::MAIN_MENU:
 		if (IsKeyPressed(KEY_ESCAPE)) return AppStatus::QUIT;
@@ -130,6 +136,10 @@ AppStatus Game::Update()
 		break;
 
 	case GameState::PLAYING:
+		if (scene->getLevelOver()) {
+			state = GameState::GAME_OVER;
+		}
+
 		if (IsKeyPressed(KEY_ESCAPE))
 		{
 			FinishPlay();
@@ -139,6 +149,13 @@ AppStatus Game::Update()
 		{
 			//Game logic
 			scene->Update();
+		}
+		break;
+
+	case GameState::GAME_OVER:
+		if (frameCount >= HOLD_FRAMES) {
+			state = GameState::MAIN_MENU;
+			frameCount = 0;
 		}
 		break;
 	}
@@ -164,6 +181,10 @@ void Game::Render()
 
 	case GameState::PLAYING:
 		scene->Render();
+		break;
+
+	case GameState::GAME_OVER:
+		DrawTexture(*img_gameover, 0, 0, WHITE);
 		break;
 	}
 
