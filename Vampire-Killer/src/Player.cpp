@@ -58,9 +58,9 @@ AppStatus Player::Initialise()
 	sprite->AddKeyFrame((int)PlayerAnim::FALLING_LEFT, { 7 * nw, 0, -nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::JUMPING_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_RIGHT, { 4 * nw, 0, nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_RIGHT, { 3 * nw, 0, nw, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::JUMPING_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_LEFT, { 4 * nw, 0, -nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_LEFT, { 3 * nw, 0, -nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::CLIMBING, ANIM_LADDER_DELAY);
 	for (i = 0; i < 4; ++i)
@@ -86,14 +86,18 @@ AppStatus Player::Initialise()
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { nw * 8, nw * 2, nw * 4, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { 3 * nw, 0, nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { nw * 4, nw * 4, -nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { nw * 8, nw * 4, -nw * 4, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { 3 * nw, 0, nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { nw * 4, nw * 4, nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { nw * 8, nw * 4, nw * 4, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { 3 * nw, 0, nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { nw * 4, nw * 6, -nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { nw * 8, nw * 6, -nw * 4, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { 3 * nw, 0, nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { nw * 4, nw * 6, nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { nw * 8, nw * 6, nw * 4, nh });
 
 	sprite->SetAnimation((int)PlayerAnim::IDLE_RIGHT);
 
@@ -200,7 +204,8 @@ void Player::StartClimbingDown()
 void Player::ChangeAnimRight()
 {
 	look = Look::RIGHT;
-	if (state != State::ATTACKING) {
+	if (state != State::ATTACKING) 
+	{
 		switch (state)
 		{
 		case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_RIGHT);    break;
@@ -214,7 +219,8 @@ void Player::ChangeAnimRight()
 void Player::ChangeAnimLeft()
 {
 	look = Look::LEFT;
-	if (state != State::ATTACKING) {
+	if (state != State::ATTACKING) 
+	{
 		switch (state)
 		{
 		case State::IDLE:		SetAnimation((int)PlayerAnim::IDLE_LEFT);    break;
@@ -229,18 +235,39 @@ void Player::Update()
 {
 	//Player doesn't use the "Entity::Update() { pos += dir; }" default behaviour.
 	//Instead, uses an independent behaviour for each axis.
-	if (IsKeyDown(KEY_F))
+	
+	if (IsKeyPressed(KEY_SPACE))
 	{
-		if (look == Look::LEFT) {
-			SetAnimation((int)PlayerAnim::ATTACKING_GROUND_LEFT);
-
+		if (state == State::JUMPING || state == State::FALLING) 
+		{
+			/*
+			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_AIR_LEFT);
+			else						SetAnimation((int)PlayerAnim::ATTACKING_AIR_RIGHT);
+			 THIS FAIL BECAUSE CHANGING THE STATE CHANGE THE GRAVITY OF THE PLAYER
+			state = State::ATTACKING;
+			Sprite* sprite = dynamic_cast<Sprite*>(render);
+			sprite->SetManualMode();
+			*/
 		}
-		else {
-			SetAnimation((int)PlayerAnim::ATTACKING_GROUND_RIGHT);
+		else if (state == State::CROUCHING)
+		{
+			/*
+			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_AIR_LEFT);
+			else						SetAnimation((int)PlayerAnim::ATTACKING_AIR_RIGHT);
+			 THIS FAIL BECAUSE THE STATE CROUCHING AND THE STATE ATTACKING CANT BE ACTIVATE
+			state = State::ATTACKING;
+			Sprite* sprite = dynamic_cast<Sprite*>(render);
+			sprite->SetManualMode();
+			*/
 		}
-		state = State::ATTACKING;
-		Sprite* sprite = dynamic_cast<Sprite*>(render);
-		sprite->SetManualMode();
+		else
+		{
+			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_GROUND_LEFT);
+			else						SetAnimation((int)PlayerAnim::ATTACKING_GROUND_RIGHT);
+			state = State::ATTACKING;
+			Sprite* sprite = dynamic_cast<Sprite*>(render);
+			sprite->SetManualMode();
+		}
 	}
 
 	MoveX();
@@ -322,6 +349,8 @@ void Player::MoveY()
 				box = GetHitbox();
 				if (map->TestOnLadder(box, &pos.x))
 					StartClimbingUp();
+				else
+					StartJumping();
 			}
 			else if (IsKeyDown(KEY_DOWN))
 			{
@@ -340,10 +369,6 @@ void Player::MoveY()
 					pos.y += PLAYER_LADDER_SPEED;
 				}
 
-			}
-			else if (IsKeyPressed(KEY_SPACE))
-			{
-				StartJumping();
 			}
 			else
 			{
@@ -382,17 +407,17 @@ void Player::MoveY()
 }
 void Player::Attack() {
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
-	if (attacking == 10)
+	if (attacking == 2)
 	{
 		sprite->NextFrame();
 		attacking++;
 	}
-	else if (attacking == 20)
+	else if (attacking == 4)
 	{
 		sprite->NextFrame();
 		attacking++;
 	}
-	else if (attacking == 30) {
+	else if (attacking == 10) {
 		Stop();
 		sprite->SetAutomaticMode();
 		attacking = 0;
