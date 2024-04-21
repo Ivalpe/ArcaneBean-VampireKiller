@@ -6,7 +6,7 @@ Github project: https://github.com/Ivalpe/ArcaneBean-VampireKiller
 
 -------------------------------------
 
-Video: 
+Video: https://www.youtube.com/watch?v=r7lXTLfv9Mk
 
 ------------------------------------
 
