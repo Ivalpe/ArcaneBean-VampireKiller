@@ -68,6 +68,8 @@ AppStatus Scene::Init()
 	//Assign the tile map reference to the player to check collisions while navigating
 	player->SetTileMap(level);
 
+	player->InitScore();
+
 	return AppStatus::OK;
 }
 AppStatus Scene::LoadLevel(int stage, int direction)
@@ -109,7 +111,6 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
 		};
-		player->InitScore();
 		i = 0;
 		for (y = 0; y < LEVEL_HEIGHT; ++y)
 		{
