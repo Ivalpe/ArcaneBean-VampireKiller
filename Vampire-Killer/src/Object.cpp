@@ -4,7 +4,7 @@
 Object::Object(const Point& p, ObjectType t) : Entity(p, OBJECT_PHYSICAL_SIZE, OBJECT_PHYSICAL_SIZE, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE)
 {
 	type = t;
-
+	isCreated = true;
 	Rectangle rc;
 	const int n = TILE_SIZE;
 	switch (type)

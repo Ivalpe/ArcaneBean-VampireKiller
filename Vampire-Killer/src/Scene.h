@@ -32,6 +32,7 @@ private:
     TileMap* level;
     std::vector<Object*> objects;
     Camera2D camera;
+    Music musicStage0;
 
     DebugMode debug;
 

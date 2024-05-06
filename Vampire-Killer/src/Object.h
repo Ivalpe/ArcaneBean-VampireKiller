@@ -20,4 +20,5 @@ public:
 
 private:
 	ObjectType type;
+	bool isCreated;
 };

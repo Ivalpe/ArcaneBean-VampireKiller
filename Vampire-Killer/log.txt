@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-Project executed on 21-04-2024 at 13:54:04.
-=======
-Project executed on 21-04-2024 at 15:01:27.
->>>>>>> a15e2af02b0d4ca7aa7b517b21ac20699a06dc7b
+Project executed on 06-05-2024 at 09:38:09.
 main.cpp(13): Application start
 main.cpp(34): Application finish
 main.cpp(37): Bye :)

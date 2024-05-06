@@ -32,6 +32,10 @@ Scene::~Scene()
 }
 AppStatus Scene::Init()
 {
+
+	ResourceManager& rm = ResourceManager::Instance();
+	musicStage0 = rm.GetMusic(MusicResource::MUSIC_STAGE0);
+
 	//Create player
 	player = new Player({ 0,0 }, State::IDLE, Look::RIGHT);
 	if (player == nullptr)
@@ -106,8 +110,8 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
-				0 ,0 ,0 ,0 ,140 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,140 ,0 ,0 ,0,
-				0 ,103,0,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,101 ,0,
+				0 ,0 ,0 ,0,140,0 ,0 ,0 ,0 ,0 ,0 ,0,140,0 ,0 ,0,
+				0,103,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,101,0,
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 				0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
 		};
@@ -145,6 +149,8 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 				++i;
 			}
 		}
+
+		PlayMusicStream(musicStage0);
 
 		//Tile map
 		level->Load(map, LEVEL_WIDTH, LEVEL_HEIGHT, 0, 2, 0, 0);
@@ -298,6 +304,8 @@ void Scene::Update()
 {
 	Point p1, p2;
 	AABB box;
+
+	UpdateMusicStream(musicStage0);
 
 	//Change level if player gets off the screen
 	LoadNextLevel();
