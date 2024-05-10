@@ -21,8 +21,10 @@
   <ItemGroup>
     <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\Entity.cpp" />
+    <ClCompile Include="src\Fire.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Globals.cpp" />
+    <ClCompile Include="src\Levels.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\Player.cpp" />
@@ -36,8 +38,10 @@
   <ItemGroup>
     <ClInclude Include="src\AABB.h" />
     <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\Fire.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Globals.h" />
+    <ClInclude Include="src\Levels.h" />
     <ClInclude Include="src\MemLeaks.h" />
     <ClInclude Include="src\Object.h" />
     <ClInclude Include="src\Player.h" />

@@ -11,7 +11,7 @@ Object::Object(const Point& p, ObjectType t) : Entity(p, OBJECT_PHYSICAL_SIZE, O
 	{
 	case ObjectType::BIG_HEART: rc = { 0 * n, 10 * n, n, n }; break;
 	case ObjectType::SMALL_HEART: rc = { n, 10 * n, n, n }; break;
-
+	case ObjectType::FIRE: rc = { n * 2, 10 * n, n, n }; break;
 	default: LOG("Internal error: object creation of invalid type");
 	}
 

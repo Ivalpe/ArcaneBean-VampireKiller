@@ -11,7 +11,8 @@ enum class Resource {
     IMG_PLAYER, 
     IMG_TILES,
     IMG_ITEMS,
-    IMG_GAMEOVER
+    IMG_GAMEOVER,
+    IMG_FIRE
 };
 
 enum class MusicResource {
