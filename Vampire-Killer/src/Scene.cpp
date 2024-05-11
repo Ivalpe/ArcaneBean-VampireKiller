@@ -38,6 +38,7 @@ AppStatus Scene::Init()
 
 	ResourceManager& rm = ResourceManager::Instance();
 	musicStage0 = rm.GetMusic(MusicResource::MUSIC_STAGE0);
+	musicStage2 = rm.GetMusic(MusicResource::MUSIC_STAGE2);
 
 	//Create player
 	player = new Player({ 0,0 }, State::IDLE, Look::RIGHT);
@@ -171,6 +172,7 @@ void Scene::Update()
 	AABB box;
 
 	UpdateMusicStream(musicStage0);
+	UpdateMusicStream(musicStage2);
 
 	//Change level if player gets off the screen
 	LoadNextLevel();
@@ -181,9 +183,17 @@ void Scene::Update()
 		debug = (DebugMode)(((int)debug + 1) % (int)DebugMode::SIZE);
 	}
 
+	//Debug
 	if (IsKeyPressed(KEY_F2))
 	{
 		levelOver = true;
+	}
+	else if (IsKeyPressed(KEY_F3))
+	{
+		LoadLevel(4, 103);
+		StopMusicStream(musicStage0);
+		PlayMusicStream(musicStage2);
+
 	}
 
 	level->Update();
@@ -283,11 +293,12 @@ void Scene::CheckCollisions()
 		if (player_box.TestAABB(obj_box) && player->GetState() == State::ATTACKING)
 		{
 
+			lvlList->setEnt((*itFi)->GetPosArray());
 			//Delete the object
 			delete* itFi;
 			//Erase the object from the vector and get the iterator to the next valid element
 			itFi = fires.erase(itFi);
-			
+
 		}
 		else
 		{

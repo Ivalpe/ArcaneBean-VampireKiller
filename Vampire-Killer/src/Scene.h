@@ -35,7 +35,7 @@ private:
     std::vector<Object*> objects;
     std::vector<Fire*> fires;
     Camera2D camera;
-    Music musicStage0;
+    Music musicStage0, musicStage2;
 
     DebugMode debug;
 

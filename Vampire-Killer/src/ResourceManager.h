@@ -17,6 +17,7 @@ enum class Resource {
 
 enum class MusicResource {
     MUSIC_STAGE0,
+    MUSIC_STAGE2,
     NUM_MUSIC
 };
 

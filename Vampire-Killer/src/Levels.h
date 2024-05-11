@@ -17,7 +17,9 @@ public:
 	std::vector<int> getEnt();
 	posTp getTp();
 	void setLvl(int level);
+	void setEnt(int pos);
 
 private:
 	int level;
+	std::vector<std::vector<int>> entities;
 };
