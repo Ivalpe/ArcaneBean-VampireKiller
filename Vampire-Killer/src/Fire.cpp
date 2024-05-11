@@ -1,9 +1,9 @@
 #include "Sprite.h"
 #include "Fire.h"
 
-Fire::Fire(const Point& p, int width, int height) : Entity(p, width, height)
+Fire::Fire(const Point& p, int width, int height, int pos) : Entity(p, width, height)
 {
-
+	posArray = pos;
 }
 
 AppStatus Fire::Initialise()
@@ -37,4 +37,8 @@ AppStatus Fire::Initialise()
 void Fire::Update() {
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
 	sprite->Update();
+}
+
+int Fire::GetPosArray() {
+	return posArray;
 }

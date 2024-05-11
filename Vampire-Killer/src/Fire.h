@@ -14,7 +14,11 @@ enum class FireAnim {
 class Fire : public Entity
 {
 public:
-	Fire(const Point& p, int width, int height);
+	Fire(const Point& p, int width, int height, int pos);
 	AppStatus Initialise();
 	void Update();
+	int GetPosArray();
+
+private:
+	int posArray;
 };

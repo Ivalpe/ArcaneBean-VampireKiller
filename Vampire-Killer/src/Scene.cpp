@@ -111,14 +111,10 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 	int mapTmp[176], entities[176];
 
 	for (size_t i = 0; i < map.size(); i++)
-	{
 		mapTmp[i] = map[i];
-	}
 
 	for (size_t i = 0; i < map.size(); i++)
-	{
 		entities[i] = mapEnt[i];
-	}
 
 	i = 0;
 	for (y = 0; y < LEVEL_HEIGHT; ++y)
@@ -153,7 +149,7 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 			{
 				pos.x = x * TILE_SIZE;
 				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ent = new Fire(pos, 16, 16);
+				ent = new Fire(pos, 16, 16, i);
 				ent->Initialise();
 				fires.push_back(ent);
 			}
@@ -261,23 +257,42 @@ void Scene::CheckCollisions()
 	AABB player_box, obj_box;
 
 	player_box = player->GetHitbox();
-	auto it = objects.begin();
-	while (it != objects.end())
+	auto itObj = objects.begin();
+	while (itObj != objects.end())
 	{
-		obj_box = (*it)->GetHitbox();
+		obj_box = (*itObj)->GetHitbox();
 		if (player_box.TestAABB(obj_box))
 		{
-			player->IncrScore((*it)->Points());
+			player->IncrScore((*itObj)->Points());
 
 			//Delete the object
-			delete* it;
+			delete* itObj;
 			//Erase the object from the vector and get the iterator to the next valid element
-			it = objects.erase(it);
+			itObj = objects.erase(itObj);
 		}
 		else
 		{
 			//Move to the next object
-			++it;
+			++itObj;
+		}
+	}
+	auto itFi = fires.begin();
+	while (itFi != fires.end())
+	{
+		obj_box = (*itFi)->GetHitbox();
+		if (player_box.TestAABB(obj_box) && player->GetState() == State::ATTACKING)
+		{
+
+			//Delete the object
+			delete* itFi;
+			//Erase the object from the vector and get the iterator to the next valid element
+			itFi = fires.erase(itFi);
+			
+		}
+		else
+		{
+			//Move to the next object
+			++itFi;
 		}
 	}
 }

@@ -32,7 +32,7 @@
 #define GRAVITY_FORCE			1
 
 //Logic states
-enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING, ATTACKING};
+enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING, ATTACKING };
 enum class Look { RIGHT, LEFT };
 
 //Rendering states
@@ -60,6 +60,7 @@ public:
 	void Update();
 	void DrawDebug(const Color& col) const;
 	void Release();
+	State GetState();
 
 	void InitScore();
 	void IncrScore(int n);
@@ -102,6 +103,6 @@ private:
 	int jump_delay;
 	int attacking;
 
-	TileMap *map;
+	TileMap* map;
 	int score;
 };
