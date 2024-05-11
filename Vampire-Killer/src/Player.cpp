@@ -115,6 +115,10 @@ int Player::GetScore()
 {
 	return score;
 }
+State Player::GetState()
+{
+	return state;
+}
 void Player::SetTileMap(TileMap* tilemap)
 {
 	map = tilemap;

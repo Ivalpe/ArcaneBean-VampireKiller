@@ -7,7 +7,7 @@
 #define POINTS_BIG_HEART	10
 #define POINTS_SMALL_HEART	20
 
-enum class ObjectType { BIG_HEART, SMALL_HEART };
+enum class ObjectType { BIG_HEART, SMALL_HEART, FIRE};
 
 class Object : public Entity
 {
@@ -20,4 +20,5 @@ public:
 
 private:
 	ObjectType type;
+	bool isCreated;
 };

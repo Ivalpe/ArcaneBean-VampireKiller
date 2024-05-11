@@ -40,6 +40,12 @@
     <ClCompile Include="src\Object.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="src\Fire.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Levels.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Globals.h">
@@ -83,6 +89,12 @@
     </ClInclude>
     <ClInclude Include="src\Object.h">
       <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Fire.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Levels.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

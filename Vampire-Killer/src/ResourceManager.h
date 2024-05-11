@@ -11,7 +11,18 @@ enum class Resource {
     IMG_PLAYER, 
     IMG_TILES,
     IMG_ITEMS,
-    IMG_GAMEOVER
+    IMG_GAMEOVER,
+    IMG_FIRE
+};
+
+enum class MusicResource {
+    MUSIC_STAGE0,
+    NUM_MUSIC
+};
+
+enum class SoundResource {
+    SOUND_ATTACK,
+    NUM_SOUNDS
 };
 
 class ResourceManager {
@@ -25,10 +36,15 @@ public:
 
     //Load and unload texture
     AppStatus LoadTexture(Resource id, const std::string& file_path);
+    void LoadSounds();
+    void LoadMusic();
     void ReleaseTexture(Resource id);
 
     //Get texture by key
     const Texture2D* GetTexture(Resource id) const;
+    Sound GetSound(SoundResource id) const;
+    Music GetMusic(MusicResource id) const;
+
 
     //Release resources
     void Release();
@@ -45,4 +61,7 @@ private:
 
     //Dictionary to store loaded textures
     std::unordered_map<Resource, Texture2D> textures;
+
+    Music musicList[(int)MusicResource::NUM_MUSIC];
+    Sound soundList[(int)SoundResource::NUM_SOUNDS];
 };

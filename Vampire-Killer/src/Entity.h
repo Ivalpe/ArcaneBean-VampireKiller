@@ -9,6 +9,7 @@
 class Entity
 {
 public:
+	Entity();
 	Entity(const Point& p, int width, int height);
 	Entity(const Point& p, int width, int height, int frame_width, int frame_height);
 	virtual ~Entity();
@@ -37,4 +38,8 @@ protected:
 	int frame_width, frame_height;
 
 	RenderComponent *render;
+
+	//Flag to mark wether an entity is active or inactive. Trick to manage dynamic arrays of
+	//entities with static arrays without new/delete operations
+	bool alive;
 };
