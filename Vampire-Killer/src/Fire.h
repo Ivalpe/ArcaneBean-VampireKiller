@@ -18,6 +18,7 @@ public:
 	AppStatus Initialise();
 	void Update();
 	int GetPosArray();
+	void DrawDebug(const Color& col) const;
 
 private:
 	int posArray;

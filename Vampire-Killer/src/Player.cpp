@@ -3,6 +3,7 @@
 #include "TileMap.h"
 #include "Globals.h"
 #include <raymath.h>
+#include <iostream>
 
 Player::Player(const Point& p, State s, Look view) :
 	Entity(p, PLAYER_PHYSICAL_WIDTH, PLAYER_PHYSICAL_HEIGHT, PLAYER_FRAME_SIZE_WIDTH, PLAYER_FRAME_SIZE_HEIGHT)
@@ -407,6 +408,7 @@ void Player::MoveY()
 		{
 			if (state != State::FALLING) StartFalling();
 		}
+		
 	}
 }
 void Player::Attack() {

@@ -32,8 +32,10 @@ private:
     void RenderGUI() const;
     Player* player;
     TileMap* level;
+
     std::vector<Object*> objects;
     std::vector<Fire*> fires;
+
     Camera2D camera;
     Music musicStage0, musicStage2;
 

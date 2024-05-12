@@ -132,20 +132,6 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
 				player->SetPos(pos);
 			}
-			else if (tile == Tile::ITEM_BIG_HEART)
-			{
-				pos.x = x * TILE_SIZE;
-				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				obj = new Object(pos, ObjectType::BIG_HEART);
-				objects.push_back(obj);
-			}
-			else if (tile == Tile::ITEM_SMALL_HEART)
-			{
-				pos.x = x * TILE_SIZE;
-				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				obj = new Object(pos, ObjectType::SMALL_HEART);
-				objects.push_back(obj);
-			}
 			else if (tile == Tile::ITEM_FIRE)
 			{
 				pos.x = x * TILE_SIZE;
@@ -238,16 +224,31 @@ void Scene::Render()
 
 	level->Render();
 
-	for (size_t i = 0; i < objects.size(); i++)
-	{
-		objects[i]->Draw();
-	}
+	//Objects
+	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
+		for (size_t i = 0; i < objects.size(); i++)
+		{
+			objects[i]->Draw();
+		}
+	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
+		for (size_t i = 0; i < objects.size(); i++)
+		{
+			objects[i]->DrawDebug(GREEN);
+		}
 
-	for (size_t i = 0; i < fires.size(); i++)
-	{
-		fires[i]->Draw();
-	}
+	//Fires
+	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
+		for (size_t i = 0; i < fires.size(); i++)
+		{
+			fires[i]->Draw();
+		}
+	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
+		for (size_t i = 0; i < fires.size(); i++)
+		{
+			fires[i]->DrawDebug(GREEN);
+		}
 
+	//Player
 	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
 		player->Draw();
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
@@ -271,7 +272,7 @@ void Scene::CheckCollisions()
 	while (itObj != objects.end())
 	{
 		obj_box = (*itObj)->GetHitbox();
-		if (player_box.TestAABB(obj_box))
+		if (player_box.TestAABB(obj_box) && (*itObj)->GetHeartState() == HeartAnim::IDLE)
 		{
 			player->IncrScore((*itObj)->Points());
 
@@ -292,8 +293,11 @@ void Scene::CheckCollisions()
 		obj_box = (*itFi)->GetHitbox();
 		if (player_box.TestAABB(obj_box) && player->GetState() == State::ATTACKING)
 		{
-
+			//Change the array for not creating more fires in this position
 			lvlList->setEnt((*itFi)->GetPosArray());
+
+			//Create a heart in the position of the fire
+			objects.push_back(new Object({ (*itFi)->GetPos().x, (*itFi)->GetPos().y }, ObjectType::HEART, level));
 			//Delete the object
 			delete* itFi;
 			//Erase the object from the vector and get the iterator to the next valid element

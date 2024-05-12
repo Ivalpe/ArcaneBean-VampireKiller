@@ -59,6 +59,8 @@ AppStatus Game::Initialise(float scale)
 	//Disable the escape key to quit functionality
 	SetExitKey(0);
 
+	//ToggleFullscreen();
+
 	return AppStatus::OK;
 }
 AppStatus Game::LoadResources()
