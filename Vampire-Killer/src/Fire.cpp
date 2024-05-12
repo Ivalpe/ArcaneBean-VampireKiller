@@ -42,3 +42,8 @@ void Fire::Update() {
 int Fire::GetPosArray() {
 	return posArray;
 }
+
+void Fire::DrawDebug(const Color& col) const
+{
+	Entity::DrawHitbox(pos.x, pos.y, width, height, col);
+}
