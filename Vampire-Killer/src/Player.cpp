@@ -209,7 +209,7 @@ void Player::StartClimbingDown()
 void Player::ChangeAnimRight()
 {
 	look = Look::RIGHT;
-	if (state != State::ATTACKING) 
+	if (state != State::ATTACKING)
 	{
 		switch (state)
 		{
@@ -224,7 +224,7 @@ void Player::ChangeAnimRight()
 void Player::ChangeAnimLeft()
 {
 	look = Look::LEFT;
-	if (state != State::ATTACKING) 
+	if (state != State::ATTACKING)
 	{
 		switch (state)
 		{
@@ -240,10 +240,10 @@ void Player::Update()
 {
 	//Player doesn't use the "Entity::Update() { pos += dir; }" default behaviour.
 	//Instead, uses an independent behaviour for each axis.
-	
+
 	if (IsKeyPressed(KEY_SPACE))
 	{
-		if (state == State::JUMPING || state == State::FALLING) 
+		if (state == State::JUMPING || state == State::FALLING)
 		{
 			/*
 			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_AIR_LEFT);
@@ -408,7 +408,7 @@ void Player::MoveY()
 		{
 			if (state != State::FALLING) StartFalling();
 		}
-		
+
 	}
 }
 void Player::Attack() {
@@ -432,6 +432,46 @@ void Player::Attack() {
 	else {
 		attacking++;
 	}
+}
+void Player::Draw()
+{
+	Point p = Entity::GetRenderingPosition();
+	switch (state)
+	{
+	case State::ATTACKING:
+		if (look == Look::RIGHT)
+			render->Draw(p.x - 16, p.y);
+		else
+			render->Draw(p.x - 32, p.y);
+		break;
+	default:
+		render->Draw(p.x, p.y);
+		break;
+	}
+	
+}
+AABB Player::GetHitbox() const
+{
+	AABB hitbox;
+	switch (state)
+	{
+	case State::ATTACKING:
+		Point p(pos.x, pos.y - (height - 1));
+		hitbox = { p, width, height };
+		hitbox.Set(p, width, height);
+		break;
+	case State::CROUCHING:
+		Point p(pos.x, pos.y - (height - 1));
+		AABB hitbox(p, width, height);
+
+		break;
+	default:
+		Point p(pos.x, pos.y - (height - 1));
+		AABB hitbox(p, width, height);
+		
+		break;
+	}
+	return hitbox;
 }
 void Player::LogicJumping()
 {
