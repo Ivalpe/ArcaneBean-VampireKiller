@@ -136,7 +136,21 @@ void TileMap::InitTileDictionary()
 	dict_rect[(int)Tile::CASTLE19] = { n * 12,  n * 5, n, n };
 	dict_rect[(int)Tile::CASTLELADER1] = { n * 9,  n * 6, n, n };
 	dict_rect[(int)Tile::CASTLELADER2] = { n * 9,  n * 7, n, n };
-
+	dict_rect[(int)Tile::GLASS1] = { n * 10,  n * 6, n, n };
+	dict_rect[(int)Tile::GLASS2] = { n * 11,  n * 6, n, n };
+	dict_rect[(int)Tile::GLASS3] = { n * 10,  n * 7, n, n };
+	dict_rect[(int)Tile::GLASS4] = { n * 11,  n * 7, n, n };
+	dict_rect[(int)Tile::GLASS5] = { n * 10,  n * 8, n, n };
+	dict_rect[(int)Tile::GLASS6] = { n * 11,  n * 8, n, n };
+	dict_rect[(int)Tile::GLASS7] = { n * 11,  n * 9, n, n };
+	dict_rect[(int)Tile::RED_THING] = { n * 12,  n * 6, n, n };
+	dict_rect[(int)Tile::RED_THING2] = { n * 13,  n * 6, n, n };
+	dict_rect[(int)Tile::ARCH1] = { n * 7,  n * 9, n, n };
+	dict_rect[(int)Tile::ARCH2] = { n * 8,  n * 9, n, n };
+	dict_rect[(int)Tile::ARCH3] = { n * 9,  n * 9, n, n };
+	dict_rect[(int)Tile::ARCH4] = { n * 10,  n * 9, n, n };
+	
+		
 
 
 	dict_rect[(int)Tile::BLOCK_GROUND] = { 0,  n * 9, n, n };
