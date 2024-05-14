@@ -65,7 +65,6 @@ void Entity::DrawHitbox(const Color& col) const
 {
 	Color c = col;
 	c.a = 128;		//50% transparent
-
 	render->DrawBox(pos.x, pos.y - (height - 1), width, height, c);
 	render->DrawCorners(pos.x, pos.y - (height - 1), width, height);
 }

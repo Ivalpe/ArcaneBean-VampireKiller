@@ -448,29 +448,28 @@ void Player::Draw()
 		render->Draw(p.x, p.y);
 		break;
 	}
-	
+
 }
 AABB Player::GetHitbox() const
 {
 	AABB hitbox;
-	switch (state)
-	{
-	case State::ATTACKING:
-		Point p(pos.x, pos.y - (height - 1));
-		hitbox = { p, width, height };
-		hitbox.Set(p, width, height);
-		break;
-	case State::CROUCHING:
-		Point p(pos.x, pos.y - (height - 1));
-		AABB hitbox(p, width, height);
 
-		break;
-	default:
+	if (state == State::ATTACKING)
+	{
 		Point p(pos.x, pos.y - (height - 1));
-		AABB hitbox(p, width, height);
-		
-		break;
+		hitbox.Set(p, width, height);
 	}
+	else if(state == State::CROUCHING)
+	{
+		Point p(pos.x, pos.y - (height - 1));
+		hitbox.Set(p, width, height - 10);
+	}
+	else
+	{
+		Point p(pos.x, pos.y - (height - 1));
+		hitbox.Set(p, width, height);
+	}
+
 	return hitbox;
 }
 void Player::LogicJumping()
@@ -583,7 +582,8 @@ void Player::LogicClimbing()
 }
 void Player::DrawDebug(const Color& col) const
 {
-	Entity::DrawHitbox(pos.x, pos.y, width, height, col);
+	AABB hitbox = GetHitbox();
+	Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y + height, hitbox.width, hitbox.height, col);
 
 	DrawText(TextFormat("Position: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 8 * 16, 0, 8, LIGHTGRAY);
 	DrawText(TextFormat("Attack: %d", attacking), 8 * 16, 16 * 4, 8, LIGHTGRAY);

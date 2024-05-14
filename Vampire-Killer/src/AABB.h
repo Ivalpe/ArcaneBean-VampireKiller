@@ -14,6 +14,7 @@ public:
     bool TestPoint(const Point& q) const;
     bool TestCircle(const Point& center, float radius) const;
     void Set(Point pos, int width, int height);
+   
 };
 
 
