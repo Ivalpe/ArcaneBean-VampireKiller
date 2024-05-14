@@ -140,6 +140,12 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 				ent->Initialise();
 				fires.push_back(ent);
 			}
+			else if (tile == Tile::ENEMY_KNIGHT)
+			{
+				pos.x = x * TILE_SIZE;
+				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
+				enemies.push_back(new Enemy(pos, EnemyState::WALKING, EnemyLook::LEFT, 16, 32));
+			}
 			++i;
 		}
 	}
@@ -194,6 +200,11 @@ void Scene::Update()
 	{
 		fires[i]->Update();
 	}
+
+	for (size_t i = 0; i < enemies.size(); i++)
+	{
+		enemies[i]->Update();
+	}
 	CheckCollisions();
 }
 void Scene::LoadNextLevel() {
@@ -223,6 +234,11 @@ void Scene::Render()
 	BeginMode2D(camera);
 
 	level->Render();
+
+	for (size_t i = 0; i < enemies.size(); i++)
+	{
+		enemies[i]->Draw();
+	}
 
 	//Objects
 	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)

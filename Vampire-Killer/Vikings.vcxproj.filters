@@ -46,6 +46,9 @@
     <ClCompile Include="src\Levels.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Enemy.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Globals.h">
@@ -95,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="src\Levels.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Enemy.h">
+      <Filter>Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

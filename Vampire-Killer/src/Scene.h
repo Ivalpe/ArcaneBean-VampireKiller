@@ -5,6 +5,7 @@
 #include "TileMap.h"
 #include "Object.h"
 #include "Levels.h"
+#include "Enemy.h"
 
 enum class DebugMode { OFF, SPRITES_AND_HITBOXES, ONLY_HITBOXES, SIZE };
 
@@ -35,6 +36,7 @@ private:
 
     std::vector<Object*> objects;
     std::vector<Fire*> fires;
+    std::vector<Enemy*> enemies;
 
     Camera2D camera;
     Music musicStage0, musicStage2;
