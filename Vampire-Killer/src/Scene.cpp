@@ -88,6 +88,7 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 	Point pos;
 	Object* obj;
 	Fire* ent;
+	Enemy* ene;
 
 	//Delete all objects
 	for (size_t i = 0; i < objects.size(); i++)
@@ -144,7 +145,9 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 			{
 				pos.x = x * TILE_SIZE;
 				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				enemies.push_back(new Enemy(pos, EnemyState::WALKING, EnemyLook::LEFT, 16, 32));
+				ene = new Enemy(pos, EnemyState::WALKING, EnemyLook::LEFT, 16, 32);
+				ene->Initialise();
+				enemies.push_back(ene);
 			}
 			++i;
 		}
@@ -235,10 +238,16 @@ void Scene::Render()
 
 	level->Render();
 
-	for (size_t i = 0; i < enemies.size(); i++)
-	{
-		enemies[i]->Draw();
-	}
+	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
+		for (size_t i = 0; i < enemies.size(); i++)
+		{
+			enemies[i]->Draw();
+		}
+	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
+		for (size_t i = 0; i < enemies.size(); i++)
+		{
+			enemies[i]->DrawDebug(GREEN);
+		}
 
 	//Objects
 	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)

@@ -18,6 +18,7 @@ public:
 	void Update();
 	void DrawDebug(const Color& col) const;
 	void Release();
+	void Render();
 
 private:
 	bool IsLookingRight() const;
