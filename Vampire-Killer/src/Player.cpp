@@ -300,7 +300,7 @@ void Player::MoveX()
 			if (IsLookingRight()) ChangeAnimLeft();
 		}
 
-		box = GetHitbox();
+		box = GetHitbox().first;
 		if (map->TestCollisionWallLeft(box) || pos.x <= 0)
 		{
 			pos.x = prev_x;
@@ -316,7 +316,7 @@ void Player::MoveX()
 			if (IsLookingLeft()) ChangeAnimRight();
 		}
 
-		box = GetHitbox();
+		box = GetHitbox().first;
 		if (map->TestCollisionWallRight(box) || pos.x >= WINDOW_WIDTH - PLAYER_PHYSICAL_WIDTH)
 		{
 			pos.x = prev_x;
@@ -343,7 +343,7 @@ void Player::MoveY()
 	else //idle, walking, falling
 	{
 		pos.y += PLAYER_SPEED;
-		box = GetHitbox();
+		box = GetHitbox().first;
 
 		if (map->TestCollisionGround(box, &pos.y))
 		{
@@ -351,7 +351,7 @@ void Player::MoveY()
 
 			if (IsKeyDown(KEY_UP))
 			{
-				box = GetHitbox();
+				box = GetHitbox().first;
 				if (map->TestOnLadder(box, &pos.x))
 					StartClimbingUp();
 				else
@@ -366,7 +366,7 @@ void Player::MoveY()
 
 				//To climb up the ladder, we need to check the control point (x, y)
 				//To climb down the ladder, we need to check pixel below (x, y+1) instead
-				box = GetHitbox();
+				box = GetHitbox().first;
 				box.pos.y++;
 				if (map->TestOnLadderTop(box, &pos.x))
 				{
@@ -386,7 +386,7 @@ void Player::MoveY()
 		{
 			if (IsKeyDown(KEY_UP))
 			{
-				box = GetHitbox();
+				box = GetHitbox().first;
 				if (map->TestOnLadder(box, &pos.x))
 					StartClimbingUp();
 			}
@@ -394,7 +394,7 @@ void Player::MoveY()
 			{
 				//To climb up the ladder, we need to check the control point (x, y)
 				//To climb down the ladder, we need to check pixel below (x, y+1) instead
-				box = GetHitbox();
+				box = GetHitbox().first;
 				box.pos.y++;
 				if (map->TestOnLadderTop(box, &pos.x))
 				{
@@ -450,27 +450,47 @@ void Player::Draw()
 	}
 
 }
-AABB Player::GetHitbox() const
+std::pair<AABB, AABB> Player::GetHitbox() const
 {
-	AABB hitbox;
+	AABB playerHitbox, whipHitbox;
 
 	if (state == State::ATTACKING)
 	{
 		Point p(pos.x, pos.y - (height - 1));
-		hitbox.Set(p, width, height);
+		playerHitbox.Set(p, width, height);
+
+		//Whip
+		Point whipPoint(pos.x + (IsLookingLeft() ? -(width * 2) - 3 : width), (pos.y - 15));
+		whipHitbox.Set(whipPoint, width * 2.3f, height / 3);
 	}
-	else if(state == State::CROUCHING)
+	else if (state == State::CROUCHING)
 	{
-		Point p(pos.x, pos.y - (height - 1));
-		hitbox.Set(p, width, height - 10);
+		Point p(pos.x, pos.y - (height - 10));
+		playerHitbox.Set(p, width, height - 9);
 	}
 	else
 	{
 		Point p(pos.x, pos.y - (height - 1));
-		hitbox.Set(p, width, height);
+		playerHitbox.Set(p, width, height);
 	}
 
-	return hitbox;
+	return { playerHitbox, whipHitbox };
+}
+void Player::DrawDebug(const Color& col) const
+{
+	AABB hitbox = GetHitbox().first;
+	Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y + hitbox.height, hitbox.width, hitbox.height, col);
+
+	if (state == State::ATTACKING && attacking >= 4)
+	{
+		AABB hitbox = GetHitbox().second;
+		Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y, hitbox.width, hitbox.height, col);
+	}
+
+	DrawText(TextFormat("Position: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 8 * 16, 0, 8, LIGHTGRAY);
+	DrawText(TextFormat("Attack: %d", attacking), 8 * 16, 16 * 4, 8, LIGHTGRAY);
+
+	DrawPixel(pos.x, pos.y, WHITE);
 }
 void Player::LogicJumping()
 {
@@ -481,7 +501,7 @@ void Player::LogicJumping()
 	if (jump_delay == 0)
 	{
 		prev_y = pos.y;
-		prev_box = GetHitbox();
+		prev_box = GetHitbox().first;
 
 		pos.y += dir.y;
 		dir.y += GRAVITY_FORCE;
@@ -510,7 +530,7 @@ void Player::LogicJumping()
 		//We check ground collision when jumping down
 		if (dir.y >= 0)
 		{
-			box = GetHitbox();
+			box = GetHitbox().first;
 
 			//A ground collision occurs if we were not in a collision state previously.
 			//This prevents scenarios where, after levitating due to a previous jump, we found
@@ -553,7 +573,7 @@ void Player::LogicClimbing()
 	//By doing so, we ensure that we don't stop climbing down immediately after starting the descent.
 	if (state == State::CLIMBING)
 	{
-		box = GetHitbox();
+		box = GetHitbox().first;
 		if (map->TestOnLadderTop(box, &tmp))
 		{
 			if (IsInSecondHalfTile())		SetAnimation((int)PlayerAnim::CLIMBING_PRE_TOP);
@@ -579,16 +599,6 @@ void Player::LogicClimbing()
 			if (GetAnimation() != PlayerAnim::CLIMBING)	SetAnimation((int)PlayerAnim::CLIMBING);
 		}
 	}
-}
-void Player::DrawDebug(const Color& col) const
-{
-	AABB hitbox = GetHitbox();
-	Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y + height, hitbox.width, hitbox.height, col);
-
-	DrawText(TextFormat("Position: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 8 * 16, 0, 8, LIGHTGRAY);
-	DrawText(TextFormat("Attack: %d", attacking), 8 * 16, 16 * 4, 8, LIGHTGRAY);
-
-	DrawPixel(pos.x, pos.y, WHITE);
 }
 void Player::Release()
 {

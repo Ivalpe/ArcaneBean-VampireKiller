@@ -265,9 +265,10 @@ void Scene::Release()
 }
 void Scene::CheckCollisions()
 {
-	AABB player_box, obj_box;
+	AABB player_box, obj_box, whip_hitbox;
 
-	player_box = player->GetHitbox();
+	player_box = player->GetHitbox().first;
+	whip_hitbox = player->GetHitbox().second;
 	auto itObj = objects.begin();
 	while (itObj != objects.end())
 	{
@@ -291,7 +292,7 @@ void Scene::CheckCollisions()
 	while (itFi != fires.end())
 	{
 		obj_box = (*itFi)->GetHitbox();
-		if (player_box.TestAABB(obj_box) && player->GetState() == State::ATTACKING)
+		if (whip_hitbox.TestAABB(obj_box) && player->GetState() == State::ATTACKING)
 		{
 			//Change the array for not creating more fires in this position
 			lvlList->setEnt((*itFi)->GetPosArray());

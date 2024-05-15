@@ -44,7 +44,14 @@ Object::~Object()
 }
 void Object::DrawDebug(const Color& col) const
 {
-	Entity::DrawHitbox(pos.x, pos.y, width, height, col);
+	AABB hitbox = GetHitbox();
+	Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y + hitbox.height, hitbox.width, hitbox.height, col);
+}
+AABB Object::GetHitbox() const
+{
+	Point p(pos.x - 1, pos.y - (height + 3));
+	AABB objectHitbox(p, width, height);
+	return objectHitbox;
 }
 int Object::Points() const
 {

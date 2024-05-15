@@ -26,6 +26,7 @@ public:
 	AppStatus Initialise();
 	HeartAnim GetHeartState() const;
 	void Update();
+	AABB GetHitbox() const;
 
 private:
 	void SetAnimation(int id);
