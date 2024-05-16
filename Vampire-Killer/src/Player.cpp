@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include <raymath.h>
 #include <iostream>
+#include "Enemy.h"
 
 Player::Player(const Point& p, State s, Look view) :
 	Entity(p, PLAYER_PHYSICAL_WIDTH, PLAYER_PHYSICAL_HEIGHT, PLAYER_FRAME_SIZE_WIDTH, PLAYER_FRAME_SIZE_HEIGHT)
@@ -12,6 +13,8 @@ Player::Player(const Point& p, State s, Look view) :
 	look = view;
 	jump_delay = PLAYER_JUMP_DELAY;
 	map = nullptr;
+	life = 20;
+	invincibility = 0;
 }
 Player::~Player()
 {
@@ -280,6 +283,11 @@ void Player::Update()
 	if (state == State::ATTACKING)
 		Attack();
 
+	if (invincibility > 0) invincibility++;
+
+	if (invincibility >= 120)
+		FinishInvincibility();
+
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
 	sprite->Update();
 }
@@ -491,6 +499,30 @@ void Player::DrawDebug(const Color& col) const
 	DrawText(TextFormat("Attack: %d", attacking), 8 * 16, 16 * 4, 8, LIGHTGRAY);
 
 	DrawPixel(pos.x, pos.y, WHITE);
+void Player::Damaged(EnemyType enemy)
+{
+	switch (enemy)
+	{
+	case EnemyType::KNIGHT:
+		life = life - 2;
+		break;
+	default:
+		break;
+	}
+}
+int Player::GetLife()
+{
+	return life;
+}
+void Player::StartInvincibility() {
+	invincibility = 1;
+}
+void Player::FinishInvincibility() {
+	invincibility = 0;
+}
+int Player::GetInvincibility()
+{
+	return invincibility;
 }
 void Player::LogicJumping()
 {
@@ -599,6 +631,17 @@ void Player::LogicClimbing()
 			if (GetAnimation() != PlayerAnim::CLIMBING)	SetAnimation((int)PlayerAnim::CLIMBING);
 		}
 	}
+}
+=======
+void Player::DrawDebug(const Color& col) const
+{
+	Entity::DrawHitbox(pos.x, pos.y, width, height, col);
+
+	DrawText(TextFormat("Position: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 8 * 16, 0, 8, LIGHTGRAY);
+	DrawText(TextFormat("Attack: %d", attacking), 8 * 16, 16 * 4, 8, LIGHTGRAY);
+	DrawText(TextFormat("Inv: %d", invincibility), 8 * 16, 16 * 5, 8, LIGHTGRAY);
+
+	DrawPixel(pos.x, pos.y, WHITE);
 }
 void Player::Release()
 {
