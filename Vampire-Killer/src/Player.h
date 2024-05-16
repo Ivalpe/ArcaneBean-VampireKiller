@@ -62,7 +62,8 @@ public:
 	void DrawDebug(const Color& col) const;
 	void Release();
 	State GetState();
-
+	std::pair<AABB, AABB> GetHitbox() const;
+	void Draw();
 	void InitScore();
 	void IncrScore(int n);
 	int GetScore();
