@@ -346,7 +346,7 @@ void Scene::CheckCollisions()
 			++itFi;
 		}
 	}
-	player_box = player->GetHitbox();
+	player_box = player->GetHitbox().first;
 	auto enList = enemies.begin();
 	while (enList != enemies.end())
 	{

@@ -484,21 +484,6 @@ std::pair<AABB, AABB> Player::GetHitbox() const
 
 	return { playerHitbox, whipHitbox };
 }
-void Player::DrawDebug(const Color& col) const
-{
-	AABB hitbox = GetHitbox().first;
-	Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y + hitbox.height, hitbox.width, hitbox.height, col);
-
-	if (state == State::ATTACKING && attacking >= 4)
-	{
-		AABB hitbox = GetHitbox().second;
-		Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y, hitbox.width, hitbox.height, col);
-	}
-
-	DrawText(TextFormat("Position: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 8 * 16, 0, 8, LIGHTGRAY);
-	DrawText(TextFormat("Attack: %d", attacking), 8 * 16, 16 * 4, 8, LIGHTGRAY);
-
-	DrawPixel(pos.x, pos.y, WHITE);
 void Player::Damaged(EnemyType enemy)
 {
 	switch (enemy)
@@ -632,10 +617,16 @@ void Player::LogicClimbing()
 		}
 	}
 }
-=======
 void Player::DrawDebug(const Color& col) const
 {
-	Entity::DrawHitbox(pos.x, pos.y, width, height, col);
+	AABB hitbox = GetHitbox().first;
+	Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y + hitbox.height, hitbox.width, hitbox.height, col);
+
+	if (state == State::ATTACKING && attacking >= 4)
+	{
+		AABB hitbox = GetHitbox().second;
+		Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y, hitbox.width, hitbox.height, col);
+	}
 
 	DrawText(TextFormat("Position: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 8 * 16, 0, 8, LIGHTGRAY);
 	DrawText(TextFormat("Attack: %d", attacking), 8 * 16, 16 * 4, 8, LIGHTGRAY);
