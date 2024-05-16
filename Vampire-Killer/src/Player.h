@@ -1,6 +1,7 @@
 #pragma once
 #include "Entity.h"
 #include "TileMap.h"
+#include "Enemy.h"
 
 //Representation model size: 32x32
 #define PLAYER_FRAME_SIZE_WIDTH		16
@@ -65,6 +66,11 @@ public:
 	void InitScore();
 	void IncrScore(int n);
 	int GetScore();
+	void Damaged(EnemyType enemyType);
+	int GetLife();
+	void StartInvincibility();
+	void FinishInvincibility();
+	int GetInvincibility();
 
 private:
 	bool IsLookingRight() const;
@@ -89,6 +95,7 @@ private:
 	void StartClimbingDown();
 	void ChangeAnimRight();
 	void ChangeAnimLeft();
+	
 
 	//Jump steps
 	bool IsAscending() const;
@@ -105,4 +112,6 @@ private:
 
 	TileMap* map;
 	int score;
+	int life;
+	int invincibility;
 };
