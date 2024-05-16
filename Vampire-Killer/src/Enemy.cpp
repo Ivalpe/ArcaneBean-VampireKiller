@@ -12,6 +12,8 @@ Enemy::Enemy(const Point& p, EnemyState s, EnemyLook view, float width, float he
 	h = height;
 	state = s;
 	look = view;
+	map = nullptr;
+	type = EnemyType::KNIGHT;
 }
 
 Enemy::~Enemy()
@@ -38,19 +40,63 @@ AppStatus Enemy::Initialise()
 
 	
 	sprite->SetAnimationDelay((int)EnemyAnim::WALKING_RIGHT, ANIM_DELAY * 2);
-	sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { 0, 0, w, h });
-	sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w, 0, w, h });
-	sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w * 2, 0, w, h });
+	sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { 0, 0, -w, h });
+	sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w, 0, -w, h });
+	sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w * 2, 0, -w, h });
 	sprite->SetAnimationDelay((int)EnemyAnim::WALKING_LEFT, ANIM_DELAY * 2);
-	sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { 0, 0, -w, h });
-	sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w, 0, -w, h });
-	sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w * 2, 0, -w, h });
+	sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { 0, 0, w, h });
+	sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w, 0, w, h });
+	sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w * 2, 0, w, h });
 	
-	sprite->SetAnimation((int)EnemyAnim::WALKING_RIGHT);
+	sprite->SetAnimation((int)EnemyAnim::WALKING_LEFT);
 }
-void Enemy::Update() {
+void Enemy::Update() 
+{
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
 	sprite->Update();
+
+	MoveY();
+	map->TestCollisionGround(GetHitbox(), &pos.y);
+
+	MoveX();
+}
+void Enemy::MoveY() 
+{
+	pos.y += ENEMY_SPEED;
+}
+void Enemy::MoveX()
+{
+	int prev_x = pos.x;
+
+	if (look == EnemyLook::LEFT)	pos.x -= ENEMY_SPEED;
+	else							pos.x += ENEMY_SPEED;
+
+	AABB box = GetHitbox();
+	
+	if (map->TestCollisionWallLeft(box) || pos.x <= 0)
+	{
+		pos.x = prev_x;
+		SetAnimation((int)EnemyAnim::WALKING_RIGHT);
+		look = EnemyLook::RIGHT;
+	}
+
+	if (map->TestCollisionWallRight(box) || pos.x >= WINDOW_WIDTH - 16)
+	{
+		pos.x = prev_x;
+		SetAnimation((int)EnemyAnim::WALKING_LEFT);
+		look = EnemyLook::LEFT;
+	}
+
+	if (pos.x >= WINDOW_WIDTH - TILE_SIZE)
+	{
+		SetAnimation((int)EnemyAnim::WALKING_LEFT);
+		look = EnemyLook::LEFT;
+	}
+	else if (pos.x <= 0)
+	{
+		SetAnimation((int)EnemyAnim::WALKING_RIGHT);
+		look = EnemyLook::RIGHT;
+	}
 }
 void Enemy::Render() {
 	Point p = GetRenderingPosition();
@@ -86,4 +132,12 @@ EnemyAnim Enemy::GetAnimation()
 {
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
 	return (EnemyAnim)sprite->GetAnimation();
+}
+void Enemy::SetTileMap(TileMap* tilemap)
+{
+	map = tilemap;
+}
+EnemyType Enemy::getType()
+{
+	return type;
 }

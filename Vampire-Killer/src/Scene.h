@@ -6,6 +6,7 @@
 #include "Object.h"
 #include "Levels.h"
 #include "Enemy.h"
+#include "Bar.h"
 
 enum class DebugMode { OFF, SPRITES_AND_HITBOXES, ONLY_HITBOXES, SIZE };
 
@@ -45,4 +46,6 @@ private:
 
     bool levelOver;
     Levels* lvlList;
+    Bar* playerBar;
+    Bar* bossBar;
 };

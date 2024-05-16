@@ -7,6 +7,8 @@ Scene::Scene()
 	player = nullptr;
 	level = nullptr;
 	levelOver = false;
+	playerBar = nullptr;
+	bossBar = nullptr;
 
 	camera.target = { 0, 0 };				//Center of the screen
 	camera.offset = { 0, MARGIN_GUI_Y };	//Offset from the target (center of the screen)
@@ -75,8 +77,12 @@ AppStatus Scene::Init()
 	}
 	//Assign the tile map reference to the player to check collisions while navigating
 	player->SetTileMap(level);
-
 	player->InitScore();
+
+	Point pos = Point(40, -10);
+	playerBar = new Bar(16, RED, pos, 60, 8);
+	pos = Point(40, -20);
+	bossBar = new Bar(16, YELLOW, pos, 60, 8);
 
 	return AppStatus::OK;
 }
@@ -90,17 +96,14 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 	Fire* ent;
 	Enemy* ene;
 
-	//Delete all objects
-	for (size_t i = 0; i < objects.size(); i++)
-	{
+	while (!objects.empty())
 		objects.pop_back();
-	}
 
-	//Delete all fires
-	for (size_t i = 0; i < fires.size(); i++)
-	{
+	while (!fires.empty())
 		fires.pop_back();
-	}
+
+	while (!enemies.empty())
+		enemies.pop_back();
 
 	lvlList->setLvl(stage);
 
@@ -147,6 +150,7 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
 				ene = new Enemy(pos, EnemyState::WALKING, EnemyLook::LEFT, 16, 32);
 				ene->Initialise();
+				ene->SetTileMap(level);
 				enemies.push_back(ene);
 			}
 			++i;
@@ -193,6 +197,8 @@ void Scene::Update()
 
 	level->Update();
 	player->Update();
+	playerBar->Update();
+	bossBar->Update();
 
 	for (size_t i = 0; i < objects.size(); i++)
 	{
@@ -279,6 +285,10 @@ void Scene::Render()
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		player->DrawDebug(GREEN);
 
+	playerBar->Draw();
+	bossBar->Draw();
+
+
 	EndMode2D();
 
 	RenderGUI();
@@ -334,6 +344,21 @@ void Scene::CheckCollisions()
 			//Move to the next object
 			++itFi;
 		}
+	}
+	player_box = player->GetHitbox();
+	auto enList = enemies.begin();
+	while (enList != enemies.end())
+	{
+		obj_box = (*enList)->GetHitbox();
+		if (player_box.TestAABB(obj_box) && player->GetInvincibility() == 0)
+		{
+			EnemyType et = (*enList)->getType();
+			player->Damaged(et);
+			playerBar->changeBar(player->GetLife());
+			player->StartInvincibility();
+		}
+		//Move to the next object
+		++enList;
 	}
 }
 void Scene::RenderObjects() const
