@@ -17,6 +17,7 @@ void log(const char file[], int line, const char* text, ...);
 //Game constants
 #define MARGIN_GUI_Y	32
 #define TILE_SIZE		16
+#define TP_TILE			8
 #define LEVEL_WIDTH		16
 #define LEVEL_HEIGHT	11
 

@@ -224,22 +224,22 @@ void Scene::Update()
 	CheckCollisions();
 }
 void Scene::LoadNextLevel() {
-	if (player->GetPos().x >= WINDOW_WIDTH - TILE_SIZE)
+	if (player->GetPos().x + PLAYER_FRAME_SIZE_WIDTH >= WINDOW_WIDTH - TP_TILE)
 	{
 		int lvl = level->GetTpMap(2);
 		if (lvl != 0)	LoadLevel(lvl, 103);
 	}
-	else if (player->GetPos().x <= 0 + TILE_SIZE)
+	else if (player->GetPos().x <= 0 + TP_TILE)
 	{
 		int lvl = level->GetTpMap(4);
 		if (lvl != 0)	LoadLevel(lvl, 101);
 	}
-	else if (player->GetPos().y >= WINDOW_HEIGHT + TILE_SIZE)
+	else if (player->GetPos().y >= WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y)
 	{
 		int lvl = level->GetTpMap(1);
 		if (lvl != 0)	LoadLevel(lvl, 102);
 	}
-	else if (player->GetPos().y <= 0 + TILE_SIZE)
+	else if (player->GetPos().y <= 0 + TP_TILE)
 	{
 		int lvl = level->GetTpMap(3);
 		if (lvl != 0)	LoadLevel(lvl, 100);
@@ -285,6 +285,18 @@ void Scene::Render()
 		{
 			fires[i]->DrawDebug(GREEN);
 		}
+
+	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
+	{
+		DrawLine(TP_TILE, 0, TP_TILE, WINDOW_HEIGHT, RED);
+		DrawLine(WINDOW_WIDTH - TP_TILE, 0, WINDOW_WIDTH - TP_TILE, WINDOW_HEIGHT, RED);
+		DrawLine(0, TP_TILE, WINDOW_WIDTH, TP_TILE, RED);
+		DrawLine(0, WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y, WINDOW_WIDTH, WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y, RED);
+	}
+
+
+
+
 
 	//Player
 	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
