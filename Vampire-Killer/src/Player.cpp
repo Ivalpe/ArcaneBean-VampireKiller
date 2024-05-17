@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include <raymath.h>
 #include <iostream>
+#include "Enemy.h"
 
 Player::Player(const Point& p, State s, Look view) :
 	Entity(p, PLAYER_PHYSICAL_WIDTH, PLAYER_PHYSICAL_HEIGHT, PLAYER_FRAME_SIZE_WIDTH, PLAYER_FRAME_SIZE_HEIGHT)
@@ -12,6 +13,8 @@ Player::Player(const Point& p, State s, Look view) :
 	look = view;
 	jump_delay = PLAYER_JUMP_DELAY;
 	map = nullptr;
+	life = 20;
+	invincibility = 0;
 }
 Player::~Player()
 {
@@ -209,7 +212,7 @@ void Player::StartClimbingDown()
 void Player::ChangeAnimRight()
 {
 	look = Look::RIGHT;
-	if (state != State::ATTACKING) 
+	if (state != State::ATTACKING)
 	{
 		switch (state)
 		{
@@ -224,7 +227,7 @@ void Player::ChangeAnimRight()
 void Player::ChangeAnimLeft()
 {
 	look = Look::LEFT;
-	if (state != State::ATTACKING) 
+	if (state != State::ATTACKING)
 	{
 		switch (state)
 		{
@@ -240,10 +243,10 @@ void Player::Update()
 {
 	//Player doesn't use the "Entity::Update() { pos += dir; }" default behaviour.
 	//Instead, uses an independent behaviour for each axis.
-	
+
 	if (IsKeyPressed(KEY_SPACE))
 	{
-		if (state == State::JUMPING || state == State::FALLING) 
+		if (state == State::JUMPING || state == State::FALLING)
 		{
 			/*
 			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_AIR_LEFT);
@@ -280,6 +283,11 @@ void Player::Update()
 	if (state == State::ATTACKING)
 		Attack();
 
+	if (invincibility > 0) invincibility++;
+
+	if (invincibility >= 120)
+		FinishInvincibility();
+
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
 	sprite->Update();
 }
@@ -300,7 +308,7 @@ void Player::MoveX()
 			if (IsLookingRight()) ChangeAnimLeft();
 		}
 
-		box = GetHitbox();
+		box = GetHitbox().first;
 		if (map->TestCollisionWallLeft(box) || pos.x <= 0)
 		{
 			pos.x = prev_x;
@@ -316,7 +324,7 @@ void Player::MoveX()
 			if (IsLookingLeft()) ChangeAnimRight();
 		}
 
-		box = GetHitbox();
+		box = GetHitbox().first;
 		if (map->TestCollisionWallRight(box) || pos.x >= WINDOW_WIDTH - PLAYER_PHYSICAL_WIDTH)
 		{
 			pos.x = prev_x;
@@ -343,7 +351,7 @@ void Player::MoveY()
 	else //idle, walking, falling
 	{
 		pos.y += PLAYER_SPEED;
-		box = GetHitbox();
+		box = GetHitbox().first;
 
 		if (map->TestCollisionGround(box, &pos.y))
 		{
@@ -351,7 +359,7 @@ void Player::MoveY()
 
 			if (IsKeyDown(KEY_UP))
 			{
-				box = GetHitbox();
+				box = GetHitbox().first;
 				if (map->TestOnLadder(box, &pos.x))
 					StartClimbingUp();
 				else
@@ -366,7 +374,7 @@ void Player::MoveY()
 
 				//To climb up the ladder, we need to check the control point (x, y)
 				//To climb down the ladder, we need to check pixel below (x, y+1) instead
-				box = GetHitbox();
+				box = GetHitbox().first;
 				box.pos.y++;
 				if (map->TestOnLadderTop(box, &pos.x))
 				{
@@ -386,7 +394,7 @@ void Player::MoveY()
 		{
 			if (IsKeyDown(KEY_UP))
 			{
-				box = GetHitbox();
+				box = GetHitbox().first;
 				if (map->TestOnLadder(box, &pos.x))
 					StartClimbingUp();
 			}
@@ -394,7 +402,7 @@ void Player::MoveY()
 			{
 				//To climb up the ladder, we need to check the control point (x, y)
 				//To climb down the ladder, we need to check pixel below (x, y+1) instead
-				box = GetHitbox();
+				box = GetHitbox().first;
 				box.pos.y++;
 				if (map->TestOnLadderTop(box, &pos.x))
 				{
@@ -408,7 +416,7 @@ void Player::MoveY()
 		{
 			if (state != State::FALLING) StartFalling();
 		}
-		
+
 	}
 }
 void Player::Attack() {
@@ -433,6 +441,74 @@ void Player::Attack() {
 		attacking++;
 	}
 }
+void Player::Draw()
+{
+	Point p = Entity::GetRenderingPosition();
+	switch (state)
+	{
+	case State::ATTACKING:
+		if (look == Look::RIGHT)
+			render->Draw(p.x - 16, p.y);
+		else
+			render->Draw(p.x - 32, p.y);
+		break;
+	default:
+		render->Draw(p.x, p.y);
+		break;
+	}
+
+}
+std::pair<AABB, AABB> Player::GetHitbox() const
+{
+	AABB playerHitbox, whipHitbox;
+
+	if (state == State::ATTACKING)
+	{
+		Point p(pos.x, pos.y - (height - 1));
+		playerHitbox.Set(p, width, height);
+
+		//Whip
+		Point whipPoint(pos.x + (IsLookingLeft() ? -(width * 2) - 3 : width), (pos.y - 15));
+		whipHitbox.Set(whipPoint, width * 2.3f, height / 3);
+	}
+	else if (state == State::CROUCHING)
+	{
+		Point p(pos.x, pos.y - (height - 10));
+		playerHitbox.Set(p, width, height - 9);
+	}
+	else
+	{
+		Point p(pos.x, pos.y - (height - 1));
+		playerHitbox.Set(p, width, height);
+	}
+
+	return { playerHitbox, whipHitbox };
+}
+void Player::Damaged(EnemyType enemy)
+{
+	switch (enemy)
+	{
+	case EnemyType::KNIGHT:
+		life = life - 2;
+		break;
+	default:
+		break;
+	}
+}
+int Player::GetLife()
+{
+	return life;
+}
+void Player::StartInvincibility() {
+	invincibility = 1;
+}
+void Player::FinishInvincibility() {
+	invincibility = 0;
+}
+int Player::GetInvincibility()
+{
+	return invincibility;
+}
 void Player::LogicJumping()
 {
 	AABB box, prev_box;
@@ -442,7 +518,7 @@ void Player::LogicJumping()
 	if (jump_delay == 0)
 	{
 		prev_y = pos.y;
-		prev_box = GetHitbox();
+		prev_box = GetHitbox().first;
 
 		pos.y += dir.y;
 		dir.y += GRAVITY_FORCE;
@@ -471,7 +547,7 @@ void Player::LogicJumping()
 		//We check ground collision when jumping down
 		if (dir.y >= 0)
 		{
-			box = GetHitbox();
+			box = GetHitbox().first;
 
 			//A ground collision occurs if we were not in a collision state previously.
 			//This prevents scenarios where, after levitating due to a previous jump, we found
@@ -514,7 +590,7 @@ void Player::LogicClimbing()
 	//By doing so, we ensure that we don't stop climbing down immediately after starting the descent.
 	if (state == State::CLIMBING)
 	{
-		box = GetHitbox();
+		box = GetHitbox().first;
 		if (map->TestOnLadderTop(box, &tmp))
 		{
 			if (IsInSecondHalfTile())		SetAnimation((int)PlayerAnim::CLIMBING_PRE_TOP);
@@ -543,10 +619,18 @@ void Player::LogicClimbing()
 }
 void Player::DrawDebug(const Color& col) const
 {
-	Entity::DrawHitbox(pos.x, pos.y, width, height, col);
+	AABB hitbox = GetHitbox().first;
+	Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y + hitbox.height, hitbox.width, hitbox.height, col);
+
+	if (state == State::ATTACKING && attacking >= 4)
+	{
+		AABB hitbox = GetHitbox().second;
+		Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y, hitbox.width, hitbox.height, col);
+	}
 
 	DrawText(TextFormat("Position: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 8 * 16, 0, 8, LIGHTGRAY);
 	DrawText(TextFormat("Attack: %d", attacking), 8 * 16, 16 * 4, 8, LIGHTGRAY);
+	DrawText(TextFormat("Inv: %d", invincibility), 8 * 16, 16 * 5, 8, LIGHTGRAY);
 
 	DrawPixel(pos.x, pos.y, WHITE);
 }
