@@ -58,6 +58,9 @@ void Enemy::Update()
 	MoveY();
 	map->TestCollisionGround(GetHitbox(), &pos.y);
 
+	
+
+
 	MoveX();
 }
 void Enemy::MoveY() 
@@ -87,6 +90,12 @@ void Enemy::MoveX()
 		look = EnemyLook::LEFT;
 	}
 
+	if (!map->TestCollisionGroundRight(box) && look == EnemyLook::RIGHT)
+	{
+		SetAnimation((int)EnemyAnim::WALKING_LEFT);
+		look = EnemyLook::LEFT;
+	}
+
 	if (pos.x >= WINDOW_WIDTH - TILE_SIZE)
 	{
 		SetAnimation((int)EnemyAnim::WALKING_LEFT);
@@ -105,8 +114,9 @@ void Enemy::Render() {
 void Enemy::DrawDebug(const Color& col) const
 {
 	Entity::DrawHitbox(pos.x, pos.y, width, height, col);
-
 	DrawPixel(pos.x, pos.y, WHITE);
+
+	DrawRectangle(pos.x + width, pos.y + 1, 4, 4, WHITE);
 }
 void Enemy::Release()
 {
