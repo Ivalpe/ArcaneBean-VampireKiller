@@ -6,16 +6,16 @@
 Object::Object(const Point& p, ObjectType t, TileMap* tilemap) : Entity(p, OBJECT_PHYSICAL_SIZE, OBJECT_PHYSICAL_SIZE, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE)
 {
 	type = t;
-	currentAnim = HeartAnim::FALLING;
+	currentAnim = ItemAnim::BREAKING;
 	const int n = TILE_SIZE;
 	map = tilemap;
+	floatTime = 30;
 	Initialise();
 }
 AppStatus Object::Initialise()
 {
-
 	ResourceManager& data = ResourceManager::Instance();
-	if (data.LoadTexture(Resource::IMG_ITEMS, "Assets/Sprites/Heart.png") != AppStatus::OK)
+	if (data.LoadTexture(Resource::IMG_ITEMS, "Assets/Sprites/Items.png") != AppStatus::OK)
 	{
 		return AppStatus::ERROR;
 	}
@@ -23,19 +23,48 @@ AppStatus Object::Initialise()
 	render = new Sprite(data.GetTexture(Resource::IMG_ITEMS));
 	if (render == nullptr)
 	{
-		LOG("Failed to allocate memory for heart sprite");
+		LOG("Failed to allocate memory for items sprite");
 		return AppStatus::ERROR;
 	}
 
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
-	sprite->SetNumberAnimations(2);
+	sprite->SetNumberAnimations((int)ItemAnim::NUM_ANIMATIONS);
 
-	sprite->SetAnimationDelay((int)HeartAnim::IDLE, 0);
-	sprite->AddKeyFrame((int)HeartAnim::IDLE, { 0, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
-	sprite->SetAnimationDelay((int)HeartAnim::FALLING, 0);
-	sprite->AddKeyFrame((int)HeartAnim::FALLING, { OBJECT_FRAME_SIZE, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+	sprite->SetAnimationDelay((int)ItemAnim::BREAKING, 10);
+	sprite->AddKeyFrame((int)ItemAnim::BREAKING, { 0, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+	sprite->AddKeyFrame((int)ItemAnim::BREAKING, { OBJECT_FRAME_SIZE, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+	sprite->AddKeyFrame((int)ItemAnim::BREAKING, { OBJECT_FRAME_SIZE * 2, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
 
-	sprite->SetAnimation((int)HeartAnim::FALLING);
+	switch (type)
+	{
+	case ObjectType::HEART:
+		sprite->SetAnimationDelay((int)ItemAnim::IDLE, 0);
+		sprite->AddKeyFrame((int)ItemAnim::IDLE, { 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->SetAnimationDelay((int)ItemAnim::FALLING, 0);
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE * 2, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		break;
+	case ObjectType::HEART_BIG:
+		sprite->SetAnimationDelay((int)ItemAnim::IDLE, 0);
+		sprite->AddKeyFrame((int)ItemAnim::IDLE, { OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->SetAnimationDelay((int)ItemAnim::FALLING, 10);
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { 0, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE * 2, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		break;
+	case ObjectType::WHIPE:
+		sprite->SetAnimationDelay((int)ItemAnim::IDLE, 0);
+		sprite->AddKeyFrame((int)ItemAnim::IDLE, { 0, OBJECT_FRAME_SIZE * 2, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->SetAnimationDelay((int)ItemAnim::FALLING, 10);
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { 0, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE * 2, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		break;
+	default:
+		break;
+	}
+
+	sprite->SetAnimation((int)ItemAnim::BREAKING);
+
 
 	return AppStatus::OK;
 }
@@ -53,6 +82,14 @@ AABB Object::GetHitbox() const
 	AABB objectHitbox(p, width, height);
 	return objectHitbox;
 }
+void Object::Release()
+{
+	ResourceManager& data = ResourceManager::Instance();
+	data.ReleaseTexture(Resource::IMG_ITEMS);
+
+	render->Release();
+
+}
 int Object::Points() const
 {
 	if (type == ObjectType::HEART)		return POINTS_BIG_HEART;
@@ -62,31 +99,34 @@ int Object::Points() const
 		return 0;
 	}
 }
-
-HeartAnim Object::GetHeartState() const
+ItemAnim Object::GetHeartState() const
 {
 	return currentAnim;
 }
-
 void Object::Update() {
+	Sprite* sprite = dynamic_cast<Sprite*>(render);
+	sprite->Update();
+
 	AABB box = GetHitbox();
-	if (!map->TestCollisionGround(box, &pos.y) && currentAnim == HeartAnim::FALLING)
-		pos.y+=SPEED_FALLING;
-	else 
-		currentAnim = HeartAnim::IDLE;
-
-	switch (currentAnim)
+	if (currentAnim == ItemAnim::BREAKING)
 	{
-	case HeartAnim::FALLING:	SetAnimation((int)HeartAnim::FALLING);
-		break;
-	case HeartAnim::IDLE:		SetAnimation((int)HeartAnim::IDLE);
-		break;
-	default:
-		break;
+		floatTime--;
+		if (floatTime <= 0)
+		{
+			currentAnim = ItemAnim::FALLING;
+			SetAnimation((int)ItemAnim::FALLING);
+		}
 	}
-
+	else if (currentAnim == ItemAnim::FALLING && !map->TestCollisionGround(box, &pos.y))
+	{
+		pos.y += SPEED_FALLING;
+	}
+	else
+	{
+		SetAnimation((int)ItemAnim::IDLE);
+		currentAnim = ItemAnim::IDLE;
+	}
 }
-
 void Object::SetAnimation(int id)
 {
 	Sprite* sprite = dynamic_cast<Sprite*>(render);

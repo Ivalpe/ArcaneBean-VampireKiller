@@ -72,6 +72,7 @@ public:
 	void StartInvincibility();
 	void FinishInvincibility();
 	int GetInvincibility();
+	int GetDmg() const;
 
 private:
 	bool IsLookingRight() const;
@@ -112,7 +113,5 @@ private:
 	int attacking;
 
 	TileMap* map;
-	int score;
-	int life;
-	int invincibility;
+	int score, life, invincibility, dmg;
 };

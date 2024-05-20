@@ -79,10 +79,16 @@ AppStatus Scene::Init()
 	player->SetTileMap(level);
 	player->InitScore();
 
-	Point pos = Point(40, -10);
-	playerBar = new Bar(16, RED, pos, 60, 8);
-	pos = Point(40, -20);
-	bossBar = new Bar(16, YELLOW, pos, 60, 8);
+	if (rm.LoadTexture(Resource::IMG_UI, "Assets/Ui.png") != AppStatus::OK)
+	{
+		return AppStatus::ERROR;
+	}
+	ui = LoadTexture("Assets/Ui.png");
+
+	Point pos = Point(61, -18);
+	playerBar = new Bar(16, { 255, 192, 150, 255 }, pos, 64, 4);
+	pos = Point(61, -9);
+	bossBar = new Bar(16, { 251, 31, 46, 255 }, pos, 64, 4);
 
 	return AppStatus::OK;
 }
@@ -136,11 +142,27 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
 				player->SetPos(pos);
 			}
-			else if (tile == Tile::ITEM_FIRE)
+			else if (tile == Tile::ITEM_FIRE_HEART)
 			{
 				pos.x = x * TILE_SIZE;
 				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ent = new Fire(pos, 16, 16, i);
+				ent = new Fire(pos, 16, 16, i, ObjectType::HEART);
+				ent->Initialise();
+				fires.push_back(ent);
+			}
+			else if (tile == Tile::ITEM_FIRE_HEART_BIG)
+			{
+				pos.x = x * TILE_SIZE;
+				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
+				ent = new Fire(pos, 16, 16, i, ObjectType::HEART_BIG);
+				ent->Initialise();
+				fires.push_back(ent);
+			}
+			else if (tile == Tile::ITEM_FIRE_WHIPE)
+			{
+				pos.x = x * TILE_SIZE;
+				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
+				ent = new Fire(pos, 16, 16, i, ObjectType::WHIPE);
 				ent->Initialise();
 				fires.push_back(ent);
 			}
@@ -203,8 +225,6 @@ void Scene::Update()
 
 	level->Update();
 	player->Update();
-	playerBar->Update();
-	bossBar->Update();
 
 	for (size_t i = 0; i < objects.size(); i++)
 	{
@@ -293,28 +313,28 @@ void Scene::Render()
 		DrawLine(0, WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y, WINDOW_WIDTH, WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y, RED);
 	}
 
-
-
-
-
 	//Player
 	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
 		player->Draw();
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		player->DrawDebug(GREEN);
 
-	playerBar->Draw();
-	bossBar->Draw();
-
+	RenderGUI();
 
 	EndMode2D();
 
-	RenderGUI();
 }
 void Scene::Release()
 {
 	level->Release();
 	player->Release();
+	for (size_t i = 0; i < enemies.size(); i++)
+		enemies[i]->Release();
+	for (size_t i = 0; i < fires.size(); i++)
+		fires[i]->Release();
+	for (size_t i = 0; i < objects.size(); i++)
+		objects[i]->Release();
+
 }
 void Scene::CheckCollisions()
 {
@@ -322,11 +342,13 @@ void Scene::CheckCollisions()
 
 	player_box = player->GetHitbox().first;
 	whip_hitbox = player->GetHitbox().second;
+
+	//Collision Heart
 	auto itObj = objects.begin();
 	while (itObj != objects.end())
 	{
 		obj_box = (*itObj)->GetHitbox();
-		if (player_box.TestAABB(obj_box) && (*itObj)->GetHeartState() == HeartAnim::IDLE)
+		if (player_box.TestAABB(obj_box) && (*itObj)->GetHeartState() == ItemAnim::IDLE)
 		{
 			player->IncrScore((*itObj)->Points());
 
@@ -341,6 +363,8 @@ void Scene::CheckCollisions()
 			++itObj;
 		}
 	}
+
+	//Collision Fire
 	auto itFi = fires.begin();
 	while (itFi != fires.end())
 	{
@@ -351,7 +375,7 @@ void Scene::CheckCollisions()
 			lvlList->setEnt((*itFi)->GetPosArray());
 
 			//Create a heart in the position of the fire
-			objects.push_back(new Object({ (*itFi)->GetPos().x, (*itFi)->GetPos().y }, ObjectType::HEART, level));
+			objects.push_back(new Object({ (*itFi)->GetPos().x, (*itFi)->GetPos().y }, (*itFi)->GetItemType(), level));
 			//Delete the object
 			delete* itFi;
 			//Erase the object from the vector and get the iterator to the next valid element
@@ -364,7 +388,8 @@ void Scene::CheckCollisions()
 			++itFi;
 		}
 	}
-	player_box = player->GetHitbox().first;
+
+	//Collision Enemy
 	auto enList = enemies.begin();
 	while (enList != enemies.end())
 	{
@@ -376,8 +401,24 @@ void Scene::CheckCollisions()
 			playerBar->changeBar(player->GetLife());
 			player->StartInvincibility();
 		}
+		else if (whip_hitbox.TestAABB(obj_box) && (*enList)->GetInvincibility() == 0)
+		{
+			(*enList)->Damaged(player->GetDmg());
+			(*enList)->StartInvincibility();
+			if ((*enList)->getLife() <= 0)
+			{
+				//Delete the object
+				delete* enList;
+				//Erase the object from the vector and get the iterator to the next valid element
+				enList = enemies.erase(enList);
+			}
+		}
+		else
+		{
+			++enList;
+		}
 		//Move to the next object
-		++enList;
+		
 	}
 }
 void Scene::RenderObjects() const
@@ -397,8 +438,10 @@ void Scene::RenderObjectsDebug(const Color& col) const
 void Scene::RenderGUI() const
 {
 	//Temporal approach
-	DrawText(TextFormat("SCORE : %d", player->GetScore()), 10, 10, 8, WHITE);
+	DrawTexture(ui, 0, -35, WHITE);
+	playerBar->Draw();
+	bossBar->Draw();
 }
-bool Scene::getLevelOver() {
+bool Scene::getLevelOver() const {
 	return levelOver;
 }

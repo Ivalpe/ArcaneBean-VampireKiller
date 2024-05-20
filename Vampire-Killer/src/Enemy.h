@@ -24,7 +24,12 @@ public:
 	void MoveY();
 	void MoveX();
 	void SetTileMap(TileMap* tilemap);
-	EnemyType getType();
+	EnemyType getType() const;
+	void Damaged(int dmg);
+	int getLife() const;
+	void StartInvincibility();
+	void FinishInvincibility();
+	int GetInvincibility();
 
 private:
 	bool IsLookingRight() const;
@@ -39,4 +44,5 @@ private:
 	EnemyType type;
 	TileMap* map;
 	float w, h;
+	int life, invincibility;
 };

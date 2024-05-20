@@ -38,7 +38,7 @@ enum class Tile {
 	CASTLE8, CASTLE9, CASTLE10, CASTLE11, CASTLE12, CASTLE13, CASTLE14, CASTLE15, CASTLE16, CASTLE17, 
 	CASTLE18 = 137, CASTLE19, CASTLELADER1, CASTLELADER2,
 
-	ITEM_FIRE = 140, 
+	ITEM_FIRE_HEART = 140, ITEM_FIRE_HEART_BIG, ITEM_FIRE_WHIPE,
 
 
 	ENEMY_KNIGHT = 200,
@@ -70,6 +70,8 @@ public:
 	//Test for collisions with walls
 	bool TestCollisionWallLeft(const AABB& box) const;
 	bool TestCollisionWallRight(const AABB& box) const;
+	bool TestCollisionGroundRight(const AABB& box) const;
+	bool TestCollisionGroundLeft(const AABB& box) const;
 
 	//Test collision with the ground and update 'py' with the maximum y-position to prevent
 	//penetration of the grounded tile, that is, the pixel y-position above the grounded tile.

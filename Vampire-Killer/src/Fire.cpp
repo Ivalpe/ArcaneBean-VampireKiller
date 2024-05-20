@@ -1,9 +1,10 @@
 #include "Sprite.h"
 #include "Fire.h"
 
-Fire::Fire(const Point& p, int width, int height, int pos) : Entity(p, width, height)
+Fire::Fire(const Point& p, int width, int height, int pos, ObjectType ot) : Entity(p, width, height)
 {
 	posArray = pos;
+	item = ot;
 }
 
 AppStatus Fire::Initialise()
@@ -46,4 +47,17 @@ int Fire::GetPosArray() {
 void Fire::DrawDebug(const Color& col) const
 {
 	Entity::DrawHitbox(pos.x, pos.y, width, height, col);
+}
+
+void Fire::Release()
+{
+	ResourceManager& data = ResourceManager::Instance();
+	data.ReleaseTexture(Resource::IMG_FIRE);
+
+	render->Release();
+}
+
+ObjectType Fire::GetItemType() const
+{
+	return item;
 }
