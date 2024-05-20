@@ -218,9 +218,8 @@ void Scene::Update()
 	}
 	else if (IsKeyPressed(KEY_F4))
 	{
-		LoadLevel(10, 103);
-		StopMusicStream(musicStage0);
-		PlayMusicStream(musicStage2);
+		LoadLevel(10, 101);
+	
 
 	}
 
