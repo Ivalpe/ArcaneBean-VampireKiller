@@ -13,8 +13,9 @@ Player::Player(const Point& p, State s, Look view) :
 	look = view;
 	jump_delay = PLAYER_JUMP_DELAY;
 	map = nullptr;
-	life = 20;
+	life = 16;
 	invincibility = 0;
+	dmg = 2;
 }
 Player::~Player()
 {
@@ -628,9 +629,9 @@ void Player::DrawDebug(const Color& col) const
 		Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y, hitbox.width, hitbox.height, col);
 	}
 
-	DrawText(TextFormat("Position: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 8 * 16, 0, 8, LIGHTGRAY);
-	DrawText(TextFormat("Attack: %d", attacking), 8 * 16, 16 * 4, 8, LIGHTGRAY);
-	DrawText(TextFormat("Inv: %d", invincibility), 8 * 16, 16 * 5, 8, LIGHTGRAY);
+	DrawText(TextFormat("Pos: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 16, 16, 1, LIGHTGRAY);
+	DrawText(TextFormat("Attack: %d", attacking), 16, 16 * 4, 1, LIGHTGRAY);
+	DrawText(TextFormat("Inv: %d", invincibility), 16, 16 * 5, 1, LIGHTGRAY);
 
 	DrawPixel(pos.x, pos.y, WHITE);
 }
@@ -640,4 +641,8 @@ void Player::Release()
 	data.ReleaseTexture(Resource::IMG_PLAYER);
 
 	render->Release();
+}
+int Player::GetDmg() const
+{
+	return dmg;
 }

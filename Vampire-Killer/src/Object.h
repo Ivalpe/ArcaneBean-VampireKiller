@@ -8,11 +8,11 @@
 #define POINTS_BIG_HEART	10
 #define POINTS_SMALL_HEART	20
 
-#define SPEED_FALLING	1
+#define SPEED_FALLING	2
 
-enum class ObjectType { HEART };
+enum class ObjectType { HEART, HEART_BIG, WHIPE };
 
-enum class HeartAnim { FALLING, IDLE };
+enum class ItemAnim { BREAKING, FALLING, IDLE, NUM_ANIMATIONS };
 
 
 class Object : public Entity
@@ -24,14 +24,16 @@ public:
 	void DrawDebug(const Color& col) const;
 	int Points() const;
 	AppStatus Initialise();
-	HeartAnim GetHeartState() const;
+	ItemAnim GetHeartState() const;
 	void Update();
 	AABB GetHitbox() const;
+	void Release();
 
 private:
 	void SetAnimation(int id);
 
 	ObjectType type;
-	HeartAnim currentAnim;
+	ItemAnim currentAnim;
 	TileMap* map;
+	int floatTime;
 };

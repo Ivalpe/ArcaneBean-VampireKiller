@@ -229,7 +229,11 @@ bool TileMap::TestCollisionWallRight(const AABB& box) const
 }
 bool TileMap::TestCollisionGroundRight(const AABB& box) const
 {
-	return CollisionX({ box.pos.x + width, box.pos.y + 1 }, 1);
+	return CollisionX({ box.pos.x + box.width, box.pos.y + box.height + 2 }, 1);
+}
+bool TileMap::TestCollisionGroundLeft(const AABB& box) const
+{
+	return CollisionX({ box.pos.x, box.pos.y + box.height + 2 }, 1);
 }
 bool TileMap::TestCollisionGround(const AABB& box, int* py) const
 {

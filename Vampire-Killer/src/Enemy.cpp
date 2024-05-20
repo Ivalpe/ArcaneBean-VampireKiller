@@ -14,6 +14,7 @@ Enemy::Enemy(const Point& p, EnemyState s, EnemyLook view, float width, float he
 	look = view;
 	map = nullptr;
 	type = EnemyType::KNIGHT;
+	invincibility = 0;
 }
 
 Enemy::~Enemy()
@@ -49,6 +50,8 @@ AppStatus Enemy::Initialise()
 	sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w * 2, 0, w, h });
 	
 	sprite->SetAnimation((int)EnemyAnim::WALKING_LEFT);
+
+	life = 8;
 }
 void Enemy::Update() 
 {
@@ -58,10 +61,13 @@ void Enemy::Update()
 	MoveY();
 	map->TestCollisionGround(GetHitbox(), &pos.y);
 
-	
-
-
 	MoveX();
+
+	if (invincibility > 0) invincibility++;
+
+	if (invincibility >= 15)
+		FinishInvincibility();
+
 }
 void Enemy::MoveY() 
 {
@@ -95,6 +101,11 @@ void Enemy::MoveX()
 		SetAnimation((int)EnemyAnim::WALKING_LEFT);
 		look = EnemyLook::LEFT;
 	}
+	if (!map->TestCollisionGroundLeft(box) && look == EnemyLook::LEFT)
+	{
+		SetAnimation((int)EnemyAnim::WALKING_RIGHT);
+		look = EnemyLook::RIGHT;
+	}
 
 	if (pos.x >= WINDOW_WIDTH - TILE_SIZE)
 	{
@@ -116,7 +127,10 @@ void Enemy::DrawDebug(const Color& col) const
 	Entity::DrawHitbox(pos.x, pos.y, width, height, col);
 	DrawPixel(pos.x, pos.y, WHITE);
 
-	DrawRectangle(pos.x + width, pos.y + 1, 4, 4, WHITE);
+	AABB box = GetHitbox();
+	DrawRectangle(box.pos.x + box.width, box.pos.y + box.height + 2, 1, 1, BLACK);
+
+	DrawText(TextFormat("%d", getLife()), box.pos.x + (box.width / 2), box.pos.y + (box.height / 2), 1, WHITE);
 }
 void Enemy::Release()
 {
@@ -147,7 +161,25 @@ void Enemy::SetTileMap(TileMap* tilemap)
 {
 	map = tilemap;
 }
-EnemyType Enemy::getType()
+EnemyType Enemy::getType() const
 {
 	return type;
+}
+void Enemy::Damaged(int dmg)
+{
+	life -= dmg;
+}
+int Enemy::getLife() const
+{
+	return life;
+}
+void Enemy::StartInvincibility() {
+	invincibility = 1;
+}
+void Enemy::FinishInvincibility() {
+	invincibility = 0;
+}
+int Enemy::GetInvincibility()
+{
+	return invincibility;
 }
