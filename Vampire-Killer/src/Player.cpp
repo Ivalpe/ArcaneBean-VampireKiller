@@ -16,6 +16,7 @@ Player::Player(const Point& p, State s, Look view) :
 	life = 16;
 	invincibility = 0;
 	dmg = 2;
+	staAtt = AttackState::NO_ATTACKING;
 }
 Player::~Player()
 {
@@ -260,19 +261,19 @@ void Player::Update()
 		}
 		else if (state == State::CROUCHING)
 		{
-			/*
 			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_AIR_LEFT);
 			else						SetAnimation((int)PlayerAnim::ATTACKING_AIR_RIGHT);
-			 THIS FAIL BECAUSE THE STATE CROUCHING AND THE STATE ATTACKING CANT BE ACTIVATE
+
 			state = State::ATTACKING;
 			Sprite* sprite = dynamic_cast<Sprite*>(render);
 			sprite->SetManualMode();
-			*/
 		}
 		else
 		{
+			/*
 			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_GROUND_LEFT);
 			else						SetAnimation((int)PlayerAnim::ATTACKING_GROUND_RIGHT);
+			*/
 			state = State::ATTACKING;
 			Sprite* sprite = dynamic_cast<Sprite*>(render);
 			sprite->SetManualMode();

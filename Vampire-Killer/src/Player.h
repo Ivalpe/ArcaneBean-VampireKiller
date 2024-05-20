@@ -35,6 +35,7 @@
 //Logic states
 enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING, ATTACKING };
 enum class Look { RIGHT, LEFT };
+enum class AttackState { NO_ATTACKING, ATTACKING};
 
 //Rendering states
 enum class PlayerAnim {
@@ -109,6 +110,7 @@ private:
 
 	State state;
 	Look look;
+	AttackState staAtt;
 	int jump_delay;
 	int attacking;
 
