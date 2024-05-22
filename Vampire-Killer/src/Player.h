@@ -33,7 +33,7 @@
 #define GRAVITY_FORCE			1
 
 //Logic states
-enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING, ATTACKING };
+enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING };
 enum class Look { RIGHT, LEFT };
 enum class AttackState { NO_ATTACKING, ATTACKING};
 
@@ -63,6 +63,7 @@ public:
 	void DrawDebug(const Color& col) const;
 	void Release();
 	State GetState();
+	AttackState GetAttackState();
 	std::pair<AABB, AABB> GetHitbox() const;
 	void Draw();
 	void InitScore();

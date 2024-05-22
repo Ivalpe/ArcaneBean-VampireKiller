@@ -125,6 +125,10 @@ State Player::GetState()
 {
 	return state;
 }
+AttackState Player::GetAttackState()
+{
+	return staAtt;
+}
 void Player::SetTileMap(TileMap* tilemap)
 {
 	map = tilemap;
@@ -214,7 +218,7 @@ void Player::StartClimbingDown()
 void Player::ChangeAnimRight()
 {
 	look = Look::RIGHT;
-	if (state != State::ATTACKING)
+	if (staAtt == AttackState::NO_ATTACKING)
 	{
 		switch (state)
 		{
@@ -229,7 +233,7 @@ void Player::ChangeAnimRight()
 void Player::ChangeAnimLeft()
 {
 	look = Look::LEFT;
-	if (state != State::ATTACKING)
+	if (staAtt == AttackState::NO_ATTACKING)
 	{
 		switch (state)
 		{
@@ -246,6 +250,9 @@ void Player::Update()
 	//Player doesn't use the "Entity::Update() { pos += dir; }" default behaviour.
 	//Instead, uses an independent behaviour for each axis.
 
+	MoveX();
+	MoveY();
+
 	if (IsKeyPressed(KEY_SPACE))
 	{
 		if (state == State::JUMPING || state == State::FALLING)
@@ -261,28 +268,26 @@ void Player::Update()
 		}
 		else if (state == State::CROUCHING)
 		{
-			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_AIR_LEFT);
-			else						SetAnimation((int)PlayerAnim::ATTACKING_AIR_RIGHT);
 
-			state = State::ATTACKING;
+			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_CROUCH_LEFT);
+			else						SetAnimation((int)PlayerAnim::ATTACKING_CROUCH_RIGHT);
+
+			staAtt == AttackState::ATTACKING;
 			Sprite* sprite = dynamic_cast<Sprite*>(render);
 			sprite->SetManualMode();
+
 		}
 		else
 		{
-			/*
 			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_GROUND_LEFT);
 			else						SetAnimation((int)PlayerAnim::ATTACKING_GROUND_RIGHT);
-			*/
-			state = State::ATTACKING;
+			staAtt = AttackState::ATTACKING;
 			Sprite* sprite = dynamic_cast<Sprite*>(render);
 			sprite->SetManualMode();
 		}
 	}
 
-	MoveX();
-	MoveY();
-	if (state == State::ATTACKING)
+	if (staAtt == AttackState::ATTACKING)
 		Attack();
 
 	if (invincibility > 0) invincibility++;
@@ -303,7 +308,7 @@ void Player::MoveX()
 
 	if (IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT))
 	{
-		if (state != State::CROUCHING && state != State::ATTACKING) pos.x += -PLAYER_SPEED;
+		if (state != State::CROUCHING && staAtt != AttackState::ATTACKING) pos.x += -PLAYER_SPEED;
 		if (state == State::IDLE) StartWalkingLeft();
 		else
 		{
@@ -319,7 +324,7 @@ void Player::MoveX()
 	}
 	else if (IsKeyDown(KEY_RIGHT))
 	{
-		if (state != State::CROUCHING && state != State::ATTACKING) pos.x += PLAYER_SPEED;
+		if (state != State::CROUCHING && staAtt != AttackState::ATTACKING) pos.x += PLAYER_SPEED;
 		if (state == State::IDLE) StartWalkingRight();
 		else
 		{
@@ -359,7 +364,7 @@ void Player::MoveY()
 		{
 			if (state == State::FALLING) Stop();
 
-			if (IsKeyDown(KEY_UP))
+			if (IsKeyDown(KEY_UP) && staAtt == AttackState::NO_ATTACKING)
 			{
 				box = GetHitbox().first;
 				if (map->TestOnLadder(box, &pos.x))
@@ -367,10 +372,10 @@ void Player::MoveY()
 				else
 					StartJumping();
 			}
-			else if (IsKeyDown(KEY_DOWN))
+			else if (IsKeyDown(KEY_DOWN) && staAtt == AttackState::NO_ATTACKING)
 			{
 				//To Crouch
-				state = State::CROUCHING;
+ 				state = State::CROUCHING;
 				if (IsLookingLeft()) ChangeAnimLeft();
 				else ChangeAnimRight();
 
@@ -388,7 +393,7 @@ void Player::MoveY()
 			else
 			{
 				//To stop Crouching
-				if (state == State::CROUCHING) Stop();
+				if (state == State::CROUCHING && staAtt == AttackState::NO_ATTACKING) Stop();
 			}
 		}
 		//To Climb the stairs in the air
@@ -437,7 +442,7 @@ void Player::Attack() {
 		Stop();
 		sprite->SetAutomaticMode();
 		attacking = 0;
-		state = State::IDLE;
+		staAtt = AttackState::NO_ATTACKING;
 	}
 	else {
 		attacking++;
@@ -446,17 +451,16 @@ void Player::Attack() {
 void Player::Draw()
 {
 	Point p = Entity::GetRenderingPosition();
-	switch (state)
+	if (staAtt == AttackState::ATTACKING)
 	{
-	case State::ATTACKING:
 		if (look == Look::RIGHT)
 			render->Draw(p.x - 16, p.y);
 		else
 			render->Draw(p.x - 32, p.y);
-		break;
-	default:
+	}
+	else
+	{
 		render->Draw(p.x, p.y);
-		break;
 	}
 
 }
@@ -464,7 +468,7 @@ std::pair<AABB, AABB> Player::GetHitbox() const
 {
 	AABB playerHitbox, whipHitbox;
 
-	if (state == State::ATTACKING)
+	if (staAtt == AttackState::ATTACKING)
 	{
 		Point p(pos.x, pos.y - (height - 1));
 		playerHitbox.Set(p, width, height);
@@ -624,7 +628,7 @@ void Player::DrawDebug(const Color& col) const
 	AABB hitbox = GetHitbox().first;
 	Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y + hitbox.height, hitbox.width, hitbox.height, col);
 
-	if (state == State::ATTACKING && attacking >= 4)
+	if (staAtt == AttackState::ATTACKING && attacking >= 4)
 	{
 		AABB hitbox = GetHitbox().second;
 		Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y, hitbox.width, hitbox.height, col);

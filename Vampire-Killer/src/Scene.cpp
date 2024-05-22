@@ -369,7 +369,7 @@ void Scene::CheckCollisions()
 	while (itFi != fires.end())
 	{
 		obj_box = (*itFi)->GetHitbox();
-		if (whip_hitbox.TestAABB(obj_box) && player->GetState() == State::ATTACKING)
+		if (whip_hitbox.TestAABB(obj_box) && player->GetAttackState() == AttackState::ATTACKING)
 		{
 			//Change the array for not creating more fires in this position
 			lvlList->setEnt((*itFi)->GetPosArray());
