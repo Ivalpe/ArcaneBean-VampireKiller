@@ -109,7 +109,7 @@ private:
 	bool IsInFirstHalfTile() const;
 	bool IsInSecondHalfTile() const;
 
-	State state;
+	State state, prev_state;
 	Look look;
 	AttackState staAtt;
 	int jump_delay;

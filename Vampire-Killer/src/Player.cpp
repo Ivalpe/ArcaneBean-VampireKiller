@@ -92,18 +92,19 @@ AppStatus Player::Initialise()
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { nw * 8, nw * 2, nw * 4, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { nw * 4, nw * 4, -nw * 4, nh });
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { nw * 8, nw * 4, -nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { nw * 4, nw * 6, -nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { nw * 8, nw * 6, -nw * 4, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { nw * 4, nw * 4, nw * 4, nh });
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { nw * 8, nw * 4, nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { nw * 4, nw * 6, nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { nw * 8, nw * 6, nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { nw * 8, nw * 6, nw * 4, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_LEFT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { nw * 4, nw * 6, -nw * 4, nh });
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { nw * 8, nw * 6, -nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { nw * 4, nw * 4, -nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { nw * 8, nw * 4, -nw * 4, nh });
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { nw * 4, nw * 6, nw * 4, nh });
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { nw * 8, nw * 6, nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { nw * 4, nw * 4, nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { nw * 8, nw * 4, nw * 4, nh });
 
 	sprite->SetAnimation((int)PlayerAnim::IDLE_RIGHT);
 
@@ -170,18 +171,21 @@ PlayerAnim Player::GetAnimation()
 void Player::Stop()
 {
 	dir = { 0,0 };
+	prev_state = state;
 	state = State::IDLE;
 	if (IsLookingRight())	SetAnimation((int)PlayerAnim::IDLE_RIGHT);
 	else					SetAnimation((int)PlayerAnim::IDLE_LEFT);
 }
 void Player::StartWalkingLeft()
 {
+	prev_state = state;
 	state = State::WALKING;
 	look = Look::LEFT;
 	SetAnimation((int)PlayerAnim::WALKING_LEFT);
 }
 void Player::StartWalkingRight()
 {
+	prev_state = state;
 	state = State::WALKING;
 	look = Look::RIGHT;
 	SetAnimation((int)PlayerAnim::WALKING_RIGHT);
@@ -189,6 +193,7 @@ void Player::StartWalkingRight()
 void Player::StartFalling()
 {
 	dir.y = PLAYER_SPEED;
+	prev_state = state;
 	state = State::FALLING;
 	if (IsLookingRight())	SetAnimation((int)PlayerAnim::FALLING_RIGHT);
 	else					SetAnimation((int)PlayerAnim::FALLING_LEFT);
@@ -196,6 +201,7 @@ void Player::StartFalling()
 void Player::StartJumping()
 {
 	dir.y = -PLAYER_JUMP_FORCE;
+	prev_state = state;
 	state = State::JUMPING;
 	if (IsLookingRight())	SetAnimation((int)PlayerAnim::JUMPING_RIGHT);
 	else					SetAnimation((int)PlayerAnim::JUMPING_LEFT);
@@ -203,6 +209,7 @@ void Player::StartJumping()
 }
 void Player::StartClimbingUp()
 {
+	prev_state = state;
 	state = State::CLIMBING;
 	SetAnimation((int)PlayerAnim::CLIMBING);
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
@@ -210,6 +217,7 @@ void Player::StartClimbingUp()
 }
 void Player::StartClimbingDown()
 {
+	prev_state = state;
 	state = State::CLIMBING;
 	SetAnimation((int)PlayerAnim::CLIMBING_TOP);
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
@@ -257,14 +265,12 @@ void Player::Update()
 	{
 		if (state == State::JUMPING || state == State::FALLING)
 		{
-			/*
 			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_AIR_LEFT);
 			else						SetAnimation((int)PlayerAnim::ATTACKING_AIR_RIGHT);
-			 THIS FAIL BECAUSE CHANGING THE STATE CHANGE THE GRAVITY OF THE PLAYER
-			state = State::ATTACKING;
+
+			staAtt = AttackState::ATTACKING;
 			Sprite* sprite = dynamic_cast<Sprite*>(render);
 			sprite->SetManualMode();
-			*/
 		}
 		else if (state == State::CROUCHING)
 		{
@@ -272,7 +278,7 @@ void Player::Update()
 			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_CROUCH_LEFT);
 			else						SetAnimation((int)PlayerAnim::ATTACKING_CROUCH_RIGHT);
 
-			staAtt == AttackState::ATTACKING;
+			staAtt = AttackState::ATTACKING;
 			Sprite* sprite = dynamic_cast<Sprite*>(render);
 			sprite->SetManualMode();
 
@@ -303,10 +309,31 @@ void Player::MoveX()
 	AABB box;
 	int prev_x = pos.x;
 
+	box = GetHitbox().first;
 	//We can only go up and down while climbing
 	if (state == State::CLIMBING)	return;
 
-	if (IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT))
+	if ((state == State::FALLING && prev_state == State::JUMPING) || state == State::JUMPING)
+	{
+		if (look == Look::LEFT && prev_state == State::WALKING)
+		{
+			pos.x += -PLAYER_SPEED;
+
+			if (map->TestCollisionWallLeft(box) || pos.x <= 0)
+				pos.x = prev_x;
+		}
+		else if (look == Look::RIGHT && prev_state == State::WALKING)
+		{
+			pos.x += PLAYER_SPEED;
+
+			if (map->TestCollisionWallRight(box) || pos.x >= WINDOW_WIDTH - PLAYER_PHYSICAL_WIDTH)
+				pos.x = prev_x;
+
+		}
+
+	}
+
+	if (IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT) && state != State::JUMPING && state != State::FALLING)
 	{
 		if (state != State::CROUCHING && staAtt != AttackState::ATTACKING) pos.x += -PLAYER_SPEED;
 		if (state == State::IDLE) StartWalkingLeft();
@@ -315,14 +342,13 @@ void Player::MoveX()
 			if (IsLookingRight()) ChangeAnimLeft();
 		}
 
-		box = GetHitbox().first;
 		if (map->TestCollisionWallLeft(box) || pos.x <= 0)
 		{
 			pos.x = prev_x;
 			if (state == State::WALKING) Stop();
 		}
 	}
-	else if (IsKeyDown(KEY_RIGHT))
+	else if (IsKeyDown(KEY_RIGHT) && state != State::JUMPING && state != State::FALLING)
 	{
 		if (state != State::CROUCHING && staAtt != AttackState::ATTACKING) pos.x += PLAYER_SPEED;
 		if (state == State::IDLE) StartWalkingRight();
@@ -346,6 +372,7 @@ void Player::MoveX()
 void Player::MoveY()
 {
 	AABB box;
+
 
 	if (state == State::JUMPING)
 	{
@@ -375,7 +402,8 @@ void Player::MoveY()
 			else if (IsKeyDown(KEY_DOWN) && staAtt == AttackState::NO_ATTACKING)
 			{
 				//To Crouch
- 				state = State::CROUCHING;
+				prev_state = state;
+				state = State::CROUCHING;
 				if (IsLookingLeft()) ChangeAnimLeft();
 				else ChangeAnimRight();
 
@@ -470,12 +498,24 @@ std::pair<AABB, AABB> Player::GetHitbox() const
 
 	if (staAtt == AttackState::ATTACKING)
 	{
-		Point p(pos.x, pos.y - (height - 1));
-		playerHitbox.Set(p, width, height);
+		if (state == State::CROUCHING)
+		{
+			Point p(pos.x, pos.y - (height - 10));
+			playerHitbox.Set(p, width, height - 9);
 
-		//Whip
-		Point whipPoint(pos.x + (IsLookingLeft() ? -(width * 2) - 3 : width), (pos.y - 15));
-		whipHitbox.Set(whipPoint, width * 2.3f, height / 3);
+			//Whip
+			Point whipPoint(pos.x + (IsLookingLeft() ? -(width * 2) - 3 : width), (pos.y - 8));
+			whipHitbox.Set(whipPoint, width * 2.3f, height - 20);
+		}
+		else
+		{
+			Point p(pos.x, pos.y - (height - 1));
+			playerHitbox.Set(p, width, height);
+
+			//Whip
+			Point whipPoint(pos.x + (IsLookingLeft() ? -(width * 2) - 3 : width), (pos.y - 15));
+			whipHitbox.Set(whipPoint, width * 2.3f, height - 20);
+		}
 	}
 	else if (state == State::CROUCHING)
 	{
@@ -550,6 +590,7 @@ void Player::LogicJumping()
 				else					SetAnimation((int)PlayerAnim::FALLING_LEFT);
 			}
 		}
+
 		//We check ground collision when jumping down
 		if (dir.y >= 0)
 		{
@@ -637,6 +678,9 @@ void Player::DrawDebug(const Color& col) const
 	DrawText(TextFormat("Pos: (%d,%d)\nSize: %dx%d\nFrame: %dx%d", pos.x, pos.y, width, height, frame_width, frame_height), 16, 16, 1, LIGHTGRAY);
 	DrawText(TextFormat("Attack: %d", attacking), 16, 16 * 4, 1, LIGHTGRAY);
 	DrawText(TextFormat("Inv: %d", invincibility), 16, 16 * 5, 1, LIGHTGRAY);
+	DrawText(TextFormat("St: %d", state), 16, 16 * 6, 1, LIGHTGRAY);
+	DrawText(TextFormat("PrevSt: %d", prev_state), 16 * 3, 16 * 6, 1, LIGHTGRAY);
+	DrawText(TextFormat("StAtk: %d", staAtt), 16, 16 * 7, 1, LIGHTGRAY);
 
 	DrawPixel(pos.x, pos.y, WHITE);
 }

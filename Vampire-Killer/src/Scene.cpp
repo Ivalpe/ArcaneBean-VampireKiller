@@ -219,7 +219,7 @@ void Scene::Update()
 	else if (IsKeyPressed(KEY_F4))
 	{
 		LoadLevel(10, 101);
-	
+
 
 	}
 
@@ -418,7 +418,7 @@ void Scene::CheckCollisions()
 			++enList;
 		}
 		//Move to the next object
-		
+
 	}
 }
 void Scene::RenderObjects() const
