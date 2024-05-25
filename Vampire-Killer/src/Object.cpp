@@ -20,10 +20,23 @@ AppStatus Object::Initialise()
 		return AppStatus::ERROR;
 	}
 
+	ResourceManager& data = ResourceManager::Instance();
+	if (data.LoadTexture(Resource::IMG_WHIP, "Assets/MorningStar.png") != AppStatus::OK)
+	{
+		return AppStatus::ERROR;
+	}
+
 	render = new Sprite(data.GetTexture(Resource::IMG_ITEMS));
 	if (render == nullptr)
 	{
 		LOG("Failed to allocate memory for heart sprite");
+		return AppStatus::ERROR;
+	}
+
+	render = new Sprite(data.GetTexture(Resource::IMG_WHIP));
+	if (render == nullptr)
+	{
+		LOG("Failed to allocate memory for MorningStar sprite");
 		return AppStatus::ERROR;
 	}
 
@@ -44,8 +57,8 @@ Object::~Object()
 }
 void Object::DrawDebug(const Color& col) const
 {
-	AABB hitbox = GetHitbox();
-	Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y + hitbox.height, hitbox.width, hitbox.height, col);
+	AABB hitbox = GetHitbox();+
+	Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y + hitbox.height, hitbox.width, hitbox.height, col);  
 }
 AABB Object::GetHitbox() const
 {
