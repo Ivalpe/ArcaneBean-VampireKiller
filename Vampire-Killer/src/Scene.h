@@ -7,6 +7,7 @@
 #include "Levels.h"
 #include "Enemy.h"
 #include "Bar.h"
+#include "StaticImage.h"
 
 enum class DebugMode { OFF, SPRITES_AND_HITBOXES, ONLY_HITBOXES, SIZE };
 
@@ -20,7 +21,7 @@ public:
     void Update();
     void Render();
     void Release();
-    bool getLevelOver();
+    bool getLevelOver() const;
 
 private:
     AppStatus LoadLevel(int stage, int direction);
@@ -48,4 +49,5 @@ private:
     Levels* lvlList;
     Bar* playerBar;
     Bar* bossBar;
+    Texture2D ui;
 };

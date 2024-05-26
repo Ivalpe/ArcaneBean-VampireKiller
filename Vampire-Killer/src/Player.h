@@ -33,8 +33,9 @@
 #define GRAVITY_FORCE			1
 
 //Logic states
-enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING, ATTACKING };
+enum class State { IDLE, WALKING, JUMPING, FALLING, CLIMBING, DEAD, CROUCHING };
 enum class Look { RIGHT, LEFT };
+enum class AttackState { NO_ATTACKING, ATTACKING};
 
 //Rendering states
 enum class PlayerAnim {
@@ -62,6 +63,7 @@ public:
 	void DrawDebug(const Color& col) const;
 	void Release();
 	State GetState();
+	AttackState GetAttackState();
 	std::pair<AABB, AABB> GetHitbox() const;
 	void Draw();
 	void InitScore();
@@ -73,6 +75,7 @@ public:
 	void StartInvincibility();
 	void FinishInvincibility();
 	int GetInvincibility();
+	int GetDmg() const;
 
 private:
 	bool IsLookingRight() const;
@@ -107,13 +110,12 @@ private:
 	bool IsInFirstHalfTile() const;
 	bool IsInSecondHalfTile() const;
 
-	State state;
+	State state, prev_state;
 	Look look;
+	AttackState staAtt;
 	int jump_delay;
 	int attacking;
 
 	TileMap* map;
-	int score;
-	int life;
-	int invincibility;
+	int score, life, invincibility, dmg;
 };

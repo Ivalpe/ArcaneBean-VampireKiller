@@ -18,4 +18,4 @@ void StaticImage::DrawTint(int x, int y, const Color& col) const
 }
 void StaticImage::Release()
 {
-}
+}	
