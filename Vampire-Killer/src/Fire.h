@@ -6,15 +6,23 @@
 #define FIRE_FRAME_SIZE_HEIGHT		16
 
 #define ANIM_FIRE	10
+#define ANIM_CANDLE 10
+
+
+enum class FireType {
+	FIRE,
+	CANDLE
+};
 
 enum class FireAnim {
-	IDLE
+	IDLE_FIRE,
+	IDLE_CANDLE
 };
 
 class Fire : public Entity
 {
 public:
-	Fire(const Point& p, int width, int height, int pos);
+	Fire(const Point& p, int width, int height, int pos, FireType type);
 	AppStatus Initialise();
 	void Update();
 	int GetPosArray();
@@ -22,4 +30,6 @@ public:
 
 private:
 	int posArray;
+	FireType type;
+
 };

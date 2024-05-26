@@ -14,6 +14,7 @@ enum class Resource {
     IMG_WHIP,
     IMG_GAMEOVER,
     IMG_FIRE, 
+    IMG_CANDLE,
     IMG_KNIGHT,
     IMG_BAR
 };
