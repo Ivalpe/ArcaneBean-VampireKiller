@@ -2,7 +2,7 @@
 #include "Fire.h"
 
 
-Fire::Fire(const Point& p, int width, int height, int pos, FireType type) : Entity(p, width, height), type(type)
+Fire::Fire(const Point& p, int width, int height, int pos, ObjectType ot, FireType type) : Entity(p, width, height), type(type)
 {
 	posArray = pos;
 	item = ot;

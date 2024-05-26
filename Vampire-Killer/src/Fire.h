@@ -24,7 +24,7 @@ class Fire : public Entity
 {
 public:
 
-	Fire(const Point& p, int width, int height, int pos, FireType type);
+	Fire(const Point& p, int width, int height, int pos, ObjectType ot, FireType type);
 
 	AppStatus Initialise();
 	void Update();
@@ -36,6 +36,6 @@ private:
 	int posArray;
 
 	FireType type;
-
+	ObjectType item;
 
 };

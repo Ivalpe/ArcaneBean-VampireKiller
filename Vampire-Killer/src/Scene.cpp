@@ -146,7 +146,7 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 			{
 				pos.x = x * TILE_SIZE;
 				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ent = new Fire(pos, 16, 16, i, ObjectType::HEART);
+				ent = new Fire(pos, 16, 16, i, ObjectType::HEART, FireType::FIRE);
 				ent->Initialise();
 				fires.push_back(ent);
 			}
@@ -154,7 +154,7 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 			{
 				pos.x = x * TILE_SIZE;
 				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ent = new Fire(pos, 16, 16, i, ObjectType::HEART_BIG);
+				ent = new Fire(pos, 16, 16, i, ObjectType::HEART_BIG, FireType::FIRE);
 				ent->Initialise();
 				fires.push_back(ent);
 			}
@@ -162,7 +162,7 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 			{
 				pos.x = x * TILE_SIZE;
 				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ent = new Fire(pos, 16, 16, i, ObjectType::WHIPE);
+				ent = new Fire(pos, 16, 16, i, ObjectType::WHIPE, FireType::FIRE);
 				ent->Initialise();
 				fires.push_back(ent);
 			}
