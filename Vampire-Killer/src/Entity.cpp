@@ -76,3 +76,14 @@ void Entity::DrawHitbox(int x, int y, int w, int h, const Color& col) const
 	render->DrawBox(x, y - (h - 1), w, h, c);
 	render->DrawCorners(x, y - (h - 1), w, h);
 }
+
+void Entity::SetWidth(int w)
+{
+	width = w;
+	frame_width = w;
+}
+void Entity::SetHeight(int h)
+{
+	height = h;
+	frame_height = h;
+}

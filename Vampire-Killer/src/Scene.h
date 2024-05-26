@@ -50,4 +50,5 @@ private:
     Bar* playerBar;
     Bar* bossBar;
     Texture2D ui;
+    int medusaSpawnRate;
 };

@@ -1,7 +1,4 @@
-Project executed on 23-05-2024 at 18:28:41.
+Project executed on 26-05-2024 at 13:45:48.
 main.cpp(13): Application start
-Object.cpp(98): Internal error: object type invalid when giving points
-Object.cpp(98): Internal error: object type invalid when giving points
-Object.cpp(98): Internal error: object type invalid when giving points
 main.cpp(34): Application finish
 main.cpp(37): Bye :)

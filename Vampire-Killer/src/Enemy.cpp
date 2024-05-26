@@ -4,118 +4,186 @@
 #include "Globals.h"
 #include <raymath.h>
 #include <iostream>
+#include <cmath>
 
-Enemy::Enemy(const Point& p, EnemyState s, EnemyLook view, float width, float height) :
-	Entity(p, width, height, width, height)
+Enemy::Enemy(float width, float height) :
+	Entity({ 0,0 }, width, height, width, height)
 {
-	w = width;
-	h = height;
-	state = s;
-	look = view;
 	map = nullptr;
-	type = EnemyType::KNIGHT;
+	alive = false;
+	medusaSpawn = false;
 	invincibility = 0;
+	time = 0;
 }
 
 Enemy::~Enemy()
 {
 }
 
-AppStatus Enemy::Initialise()
+AppStatus Enemy::Initialise(Point& p, EnemyType et, EnemyState s, EnemyLook view, TileMap* tilemap, int width, int height)
 {
 	ResourceManager& data = ResourceManager::Instance();
-	if (data.LoadTexture(Resource::IMG_KNIGHT, "Assets/Sprites/Knight.png") != AppStatus::OK)
+	Sprite* sprite;
+
+	pos.x = p.x;
+	pos.y = p.y;
+	initialY = p.y;
+	initialX = p.x;
+
+
+	Entity::SetWidth(width);
+	Entity::SetHeight(height);
+
+	map = tilemap;
+	type = et;
+	state = s;
+	look = view;
+	alive = true;
+
+	float w = width, h = height;
+
+	switch (type)
 	{
+	case EnemyType::KNIGHT:
+
+		if (data.LoadTexture(Resource::IMG_KNIGHT, "Assets/Sprites/Knight.png") != AppStatus::OK)
+		{
+			return AppStatus::ERROR;
+		}
+
+		render = new Sprite(data.GetTexture(Resource::IMG_KNIGHT));
+		if (render == nullptr)
+		{
+			LOG("Failed to allocate memory for player sprite");
+			return AppStatus::ERROR;
+		}
+
+		sprite = dynamic_cast<Sprite*>(render);
+		sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS);
+
+		sprite->SetAnimationDelay((int)EnemyAnim::WALKING_RIGHT, ANIM_DELAY * 2);
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { 0, 0, -w, h });
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w, 0, -w, h });
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w * 2, 0, -w, h });
+		sprite->SetAnimationDelay((int)EnemyAnim::WALKING_LEFT, ANIM_DELAY * 2);
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { 0, 0, w, h });
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w, 0, w, h });
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w * 2, 0, w, h });
+
+		sprite->SetAnimation((int)EnemyAnim::WALKING_LEFT);
+
+		life = 8;
+		break;
+	case EnemyType::MEDUSA_HEAD:
+		if (data.LoadTexture(Resource::IMG_MEDUSA_HEAD, "Assets/Sprites/MedusaHead.png") != AppStatus::OK)
+		{
+			return AppStatus::ERROR;
+		}
+
+		render = new Sprite(data.GetTexture(Resource::IMG_MEDUSA_HEAD));
+		if (render == nullptr)
+		{
+			LOG("Failed to allocate memory for player sprite");
+			return AppStatus::ERROR;
+		}
+
+		sprite = dynamic_cast<Sprite*>(render);
+		sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS);
+
+		sprite->SetAnimationDelay((int)EnemyAnim::WALKING_RIGHT, ANIM_DELAY * 2);
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { 0, 0, -w, h });
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w, 0, -w, h });
+		sprite->SetAnimationDelay((int)EnemyAnim::WALKING_LEFT, ANIM_DELAY * 2);
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { 0, 0, w, h });
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w, 0, w, h });
+
+		if (look == EnemyLook::RIGHT)
+			sprite->SetAnimation((int)EnemyAnim::WALKING_RIGHT);
+		else
+			sprite->SetAnimation((int)EnemyAnim::WALKING_LEFT);
+
+		life = 1;
+		break;
+	default:
+		LOG("Failed to load Enemy");
 		return AppStatus::ERROR;
+		break;
 	}
 
-	render = new Sprite(data.GetTexture(Resource::IMG_KNIGHT));
-	if (render == nullptr)
+
+
+}
+void Enemy::Update()
+{
+	if (type == EnemyType::KNIGHT || (type == EnemyType::MEDUSA_HEAD && medusaSpawn))
 	{
-		LOG("Failed to allocate memory for player sprite");
-		return AppStatus::ERROR;
+		Sprite* sprite = dynamic_cast<Sprite*>(render);
+		sprite->Update();
+
+		MoveY();
+		if (type != EnemyType::MEDUSA_HEAD)
+			map->TestCollisionGround(GetHitbox(), &pos.y);
+
+		MoveX();
+
+		if (invincibility > 0) invincibility++;
+
+		if (invincibility >= 15)
+			FinishInvincibility();
 	}
-
-	Sprite* sprite = dynamic_cast<Sprite*>(render);
-	sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS);
-
-	
-	sprite->SetAnimationDelay((int)EnemyAnim::WALKING_RIGHT, ANIM_DELAY * 2);
-	sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { 0, 0, -w, h });
-	sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w, 0, -w, h });
-	sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w * 2, 0, -w, h });
-	sprite->SetAnimationDelay((int)EnemyAnim::WALKING_LEFT, ANIM_DELAY * 2);
-	sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { 0, 0, w, h });
-	sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w, 0, w, h });
-	sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w * 2, 0, w, h });
-	
-	sprite->SetAnimation((int)EnemyAnim::WALKING_LEFT);
-
-	life = 8;
 }
-void Enemy::Update() 
+void Enemy::MoveY()
 {
-	Sprite* sprite = dynamic_cast<Sprite*>(render);
-	sprite->Update();
-
-	MoveY();
-	map->TestCollisionGround(GetHitbox(), &pos.y);
-
-	MoveX();
-
-	if (invincibility > 0) invincibility++;
-
-	if (invincibility >= 15)
-		FinishInvincibility();
-
-}
-void Enemy::MoveY() 
-{
-	pos.y += ENEMY_SPEED;
+	if (type == EnemyType::KNIGHT)
+		pos.y += ENEMY_SPEED;
+	else
+		pos.y = initialY + 20 * sin(time);
 }
 void Enemy::MoveX()
 {
 	int prev_x = pos.x;
+	AABB box;
 
-	if (look == EnemyLook::LEFT)	pos.x -= ENEMY_SPEED;
-	else							pos.x += ENEMY_SPEED;
+	switch (type)
+	{
+	case EnemyType::KNIGHT:
 
-	AABB box = GetHitbox();
-	
-	if (map->TestCollisionWallLeft(box) || pos.x <= 0)
-	{
-		pos.x = prev_x;
-		SetAnimation((int)EnemyAnim::WALKING_RIGHT);
-		look = EnemyLook::RIGHT;
-	}
+		if (look == EnemyLook::LEFT)	pos.x -= ENEMY_SPEED;
+		else							pos.x += ENEMY_SPEED;
 
-	if (map->TestCollisionWallRight(box) || pos.x >= WINDOW_WIDTH - 16)
-	{
-		pos.x = prev_x;
-		SetAnimation((int)EnemyAnim::WALKING_LEFT);
-		look = EnemyLook::LEFT;
-	}
+		box = GetHitbox();
 
-	if (!map->TestCollisionGroundRight(box) && look == EnemyLook::RIGHT)
-	{
-		SetAnimation((int)EnemyAnim::WALKING_LEFT);
-		look = EnemyLook::LEFT;
-	}
-	if (!map->TestCollisionGroundLeft(box) && look == EnemyLook::LEFT)
-	{
-		SetAnimation((int)EnemyAnim::WALKING_RIGHT);
-		look = EnemyLook::RIGHT;
-	}
+		if (map->TestCollisionWallLeft(box) || pos.x <= 0)
+		{
+			pos.x = prev_x;
+			SetAnimation((int)EnemyAnim::WALKING_RIGHT);
+			look = EnemyLook::RIGHT;
+		}
+		if (map->TestCollisionWallRight(box) || pos.x >= WINDOW_WIDTH - 16)
+		{
+			pos.x = prev_x;
+			SetAnimation((int)EnemyAnim::WALKING_LEFT);
+			look = EnemyLook::LEFT;
+		}
+		if ((!map->TestCollisionGroundRight(box) && look == EnemyLook::RIGHT) || pos.x >= WINDOW_WIDTH - TILE_SIZE)
+		{
+			SetAnimation((int)EnemyAnim::WALKING_LEFT);
+			look = EnemyLook::LEFT;
+		}
+		if ((!map->TestCollisionGroundLeft(box) && look == EnemyLook::LEFT) || pos.x <= 0)
+		{
+			SetAnimation((int)EnemyAnim::WALKING_RIGHT);
+			look = EnemyLook::RIGHT;
+		}
+		break;
+	case EnemyType::MEDUSA_HEAD:
+		if (look == EnemyLook::LEFT)	pos.x -= ENEMY_SPEED;
+		else							pos.x += ENEMY_SPEED;
 
-	if (pos.x >= WINDOW_WIDTH - TILE_SIZE)
-	{
-		SetAnimation((int)EnemyAnim::WALKING_LEFT);
-		look = EnemyLook::LEFT;
-	}
-	else if (pos.x <= 0)
-	{
-		SetAnimation((int)EnemyAnim::WALKING_RIGHT);
-		look = EnemyLook::RIGHT;
+		time += 0.1;
+		break;
+	default:
+		break;
 	}
 }
 void Enemy::Render() {
@@ -135,9 +203,10 @@ void Enemy::DrawDebug(const Color& col) const
 void Enemy::Release()
 {
 	ResourceManager& data = ResourceManager::Instance();
-	data.ReleaseTexture(Resource::IMG_PLAYER);
-
-	render->Release();
+	if (type == EnemyType::KNIGHT)
+		data.ReleaseTexture(Resource::IMG_KNIGHT);
+	else
+		data.ReleaseTexture(Resource::IMG_MEDUSA_HEAD);
 }
 bool Enemy::IsLookingRight() const
 {
@@ -156,10 +225,6 @@ EnemyAnim Enemy::GetAnimation()
 {
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
 	return (EnemyAnim)sprite->GetAnimation();
-}
-void Enemy::SetTileMap(TileMap* tilemap)
-{
-	map = tilemap;
 }
 EnemyType Enemy::getType() const
 {
@@ -182,4 +247,43 @@ void Enemy::FinishInvincibility() {
 int Enemy::GetInvincibility()
 {
 	return invincibility;
+}
+bool Enemy::IsAlive() const
+{
+	return alive;
+}
+void Enemy::Die()
+{
+	alive = false;
+}
+AABB Enemy::GetHitbox() const
+{
+	if (type == EnemyType::KNIGHT)
+	{
+		Point p(pos.x, pos.y - (height - 1));
+		AABB hitbox(p, width, height);
+		return hitbox;
+	}
+	else
+	{
+		Point p(pos.x, pos.y - (height - 1));
+		AABB hitbox(p, width, height);
+		return hitbox;
+	}
+
+}
+void Enemy::MedusaSpawn(bool spawn)
+{
+	medusaSpawn = spawn;
+	if (!spawn)
+		RestartMedusa();
+}
+bool Enemy::IsMedusaSpawn()
+{
+	return medusaSpawn;
+}
+void Enemy::RestartMedusa()
+{
+	pos.x = initialX;
+	pos.y = initialY;
 }

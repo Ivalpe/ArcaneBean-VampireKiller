@@ -15,6 +15,8 @@ Scene::Scene()
 	camera.rotation = 0.0f;					//No rotation
 	camera.zoom = 1.0f;						//Default zoom
 
+	medusaSpawnRate = 120;
+
 	debug = DebugMode::OFF;
 }
 Scene::~Scene()
@@ -90,6 +92,11 @@ AppStatus Scene::Init()
 	pos = Point(61, -9);
 	bossBar = new Bar(16, { 251, 31, 46, 255 }, pos, 64, 4);
 
+	//Init Enemies
+	enemies = std::vector<Enemy*>(5);
+	for (size_t i = 0; i < enemies.size(); i++)
+		enemies[i] = new Enemy(16, 16);
+
 	return AppStatus::OK;
 }
 AppStatus Scene::LoadLevel(int stage, int direction)
@@ -100,7 +107,6 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 	Point pos;
 	Object* obj;
 	Fire* ent;
-	Enemy* ene;
 
 	while (!objects.empty())
 		objects.pop_back();
@@ -108,8 +114,10 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 	while (!fires.empty())
 		fires.pop_back();
 
-	while (!enemies.empty())
-		enemies.pop_back();
+	for (size_t i = 0; i < enemies.size(); i++)
+	{
+		enemies[i]->Die();
+	}
 
 	lvlList->setLvl(stage);
 
@@ -132,48 +140,52 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 	{
 		for (x = 0; x < LEVEL_WIDTH; ++x)
 		{
+
+			pos.x = x * TILE_SIZE;
+			pos.y = y * TILE_SIZE + TILE_SIZE - 1;
 			tile = (Tile)entities[i];
 			if ((direction == 100 && tile == Tile::PLAYERUP) ||
 				(direction == 101 && tile == Tile::PLAYERRIGHT) ||
 				(direction == 102 && tile == Tile::PLAYERDOWN) ||
 				(direction == 103 && tile == Tile::PLAYERLEFT))
 			{
-				pos.x = x * TILE_SIZE;
-				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
 				player->SetPos(pos);
 			}
-			else if (tile == Tile::ITEM_FIRE_HEART)
+			else if (tile == Tile::ITEM_FIRE_HEART || tile == Tile::ITEM_FIRE_HEART_BIG || tile == Tile::ITEM_FIRE_WHIPE)
 			{
-				pos.x = x * TILE_SIZE;
-				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ent = new Fire(pos, 16, 16, i, ObjectType::HEART);
-				ent->Initialise();
-				fires.push_back(ent);
-			}
-			else if (tile == Tile::ITEM_FIRE_HEART_BIG)
-			{
-				pos.x = x * TILE_SIZE;
-				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ent = new Fire(pos, 16, 16, i, ObjectType::HEART_BIG);
-				ent->Initialise();
-				fires.push_back(ent);
-			}
-			else if (tile == Tile::ITEM_FIRE_WHIPE)
-			{
-				pos.x = x * TILE_SIZE;
-				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ent = new Fire(pos, 16, 16, i, ObjectType::WHIPE);
+				if (tile == Tile::ITEM_FIRE_HEART)
+					ent = new Fire(pos, 16, 16, i, ObjectType::HEART);
+				else if (tile == Tile::ITEM_FIRE_HEART_BIG)
+					ent = new Fire(pos, 16, 16, i, ObjectType::HEART_BIG);
+				else
+					ent = new Fire(pos, 16, 16, i, ObjectType::WHIPE);
 				ent->Initialise();
 				fires.push_back(ent);
 			}
 			else if (tile == Tile::ENEMY_KNIGHT)
 			{
-				pos.x = x * TILE_SIZE;
-				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ene = new Enemy(pos, EnemyState::WALKING, EnemyLook::LEFT, 16, 32);
-				ene->Initialise();
-				ene->SetTileMap(level);
-				enemies.push_back(ene);
+				for (size_t i = 0; i < enemies.size(); i++)
+				{
+					if (!enemies[i]->IsAlive())
+					{
+						enemies[i]->Initialise(pos, EnemyType::KNIGHT, EnemyState::WALKING, EnemyLook::LEFT, level, 16, 32);
+						break;
+					}
+				}
+			}
+			else if (tile == Tile::ENEMY_MEDUSA_HEAD_LEFT || tile == Tile::ENEMY_MEDUSA_HEAD_RIGHT)
+			{
+				for (size_t i = 0; i < enemies.size(); i++)
+				{
+					if (!enemies[i]->IsAlive())
+					{
+						if (tile == Tile::ENEMY_MEDUSA_HEAD_LEFT)
+							enemies[i]->Initialise(pos, EnemyType::MEDUSA_HEAD, EnemyState::WALKING, EnemyLook::LEFT, level, 16, 16);
+						else
+							enemies[i]->Initialise(pos, EnemyType::MEDUSA_HEAD, EnemyState::WALKING, EnemyLook::RIGHT, level, 16, 16);
+						break;
+					}
+				}
 			}
 			++i;
 		}
@@ -219,8 +231,6 @@ void Scene::Update()
 	else if (IsKeyPressed(KEY_F4))
 	{
 		LoadLevel(10, 101);
-
-
 	}
 
 	level->Update();
@@ -238,7 +248,32 @@ void Scene::Update()
 
 	for (size_t i = 0; i < enemies.size(); i++)
 	{
-		enemies[i]->Update();
+		if (enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD)
+		{
+			medusaSpawnRate--;
+			break;
+		}
+	}
+
+
+	for (size_t i = 0; i < enemies.size(); i++)
+	{
+		if (enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::KNIGHT)
+			enemies[i]->Update();
+
+		if (medusaSpawnRate == 0 && enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && !enemies[i]->IsMedusaSpawn())
+		{
+			enemies[i]->MedusaSpawn(true);
+			medusaSpawnRate = 120;
+		}
+		if (enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())
+			enemies[i]->Update();
+
+		if (enemies[i]->GetPos().x <= -16 || enemies[i]->GetPos().x >= WINDOW_WIDTH)
+		{
+			enemies[i]->MedusaSpawn(false);
+		}
+
 	}
 	CheckCollisions();
 }
@@ -273,12 +308,14 @@ void Scene::Render()
 	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
 		for (size_t i = 0; i < enemies.size(); i++)
 		{
-			enemies[i]->Draw();
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+				enemies[i]->Draw();
 		}
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		for (size_t i = 0; i < enemies.size(); i++)
 		{
-			enemies[i]->DrawDebug(GREEN);
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+				enemies[i]->DrawDebug(GREEN);
 		}
 
 	//Objects
@@ -390,35 +427,33 @@ void Scene::CheckCollisions()
 	}
 
 	//Collision Enemy
-	auto enList = enemies.begin();
-	while (enList != enemies.end())
+	for (size_t i = 0; i < enemies.size(); i++)
 	{
-		obj_box = (*enList)->GetHitbox();
-		if (player_box.TestAABB(obj_box) && player->GetInvincibility() == 0)
+		if (enemies[i]->IsAlive())
 		{
-			EnemyType et = (*enList)->getType();
-			player->Damaged(et);
-			playerBar->changeBar(player->GetLife());
-			player->StartInvincibility();
-		}
-		else if (whip_hitbox.TestAABB(obj_box) && (*enList)->GetInvincibility() == 0)
-		{
-			(*enList)->Damaged(player->GetDmg());
-			(*enList)->StartInvincibility();
-			if ((*enList)->getLife() <= 0)
+			obj_box = enemies[i]->GetHitbox();
+			//Collision Player with Enemy
+			if (player_box.TestAABB(obj_box) && player->GetInvincibility() == 0)
 			{
-				//Delete the object
-				delete* enList;
-				//Erase the object from the vector and get the iterator to the next valid element
-				enList = enemies.erase(enList);
+				EnemyType et = enemies[i]->getType();
+				player->Damaged(et);
+				playerBar->changeBar(player->GetLife());
+				player->StartInvincibility();
+			}
+			//Collision Whip with Enemy
+			else if (whip_hitbox.TestAABB(obj_box) && enemies[i]->GetInvincibility() == 0)
+			{
+				enemies[i]->Damaged(player->GetDmg());
+				enemies[i]->StartInvincibility();
+				if (enemies[i]->getLife() <= 0)
+				{
+					if (enemies[i]->getType() == EnemyType::KNIGHT)
+						enemies[i]->Die();
+					else
+						enemies[i]->MedusaSpawn(false);
+				}
 			}
 		}
-		else
-		{
-			++enList;
-		}
-		//Move to the next object
-
 	}
 }
 void Scene::RenderObjects() const
