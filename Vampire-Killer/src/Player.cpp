@@ -541,6 +541,11 @@ void Player::Damaged(EnemyType enemy)
 		break;
 	}
 }
+void Player::Healed() {
+
+	life = life + 1;
+
+}
 int Player::GetLife()
 {
 	return life;

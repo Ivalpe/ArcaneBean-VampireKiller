@@ -351,7 +351,7 @@ void Scene::CheckCollisions()
 		if (player_box.TestAABB(obj_box) && (*itObj)->GetHeartState() == ItemAnim::IDLE)
 		{
 			player->IncrScore((*itObj)->Points());
-
+			player->Healed();
 			//Delete the object
 			delete* itObj;
 			//Erase the object from the vector and get the iterator to the next valid element

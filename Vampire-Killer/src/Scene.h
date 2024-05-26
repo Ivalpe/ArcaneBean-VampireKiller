@@ -37,7 +37,7 @@ private:
     TileMap* level;
 
     std::vector<Object*> objects;
-    std::vector<Fire*> fires;
+    std::vector<Fire*> fires; 
     std::vector<Enemy*> enemies;
 
     Camera2D camera;
