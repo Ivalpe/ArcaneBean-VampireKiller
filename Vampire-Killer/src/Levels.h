@@ -16,8 +16,9 @@ public:
 	std::vector<int> getMap();
 	std::vector<int> getEnt();
 	posTp getTp();
-	void setLvl(int level);
-	void setEnt(int pos);
+	int GetLvl();
+	void SetLvl(int level);
+	void SetEnt(int pos);
 
 private:
 	int level;

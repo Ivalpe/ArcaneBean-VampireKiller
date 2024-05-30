@@ -106,6 +106,7 @@ void TileMap::InitTileDictionary()
 
 	dict_rect[(int)Tile::BLOCK_CASTLE_DIRT] = { n * 9,  0, n, n };
 	dict_rect[(int)Tile::BLOCK_CASTLE_DIRT2] = { n * 10,  n * 5, n, n };
+	dict_rect[(int)Tile::BLOCK_INVISIBLE] = { n,  n * 9, n, n };
 
 	dict_rect[(int)Tile::CASTLE1] = { n * 10,  0, n, n };
 	dict_rect[(int)Tile::CASTLE2] = { n * 11,  0, n, n };

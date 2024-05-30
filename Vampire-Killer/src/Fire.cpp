@@ -1,7 +1,8 @@
 #include "Sprite.h"
 #include "Fire.h"
 
-Fire::Fire(const Point& p, int width, int height, int pos, ObjectType ot) : Entity(p, width, height)
+
+Fire::Fire(const Point& p, int width, int height, int pos, ObjectType ot, FireType type) : Entity(p, width, height), type(type)
 {
 	posArray = pos;
 	item = ot;
@@ -9,17 +10,24 @@ Fire::Fire(const Point& p, int width, int height, int pos, ObjectType ot) : Enti
 
 AppStatus Fire::Initialise()
 {
-
 	ResourceManager& data = ResourceManager::Instance();
-	if (data.LoadTexture(Resource::IMG_FIRE, "Assets/Sprites/Fire.png") != AppStatus::OK)
-	{
-		return AppStatus::ERROR;
+
+	if (type == FireType::FIRE) {
+		if (data.LoadTexture(Resource::IMG_FIRE, "Assets/Sprites/Fire.png") != AppStatus::OK) {
+			return AppStatus::ERROR;
+		}
+		render = new Sprite(data.GetTexture(Resource::IMG_FIRE));
+	}
+	else if (type == FireType::CANDLE) {
+		if (data.LoadTexture(Resource::IMG_CANDLE, "Assets/Sprites/Candle.png") != AppStatus::OK) {
+			return AppStatus::ERROR;
+		}
+		render = new Sprite(data.GetTexture(Resource::IMG_CANDLE));
 	}
 
-	render = new Sprite(data.GetTexture(Resource::IMG_FIRE));
 	if (render == nullptr)
 	{
-		LOG("Failed to allocate memory for fire sprite");
+		LOG("Failed to allocate memory for sprite");
 		return AppStatus::ERROR;
 	}
 
@@ -29,8 +37,8 @@ AppStatus Fire::Initialise()
 	sprite->SetAnimationDelay((int)FireAnim::IDLE, ANIM_FIRE);
 	sprite->AddKeyFrame((int)FireAnim::IDLE, { 0, 0, FIRE_FRAME_SIZE_WIDTH, FIRE_FRAME_SIZE_HEIGHT });
 	sprite->AddKeyFrame((int)FireAnim::IDLE, { FIRE_FRAME_SIZE_WIDTH, 0, FIRE_FRAME_SIZE_WIDTH, FIRE_FRAME_SIZE_HEIGHT });
-
 	sprite->SetAnimation((int)FireAnim::IDLE);
+
 
 	return AppStatus::OK;
 }

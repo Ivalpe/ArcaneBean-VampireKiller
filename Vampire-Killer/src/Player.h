@@ -48,6 +48,7 @@ enum class PlayerAnim {
 	ATTACKING_GROUND_LEFT, ATTACKING_GROUND_RIGHT,
 	ATTACKING_AIR_LEFT, ATTACKING_AIR_RIGHT,
 	ATTACKING_CROUCH_LEFT, ATTACKING_CROUCH_RIGHT,
+	LOOKING_AHEAD,
 	NUM_ANIMATIONS
 };
 
@@ -75,6 +76,9 @@ public:
 	void FinishInvincibility();
 	int GetInvincibility();
 	int GetDmg() const;
+	void MoveAuto(bool move);
+	void BlockMovement(bool m);
+	void LookAhead(bool trigger);
 
 private:
 	bool IsLookingRight() const;
@@ -99,7 +103,7 @@ private:
 	void StartClimbingDown();
 	void ChangeAnimRight();
 	void ChangeAnimLeft();
-	
+	void Move(Look l, AABB box, int prev_x);
 
 	//Jump steps
 	bool IsAscending() const;
@@ -112,6 +116,7 @@ private:
 	State state, prev_state;
 	Look look;
 	AttackState staAtt;
+	bool move, blockMovement;
 	int jump_delay;
 	int attacking;
 

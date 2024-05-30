@@ -8,6 +8,12 @@
 
 #define ANIM_FIRE	10
 
+
+enum class FireType {
+	FIRE,
+	CANDLE
+};
+
 enum class FireAnim {
 	IDLE
 };
@@ -15,7 +21,9 @@ enum class FireAnim {
 class Fire : public Entity
 {
 public:
-	Fire(const Point& p, int width, int height, int pos, ObjectType ot);
+
+	Fire(const Point& p, int width, int height, int pos, ObjectType ot, FireType type);
+
 	AppStatus Initialise();
 	void Update();
 	int GetPosArray();
@@ -24,5 +32,8 @@ public:
 	ObjectType GetItemType() const;
 private:
 	int posArray;
+
+	FireType type;
 	ObjectType item;
+
 };

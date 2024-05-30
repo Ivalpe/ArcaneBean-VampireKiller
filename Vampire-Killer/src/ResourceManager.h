@@ -8,15 +8,15 @@
 enum class Resource {
     IMG_MSCREEN,
     IMG_MENU,
-    IMG_PLAYER, 
+    IMG_PLAYER,
     IMG_TILES,
     IMG_ITEMS,
     IMG_GAMEOVER,
-    IMG_FIRE, 
+    IMG_FIRE,
+    IMG_CANDLE,
     IMG_KNIGHT,
     IMG_MEDUSA_HEAD,
     IMG_BAR,
-    IMG_UI
 };
 
 enum class MusicResource {
