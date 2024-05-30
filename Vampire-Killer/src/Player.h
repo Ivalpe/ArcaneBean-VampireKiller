@@ -71,7 +71,6 @@ public:
 	void IncrScore(int n);
 	int GetScore();
 	void Damaged(EnemyType enemyType);
-	void Healed();
 	int GetLife();
 	void StartInvincibility();
 	void FinishInvincibility();
