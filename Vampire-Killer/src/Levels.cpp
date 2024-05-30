@@ -9,6 +9,22 @@ AppStatus Levels::Initialise() {
 	level = 1;
 	std::vector<int> mapEnt;
 
+	mapEnt =  //stage 0.0
+	{
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,101,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
+	};
+	entities.push_back(mapEnt);
+
 	mapEnt =  //stage 0.1
 	{
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
@@ -57,9 +73,9 @@ AppStatus Levels::Initialise() {
 	};
 	entities.push_back(mapEnt);
 
-	mapEnt = {//stage 2.1
+	mapEnt = {//stage 2.4
 
-		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,100 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,200 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
@@ -73,9 +89,9 @@ AppStatus Levels::Initialise() {
 	};
 	entities.push_back(mapEnt);
 
-	mapEnt = {//stage 2.2
+	mapEnt = {//stage 2.5
 
-		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,100 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
@@ -89,9 +105,9 @@ AppStatus Levels::Initialise() {
 	};
 	entities.push_back(mapEnt);
 
-	mapEnt = {//stage 2.3
+	mapEnt = {//stage 2.6
 
-		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,100 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
@@ -105,7 +121,7 @@ AppStatus Levels::Initialise() {
 	};
 	entities.push_back(mapEnt);
 
-	mapEnt = {//stage 2.4
+	mapEnt = {//stage 2.7
 
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
@@ -117,27 +133,27 @@ AppStatus Levels::Initialise() {
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0,0,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
-		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
+		0 ,0 ,0 ,0 ,0 ,104 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
 	};
 	entities.push_back(mapEnt);
 
-	mapEnt = {//stage 2.5
+	mapEnt = {//stage 2.8
 
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
-		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
-		0 ,103 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,101 ,0,
-		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
-		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,201,
+		0 ,103,0,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,101,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
-		0 ,0,0,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
-		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,104 ,0 ,0 ,0 ,0 ,0 ,0 ,0
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		202,0,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,201,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,104,0,0 ,0 ,0 ,0 ,0 ,0
 	};
 	entities.push_back(mapEnt);
 
-	mapEnt = {//stage 2.6
+	mapEnt = {//stage 2.9
 
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
@@ -149,7 +165,7 @@ AppStatus Levels::Initialise() {
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0,0,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
-		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,104 ,0 ,0
 	};
 	entities.push_back(mapEnt);
 
@@ -176,7 +192,23 @@ std::vector<int> Levels::getMap() {
 	std::vector<int> map;
 	switch (level)
 	{
-	case 1://stage 1.1
+	case 1://stage 0.0
+		map = {
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,
+		};
+		return map;
+		break;
+	case 2://stage 1.1
 		map = {
 		1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4,
 		9, 10,11,12,9 ,10,11,12,9 ,10,11,12,9 ,10,11,12,
@@ -192,7 +224,7 @@ std::vector<int> Levels::getMap() {
 		};
 		return map;
 		break;
-	case 2://stage 1.2
+	case 3://stage 1.2
 		map = {
 		 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4
 		,9, 10,11,12,9 ,10,11,12,9 ,10,11,12,9 ,10,11,12
@@ -208,7 +240,7 @@ std::vector<int> Levels::getMap() {
 		};
 		return map;
 		break;
-	case 3://stage 1.3
+	case 4://stage 1.3
 		map = {
 		1 ,2 ,3 ,4 ,1 ,2 ,3 ,4 ,1 ,2 ,70,71,72,71,72,71,
 		9 ,10,11,12,9 ,10,11,12,9 ,10,73,74,75,75,75,77,
@@ -224,7 +256,7 @@ std::vector<int> Levels::getMap() {
 		};
 		return map;
 		break;
-	case 4://stage 2.1
+	case 5://stage 2.1
 		map = {
 		 61 ,61 ,61 ,61 ,111,111,112,113,123,134,111,111,112,113,61 ,61
 		,61 ,61 ,61 ,61 ,119,121,112,113,126,125,119,121,112,113,61 ,61
@@ -240,7 +272,7 @@ std::vector<int> Levels::getMap() {
 		};
 		return map;
 		break;
-	case 5://stage 2.2
+	case 6://stage 2.2
 		map = {
 		 61,61,112,113,126,127,111,111,139,111,61,61,111,111,112,113,
 		61,61,112,113,111,111,111,139,119,121,61,61,111,111,112,113,
@@ -256,7 +288,7 @@ std::vector<int> Levels::getMap() {
 		};
 		return map;
 		break;
-	case 6://stage 2.3
+	case 7://stage 2.3
 		map = {
 		 128,129,111,111,139,111,61,61,111,111,114,125,139,111,61,61,
 		133,134,111,139,111,111,61,61,119,121,138,139,111,111,61,61,
@@ -272,7 +304,7 @@ std::vector<int> Levels::getMap() {
 		};
 		return map;
 		break;
-	case 7://stage 2.4
+	case 8://stage 2.4
 		map = {
 		61,61,111,111,111,111,112,113,111,111,114,125,112,113,111,111,
 		115,116,119,121,111,111,112,113,119,121,111,111,112,113,119,121,
@@ -288,7 +320,7 @@ std::vector<int> Levels::getMap() {
 		};
 		return map;
 		break;
-	case 8://stage 2.5
+	case 9://stage 2.5
 		map = {
 		114,125,111,111,112,113,126,127,111,111,111,111,112,113,111,111,
 		111,111,119,121,112,113,131,132,119,121,111,111,112,113,119,121,
@@ -304,7 +336,7 @@ std::vector<int> Levels::getMap() {
 		};
 		return map;
 		break;
-	case 9://stage 2.6
+	case 10://stage 2.6
 		map = {
 		128,129,112,113,111,111,114,125,111,111,112,113,114,125,61,61,
 		133,134,112,113,119,121,111,111,119,121,112,113,119,121,61,61,
@@ -320,7 +352,7 @@ std::vector<int> Levels::getMap() {
 		};
 		return map;
 		break;
-	case 10://boss fight
+	case 11://boss fight
 		map = {
 		111,111,182,179,180,181,182,179,180,181,182,179,180,181,182,179,
 		111,111,112,113,0,0,112,113,170,171,112,113,0,0,112,113,
@@ -343,7 +375,7 @@ std::vector<int> Levels::getEnt() {
 	return entities[level - 1];
 }
 
-void Levels::setEnt(int pos) {
+void Levels::SetEnt(int pos) {
 	entities[level - 1][pos] = 0;
 }
 
@@ -351,72 +383,79 @@ posTp Levels::getTp() {
 	posTp tp;
 	switch (level)
 	{
-	case 1://stage 1.1
+	case 1: //stage 0.0
 		tp.top = 0;
-		tp.right = 2;
+		tp.right = 0;
 		tp.down = 0;
 		tp.left = 0;
 		return tp;
 		break;
-	case 2://stage 1.2
+	case 2://stage 1.1
 		tp.top = 0;
 		tp.right = 3;
 		tp.down = 0;
-		tp.left = 1;
+		tp.left = 0;
 		return tp;
 		break;
-	case 3://stage 1.3
+	case 3://stage 1.2
 		tp.top = 0;
-		tp.right = 0;
+		tp.right = 4;
 		tp.down = 0;
 		tp.left = 2;
 		return tp;
 		break;
-	case 4://stage 2.1
-		tp.top = 7;
+	case 4://stage 1.3
+		tp.top = 0;
+		tp.right = 0;
+		tp.down = 0;
+		tp.left = 3;
+		return tp;
+		break;
+	case 5://stage 2.4
+		tp.top = 8;
+		tp.right = 6;
+		tp.down = 0;
+		tp.left = 7;
+		return tp;
+		break;
+	case 6://stage 2.5
+		tp.top = 9;
+		tp.right = 7;
+		tp.down = 0;
+		tp.left = 5;
+		return tp;
+		break;
+	case 7://stage 2.6
+		tp.top = 10;
 		tp.right = 5;
 		tp.down = 0;
 		tp.left = 6;
 		return tp;
 		break;
-	case 5://stage 2.2
-		tp.top = 8;
-		tp.right = 6;
-		tp.down = 0;
-		tp.left = 4;
-		return tp;
-		break;
-	case 6://stage 2.3
-		tp.top = 9;
-		tp.right = 4;
-		tp.down = 0;
-		tp.left = 5;
-		return tp;
-		break;
-	case 7://stage 2.4
-		tp.top = 0;
-		tp.right = 8;
-		tp.down = 4;
-		tp.left = 0;//boss
-		return tp;
-		break;
-	case 8://stage 2.5
+	case 8://stage 2.7
 		tp.top = 0;
 		tp.right = 9;
 		tp.down = 5;
-		tp.left = 7;
+		tp.left = 0;//boss
 		return tp;
 		break;
-	case 9://stage 2.6
+	case 9://stage 2.8
 		tp.top = 0;
-		tp.right = 0;
+		tp.right = 10;
 		tp.down = 6;
 		tp.left = 8;
 		return tp;
 		break;
-	case 10://boss fight
+	case 10://stage 2.9
 		tp.top = 0;
-		tp.right = 7;
+		tp.right = 0;
+		tp.down = 7;
+		tp.left = 9;
+		return tp;
+		break;
+	case 11://boss fight
+		tp.top = 0;
+		tp.right = 8;
 		tp.down = 0;
 		tp.left = 0;
 		return tp;
@@ -424,6 +463,11 @@ posTp Levels::getTp() {
 	}
 }
 
-void Levels::setLvl(int lvl) {
+void Levels::SetLvl(int lvl) {
 	level = lvl;
+}
+
+int Levels::GetLvl()
+{
+	return level;
 }

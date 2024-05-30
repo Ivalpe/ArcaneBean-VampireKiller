@@ -116,7 +116,7 @@ AppStatus Game::Update()
 {
 	//Only sum if there is in the main screen or the game over the screen
 	if (state == GameState::MAIN_SCREEN || state == GameState::GAME_OVER)	frameCount++;
-	
+
 	//Check if user attempts to close the window, either by clicking the close button or by pressing Alt+F4
 	if (WindowShouldClose()) return AppStatus::QUIT;
 

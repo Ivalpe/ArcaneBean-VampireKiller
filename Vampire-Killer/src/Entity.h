@@ -27,6 +27,9 @@ public:
 	void DrawHitbox(const Color& col) const;
 	void DrawHitbox(int x, int y, int w, int h, const Color& col) const;
 
+	//Change width and height
+	void SetWidth(int width);
+	void SetHeight(int height);
 protected:
 	Point GetRenderingPosition() const;
 

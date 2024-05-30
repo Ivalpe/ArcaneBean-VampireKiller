@@ -15,6 +15,12 @@ enum class FireType {
 	CANDLE
 };
 
+
+enum class FireType {
+	FIRE,
+	CANDLE
+};
+
 enum class FireAnim {
 	IDLE_FIRE,
 	IDLE_CANDLE

@@ -52,6 +52,9 @@
     <ClCompile Include="src\Bar.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Sequence.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Globals.h">
@@ -106,6 +109,9 @@
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="src\Bar.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sequence.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

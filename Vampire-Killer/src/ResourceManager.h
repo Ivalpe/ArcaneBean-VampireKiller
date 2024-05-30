@@ -13,11 +13,11 @@ enum class Resource {
     IMG_ITEMS,
     IMG_WHIP,
     IMG_GAMEOVER,
-    IMG_FIRE, 
+    IMG_FIRE,
     IMG_CANDLE,
     IMG_KNIGHT,
+    IMG_MEDUSA_HEAD,
     IMG_BAR,
-    IMG_UI
 };
 
 enum class MusicResource {

@@ -15,6 +15,8 @@ Scene::Scene()
 	camera.rotation = 0.0f;					//No rotation
 	camera.zoom = 1.0f;						//Default zoom
 
+	medusaSpawnRate = 120;
+
 	debug = DebugMode::OFF;
 }
 Scene::~Scene()
@@ -34,6 +36,8 @@ Scene::~Scene()
 }
 AppStatus Scene::Init()
 {
+	seq = new Sequence(GameSequence::GAME_START, { { WINDOW_WIDTH / 2 - 10, 0 }, 3, WINDOW_HEIGHT });
+	seq->SetStateSequence(StateSequence::SEQUENCE);
 
 	lvlList = new Levels();
 	lvlList->Initialise();
@@ -43,7 +47,7 @@ AppStatus Scene::Init()
 	musicStage2 = rm.GetMusic(MusicResource::MUSIC_STAGE2);
 
 	//Create player
-	player = new Player({ 0,0 }, State::IDLE, Look::RIGHT);
+	player = new Player({ 0,0 }, State::IDLE, Look::LEFT);
 	if (player == nullptr)
 	{
 		LOG("Failed to allocate memory for Player");
@@ -70,7 +74,7 @@ AppStatus Scene::Init()
 		return AppStatus::ERROR;
 	}
 	//Load level
-	if (LoadLevel(1, 103) != AppStatus::OK)
+	if (LoadLevel(1, 101) != AppStatus::OK)
 	{
 		LOG("Failed to load Level 1");
 		return AppStatus::ERROR;
@@ -79,16 +83,27 @@ AppStatus Scene::Init()
 	player->SetTileMap(level);
 	player->InitScore();
 
-	if (rm.LoadTexture(Resource::IMG_UI, "Assets/Ui.png") != AppStatus::OK)
-	{
-		return AppStatus::ERROR;
-	}
+	//UI
 	ui = LoadTexture("Assets/Ui.png");
+
+	//Game Start
+	gameStart = LoadTexture("Assets/GameStart.png");
+
+	//False Tile
+	falseTile = LoadTexture("Assets/FalseTile.png");
 
 	Point pos = Point(61, -18);
 	playerBar = new Bar(16, { 255, 192, 150, 255 }, pos, 64, 4);
 	pos = Point(61, -9);
 	bossBar = new Bar(16, { 251, 31, 46, 255 }, pos, 64, 4);
+
+	//Init Enemies
+	enemies = std::vector<Enemy*>(5);
+	for (size_t i = 0; i < enemies.size(); i++)
+		enemies[i] = new Enemy(16, 16);
+
+	player->MoveAuto(true);
+	player->BlockMovement(true);
 
 	return AppStatus::OK;
 }
@@ -100,7 +115,6 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 	Point pos;
 	Object* obj;
 	Fire* ent;
-	Enemy* ene;
 
 	while (!objects.empty())
 		objects.pop_back();
@@ -108,10 +122,12 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 	while (!fires.empty())
 		fires.pop_back();
 
-	while (!enemies.empty())
-		enemies.pop_back();
+	for (size_t i = 0; i < enemies.size(); i++)
+	{
+		enemies[i]->Die();
+	}
 
-	lvlList->setLvl(stage);
+	lvlList->SetLvl(stage);
 
 	size = LEVEL_WIDTH * LEVEL_HEIGHT;
 	//Get map of the stage
@@ -132,48 +148,54 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 	{
 		for (x = 0; x < LEVEL_WIDTH; ++x)
 		{
+
+			pos.x = x * TILE_SIZE;
+			pos.y = y * TILE_SIZE + TILE_SIZE - 1;
 			tile = (Tile)entities[i];
 			if ((direction == 100 && tile == Tile::PLAYERUP) ||
 				(direction == 101 && tile == Tile::PLAYERRIGHT) ||
 				(direction == 102 && tile == Tile::PLAYERDOWN) ||
 				(direction == 103 && tile == Tile::PLAYERLEFT))
 			{
-				pos.x = x * TILE_SIZE;
-				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
 				player->SetPos(pos);
 			}
-			else if (tile == Tile::ITEM_FIRE_HEART)
+			else if (tile == Tile::ITEM_FIRE_HEART || tile == Tile::ITEM_FIRE_HEART_BIG || tile == Tile::ITEM_FIRE_WHIPE || tile == Tile::ITEM_CANDLE_HEART)
 			{
-				pos.x = x * TILE_SIZE;
-				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ent = new Fire(pos, 16, 16, i, ObjectType::HEART, FireType::FIRE);
-				ent->Initialise();
-				fires.push_back(ent);
-			}
-			else if (tile == Tile::ITEM_FIRE_HEART_BIG)
-			{
-				pos.x = x * TILE_SIZE;
-				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ent = new Fire(pos, 16, 16, i, ObjectType::HEART_BIG, FireType::FIRE);
-				ent->Initialise();
-				fires.push_back(ent);
-			}
-			else if (tile == Tile::ITEM_FIRE_WHIPE)
-			{
-				pos.x = x * TILE_SIZE;
-				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ent = new Fire(pos, 16, 16, i, ObjectType::WHIPE, FireType::FIRE);
+				if (tile == Tile::ITEM_FIRE_HEART)
+					ent = new Fire(pos, 16, 16, i, ObjectType::HEART, FireType::FIRE);
+				else if (tile == Tile::ITEM_FIRE_HEART_BIG)
+					ent = new Fire(pos, 16, 16, i, ObjectType::HEART_BIG, FireType::FIRE);
+				else if (tile == Tile::ITEM_FIRE_WHIPE)
+					ent = new Fire(pos, 16, 16, i, ObjectType::WHIPE, FireType::FIRE);
+				else
+					ent = new Fire(pos, 16, 16, i, ObjectType::HEART, FireType::CANDLE);
 				ent->Initialise();
 				fires.push_back(ent);
 			}
 			else if (tile == Tile::ENEMY_KNIGHT)
 			{
-				pos.x = x * TILE_SIZE;
-				pos.y = y * TILE_SIZE + TILE_SIZE - 1;
-				ene = new Enemy(pos, EnemyState::WALKING, EnemyLook::LEFT, 16, 32);
-				ene->Initialise();
-				ene->SetTileMap(level);
-				enemies.push_back(ene);
+				for (size_t i = 0; i < enemies.size(); i++)
+				{
+					if (!enemies[i]->IsAlive())
+					{
+						enemies[i]->Initialise(pos, EnemyType::KNIGHT, EnemyState::WALKING, EnemyLook::LEFT, level, 16, 32);
+						break;
+					}
+				}
+			}
+			else if (tile == Tile::ENEMY_MEDUSA_HEAD_LEFT || tile == Tile::ENEMY_MEDUSA_HEAD_RIGHT)
+			{
+				for (size_t i = 0; i < enemies.size(); i++)
+				{
+					if (!enemies[i]->IsAlive())
+					{
+						if (tile == Tile::ENEMY_MEDUSA_HEAD_LEFT)
+							enemies[i]->Initialise(pos, EnemyType::MEDUSA_HEAD, EnemyState::WALKING, EnemyLook::LEFT, level, 16, 16);
+						else
+							enemies[i]->Initialise(pos, EnemyType::MEDUSA_HEAD, EnemyState::WALKING, EnemyLook::RIGHT, level, 16, 16);
+						break;
+					}
+				}
 			}
 			++i;
 		}
@@ -211,16 +233,14 @@ void Scene::Update()
 	}
 	else if (IsKeyPressed(KEY_F3))
 	{
-		LoadLevel(4, 103);
+		LoadLevel(5, 103);
 		StopMusicStream(musicStage0);
 		PlayMusicStream(musicStage2);
 
 	}
 	else if (IsKeyPressed(KEY_F4))
 	{
-		LoadLevel(10, 101);
-
-
+		LoadLevel(11, 101);
 	}
 
 	level->Update();
@@ -238,9 +258,62 @@ void Scene::Update()
 
 	for (size_t i = 0; i < enemies.size(); i++)
 	{
-		enemies[i]->Update();
+		if (enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD)
+		{
+			medusaSpawnRate--;
+			break;
+		}
 	}
+
+	int middle = (WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y) / 2;
+	for (size_t i = 0; i < enemies.size(); i++)
+	{
+		if (enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::KNIGHT)
+			enemies[i]->Update();
+
+		if (medusaSpawnRate == 0 && enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && !enemies[i]->IsMedusaSpawn())
+		{
+			if ((enemies[i]->GetPos().y >= middle && player->GetPos().y >= middle) || (enemies[i]->GetPos().y <= middle && player->GetPos().y <= middle))
+				enemies[i]->MedusaSpawn(true);
+			medusaSpawnRate = 120;
+		}
+		if (enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())
+			enemies[i]->Update();
+
+		if (enemies[i]->GetPos().x <= -16 || enemies[i]->GetPos().x >= WINDOW_WIDTH)
+		{
+			enemies[i]->MedusaSpawn(false);
+		}
+
+	}
+
+	seq->Update();
+
+	if (seq->GetCont() == 0)
+	{
+		if (seq->GetGameSequence() == GameSequence::GAME_START)
+		{
+			LoadLevel(2, 103);
+			seq->SetStateSequence(StateSequence::IDLE);
+			seq->SetSequence(GameSequence::CASTLE_ENTRY, { {221, 0}, 3, WINDOW_HEIGHT }, 60);
+			player->BlockMovement(false);
+			player->LookAhead(false);
+		}
+		else if (seq->GetGameSequence() == GameSequence::CASTLE_ENTRY)
+		{
+			LoadLevel(5, 103);
+			seq->SetStateSequence(StateSequence::IDLE);
+			seq->SetSequence(GameSequence::BOSS_DOOR_OPEN, { {0, 0}, 0, 0 }, 0);
+			player->BlockMovement(false);
+			player->MoveAuto(false);
+			player->LookAhead(false);
+		}
+
+	}
+
 	CheckCollisions();
+
+
 }
 void Scene::LoadNextLevel() {
 	if (player->GetPos().x + PLAYER_FRAME_SIZE_WIDTH >= WINDOW_WIDTH - TP_TILE)
@@ -255,30 +328,38 @@ void Scene::LoadNextLevel() {
 	}
 	else if (player->GetPos().y >= WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y)
 	{
-		int lvl = level->GetTpMap(1);
-		if (lvl != 0)	LoadLevel(lvl, 102);
+		int lvl = level->GetTpMap(3);
+		if (lvl != 0)	LoadLevel(lvl, 100);
 	}
 	else if (player->GetPos().y <= 0 + TP_TILE)
 	{
-		int lvl = level->GetTpMap(3);
-		if (lvl != 0)	LoadLevel(lvl, 100);
+		int lvl = level->GetTpMap(1);
+		if (lvl != 0)	LoadLevel(lvl, 102);
 	}
 }
 void Scene::Render()
 {
 	BeginMode2D(camera);
 
+
+
 	level->Render();
+
+	//Draw Castle
+	if (lvlList->GetLvl() == 1)
+		DrawTexture(gameStart, 0, -35, WHITE);
 
 	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
 		for (size_t i = 0; i < enemies.size(); i++)
 		{
-			enemies[i]->Draw();
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+				enemies[i]->Draw();
 		}
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		for (size_t i = 0; i < enemies.size(); i++)
 		{
-			enemies[i]->DrawDebug(GREEN);
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+				enemies[i]->DrawDebug(GREEN);
 		}
 
 	//Objects
@@ -311,6 +392,7 @@ void Scene::Render()
 		DrawLine(WINDOW_WIDTH - TP_TILE, 0, WINDOW_WIDTH - TP_TILE, WINDOW_HEIGHT, RED);
 		DrawLine(0, TP_TILE, WINDOW_WIDTH, TP_TILE, RED);
 		DrawLine(0, WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y, WINDOW_WIDTH, WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y, RED);
+		DrawRectangle(seq->GetHitBox().pos.x, seq->GetHitBox().pos.y, seq->GetHitBox().width, seq->GetHitBox().height, YELLOW);
 	}
 
 	//Player
@@ -318,6 +400,10 @@ void Scene::Render()
 		player->Draw();
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		player->DrawDebug(GREEN);
+
+	//False Tile
+	if (lvlList->GetLvl() == 4)
+		DrawTexture(falseTile, 224, 112, WHITE);
 
 	RenderGUI();
 
@@ -372,7 +458,7 @@ void Scene::CheckCollisions()
 		if (whip_hitbox.TestAABB(obj_box) && player->GetAttackState() == AttackState::ATTACKING)
 		{
 			//Change the array for not creating more fires in this position
-			lvlList->setEnt((*itFi)->GetPosArray());
+			lvlList->SetEnt((*itFi)->GetPosArray());
 
 			//Create a heart in the position of the fire
 			objects.push_back(new Object({ (*itFi)->GetPos().x, (*itFi)->GetPos().y }, (*itFi)->GetItemType(), level));
@@ -390,35 +476,54 @@ void Scene::CheckCollisions()
 	}
 
 	//Collision Enemy
-	auto enList = enemies.begin();
-	while (enList != enemies.end())
+	for (size_t i = 0; i < enemies.size(); i++)
 	{
-		obj_box = (*enList)->GetHitbox();
-		if (player_box.TestAABB(obj_box) && player->GetInvincibility() == 0)
+		if (enemies[i]->IsAlive())
 		{
-			EnemyType et = (*enList)->getType();
-			player->Damaged(et);
-			playerBar->changeBar(player->GetLife());
-			player->StartInvincibility();
-		}
-		else if (whip_hitbox.TestAABB(obj_box) && (*enList)->GetInvincibility() == 0)
-		{
-			(*enList)->Damaged(player->GetDmg());
-			(*enList)->StartInvincibility();
-			if ((*enList)->getLife() <= 0)
+			obj_box = enemies[i]->GetHitbox();
+			//Collision Player with Enemy
+			if (player_box.TestAABB(obj_box) && player->GetInvincibility() == 0)
 			{
-				//Delete the object
-				delete* enList;
-				//Erase the object from the vector and get the iterator to the next valid element
-				enList = enemies.erase(enList);
+				EnemyType et = enemies[i]->getType();
+				player->Damaged(et);
+				playerBar->changeBar(player->GetLife());
+				player->StartInvincibility();
+			}
+			//Collision Whip with Enemy
+			else if (whip_hitbox.TestAABB(obj_box) && enemies[i]->GetInvincibility() == 0)
+			{
+				enemies[i]->Damaged(player->GetDmg());
+				enemies[i]->StartInvincibility();
+				if (enemies[i]->getLife() <= 0)
+				{
+					if (enemies[i]->getType() == EnemyType::KNIGHT)
+						enemies[i]->Die();
+					else
+						enemies[i]->MedusaSpawn(false);
+				}
 			}
 		}
-		else
-		{
-			++enList;
-		}
-		//Move to the next object
+	}
 
+	//Game Start Sequence
+	if (seq->GetGameSequence() == GameSequence::GAME_START && seq->GetStateSequence() == StateSequence::SEQUENCE && player_box.TestAABB(seq->GetHitBox()))
+	{
+		player->MoveAuto(false);
+		player->LookAhead(true);
+		seq->StartWaiting();
+	}
+
+	//Castle Entry Sequence
+	if (lvlList->GetLvl() == 4 && seq->GetGameSequence() == GameSequence::CASTLE_ENTRY && player_box.TestAABB(seq->GetHitBox()))
+	{
+		seq->SetStateSequence(StateSequence::SEQUENCE);
+		player->BlockMovement(true);
+
+		if (player->GetPos().y == 143)
+		{
+			player->MoveAuto(true);
+			seq->StartWaiting();
+		}
 	}
 }
 void Scene::RenderObjects() const

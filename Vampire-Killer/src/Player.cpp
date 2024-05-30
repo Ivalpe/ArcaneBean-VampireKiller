@@ -17,6 +17,8 @@ Player::Player(const Point& p, State s, Look view) :
 	invincibility = 0;
 	dmg = 2;
 	staAtt = AttackState::NO_ATTACKING;
+	move = false;
+	blockMovement = false;
 }
 Player::~Player()
 {
@@ -106,7 +108,10 @@ AppStatus Player::Initialise()
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { nw * 4, nw * 4, nw * 4, nh });
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { nw * 8, nw * 4, nw * 4, nh });
 
-	sprite->SetAnimation((int)PlayerAnim::IDLE_RIGHT);
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::LOOKING_AHEAD, { nw * 16, 0, nw, nh });
+
+	sprite->SetAnimation(look == Look::LEFT ? (int)PlayerAnim::IDLE_LEFT : (int)PlayerAnim::IDLE_RIGHT);
 
 	return AppStatus::OK;
 }
@@ -261,7 +266,7 @@ void Player::Update()
 	MoveX();
 	MoveY();
 
-	if (IsKeyPressed(KEY_SPACE))
+	if (!move && GetAnimation() != PlayerAnim::LOOKING_AHEAD && IsKeyPressed(KEY_SPACE))
 	{
 		if (state == State::JUMPING || state == State::FALLING)
 		{
@@ -333,41 +338,63 @@ void Player::MoveX()
 
 	}
 
-	if (IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT) && state != State::JUMPING && state != State::FALLING)
+	if (move)
 	{
-		if (state != State::CROUCHING && staAtt != AttackState::ATTACKING) pos.x += -PLAYER_SPEED;
-		if (state == State::IDLE) StartWalkingLeft();
-		else
-		{
-			if (IsLookingRight()) ChangeAnimLeft();
-		}
-
-		if (map->TestCollisionWallLeft(box) || pos.x <= 0)
-		{
-			pos.x = prev_x;
-			if (state == State::WALKING) Stop();
-		}
+		Move(look == Look::LEFT ? Look::LEFT : Look::RIGHT, box, prev_x);
 	}
-	else if (IsKeyDown(KEY_RIGHT) && state != State::JUMPING && state != State::FALLING)
+
+	if (!blockMovement && IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT) && state != State::JUMPING && state != State::FALLING)
 	{
-		if (state != State::CROUCHING && staAtt != AttackState::ATTACKING) pos.x += PLAYER_SPEED;
-		if (state == State::IDLE) StartWalkingRight();
-		else
-		{
-			if (IsLookingLeft()) ChangeAnimRight();
-		}
-
-		box = GetHitbox().first;
-		if (map->TestCollisionWallRight(box) || pos.x >= WINDOW_WIDTH - PLAYER_PHYSICAL_WIDTH)
-		{
-			pos.x = prev_x;
-			if (state == State::WALKING) Stop();
-		}
+		Move(Look::LEFT, box, prev_x);
 	}
-	else
+	else if (!blockMovement && IsKeyDown(KEY_RIGHT) && state != State::JUMPING && state != State::FALLING)
+	{
+		Move(Look::RIGHT, box, prev_x);
+	}
+	else if (!move)
 	{
 		if (state == State::WALKING) Stop();
 	}
+}
+void Player::Move(Look l, AABB box, int prev_x)
+{
+	if (state != State::CROUCHING && staAtt != AttackState::ATTACKING)
+	{
+		if (move)
+			l == Look::RIGHT ? pos.x += PLAYER_SPEED / 2 : pos.x += -PLAYER_SPEED / 2;
+		else
+			l == Look::RIGHT ? pos.x += PLAYER_SPEED : pos.x += -PLAYER_SPEED;
+	}
+	if (state == State::IDLE)
+		l == Look::RIGHT ? StartWalkingRight() : StartWalkingLeft();
+	else
+	{
+		if (l == Look::LEFT && IsLookingRight()) ChangeAnimLeft();
+		if (l == Look::RIGHT && IsLookingLeft()) ChangeAnimRight();
+	}
+
+	if ((l == Look::LEFT && map->TestCollisionWallLeft(box) || pos.x <= 0) || (l == Look::RIGHT && map->TestCollisionWallRight(box) || pos.x >= WINDOW_WIDTH - PLAYER_PHYSICAL_WIDTH))
+	{
+		pos.x = prev_x;
+		if (state == State::WALKING) Stop();
+	}
+}
+void Player::LookAhead(bool trigger)
+{
+	Stop();
+	if (trigger)
+	{ 
+		SetAnimation((int)PlayerAnim::LOOKING_AHEAD);
+
+	}
+	else
+	{ 
+		SetAnimation((int)PlayerAnim::IDLE_RIGHT);
+	}
+}
+void Player::BlockMovement(bool m)
+{
+	blockMovement = m;
 }
 void Player::MoveY()
 {
@@ -391,7 +418,7 @@ void Player::MoveY()
 		{
 			if (state == State::FALLING) Stop();
 
-			if (IsKeyDown(KEY_UP) && staAtt == AttackState::NO_ATTACKING)
+			if (!blockMovement && IsKeyDown(KEY_UP) && staAtt == AttackState::NO_ATTACKING)
 			{
 				box = GetHitbox().first;
 				if (map->TestOnLadder(box, &pos.x))
@@ -399,7 +426,7 @@ void Player::MoveY()
 				else
 					StartJumping();
 			}
-			else if (IsKeyDown(KEY_DOWN) && staAtt == AttackState::NO_ATTACKING)
+			else if (!blockMovement && IsKeyDown(KEY_DOWN) && staAtt == AttackState::NO_ATTACKING)
 			{
 				//To Crouch
 				prev_state = state;
@@ -535,7 +562,10 @@ void Player::Damaged(EnemyType enemy)
 	switch (enemy)
 	{
 	case EnemyType::KNIGHT:
-		life = life - 2;
+		life -= 2;
+		break;
+	case EnemyType::MEDUSA_HEAD:
+		life -= 1;
 		break;
 	default:
 		break;
@@ -699,4 +729,8 @@ void Player::Release()
 int Player::GetDmg() const
 {
 	return dmg;
+}
+void Player::MoveAuto(bool m)
+{
+	move = m;
 }

@@ -8,6 +8,7 @@
 #include "Enemy.h"
 #include "Bar.h"
 #include "StaticImage.h"
+#include "Sequence.h"
 
 enum class DebugMode { OFF, SPRITES_AND_HITBOXES, ONLY_HITBOXES, SIZE };
 
@@ -31,7 +32,6 @@ private:
     void RenderObjects() const;
     void RenderObjectsDebug(const Color& col) const;
     void LoadNextLevel();
-
     void RenderGUI() const;
     Player* player;
     TileMap* level;
@@ -49,5 +49,7 @@ private:
     Levels* lvlList;
     Bar* playerBar;
     Bar* bossBar;
-    Texture2D ui;
+    Texture2D ui, gameStart, falseTile;
+    int medusaSpawnRate;
+    Sequence* seq;
 };
