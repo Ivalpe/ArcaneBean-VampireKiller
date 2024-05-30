@@ -7,6 +7,13 @@
 #define FIRE_FRAME_SIZE_HEIGHT		16
 
 #define ANIM_FIRE	10
+#define ANIM_CANDLE 10
+
+
+enum class FireType {
+	FIRE,
+	CANDLE
+};
 
 
 enum class FireType {
@@ -15,7 +22,8 @@ enum class FireType {
 };
 
 enum class FireAnim {
-	IDLE
+	IDLE_FIRE,
+	IDLE_CANDLE
 };
 
 class Fire : public Entity

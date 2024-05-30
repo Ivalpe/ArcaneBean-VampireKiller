@@ -24,7 +24,7 @@ AppStatus Fire::Initialise()
 		}
 		render = new Sprite(data.GetTexture(Resource::IMG_CANDLE));
 	}
-
+	
 	if (render == nullptr)
 	{
 		LOG("Failed to allocate memory for sprite");

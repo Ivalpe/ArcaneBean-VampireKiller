@@ -74,7 +74,7 @@ Object::~Object()
 void Object::DrawDebug(const Color& col) const
 {
 	AABB hitbox = GetHitbox();
-	Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y + hitbox.height, hitbox.width, hitbox.height, col);
+	Entity::DrawHitbox(hitbox.pos.x, hitbox.pos.y + hitbox.height, hitbox.width, hitbox.height, col);  
 }
 AABB Object::GetHitbox() const
 {
