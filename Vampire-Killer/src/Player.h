@@ -79,6 +79,8 @@ public:
 	void MoveAuto(bool move);
 	void BlockMovement(bool m);
 	void LookAhead(bool trigger);
+	void ChangeLook(Look l);
+	void Stop();
 
 private:
 	bool IsLookingRight() const;
@@ -94,7 +96,6 @@ private:
 	//Animation management
 	void SetAnimation(int id);
 	PlayerAnim GetAnimation();
-	void Stop();
 	void StartWalkingLeft();
 	void StartWalkingRight();
 	void StartFalling();

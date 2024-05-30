@@ -92,6 +92,9 @@ AppStatus Scene::Init()
 	//False Tile
 	falseTile = LoadTexture("Assets/FalseTile.png");
 
+	//Door
+	door = LoadTexture("Assets/Door.png");
+
 	Point pos = Point(61, -18);
 	playerBar = new Bar(16, { 255, 192, 150, 255 }, pos, 64, 4);
 	pos = Point(61, -9);
@@ -231,17 +234,6 @@ void Scene::Update()
 	{
 		levelOver = true;
 	}
-	else if (IsKeyPressed(KEY_F3))
-	{
-		LoadLevel(5, 103);
-		StopMusicStream(musicStage0);
-		PlayMusicStream(musicStage2);
-
-	}
-	else if (IsKeyPressed(KEY_F4))
-	{
-		LoadLevel(11, 101);
-	}
 
 	level->Update();
 	player->Update();
@@ -287,10 +279,21 @@ void Scene::Update()
 
 	}
 
+	//Debug Level
+	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
+	{
+		for (int i = KEY_ONE; i <= KEY_NINE; i++) {
+			if (IsKeyDown(i)) {
+				LoadLevel(i - KEY_ZERO, 103);
+			}
+		}
+	}
+
 	seq->Update();
 
 	if (seq->GetCont() == 0)
 	{
+		//Sequence for Game Start
 		if (seq->GetGameSequence() == GameSequence::GAME_START)
 		{
 			LoadLevel(2, 103);
@@ -299,16 +302,34 @@ void Scene::Update()
 			player->BlockMovement(false);
 			player->LookAhead(false);
 		}
+		//Sequence for Castle Entry
 		else if (seq->GetGameSequence() == GameSequence::CASTLE_ENTRY)
 		{
 			LoadLevel(5, 103);
 			seq->SetStateSequence(StateSequence::IDLE);
-			seq->SetSequence(GameSequence::BOSS_DOOR_OPEN, { {0, 0}, 0, 0 }, 0);
+			seq->SetSequence(GameSequence::BOSS_DOOR_OPEN, { {29, 16}, 3, 48 }, 240);
+			seq->SetY(16);
+			falseTile = LoadTexture("Assets/FalseWall.png");	//Change the texture for the wall
 			player->BlockMovement(false);
 			player->MoveAuto(false);
 			player->LookAhead(false);
 		}
+		//Sequence for Boss Door
+		else if (seq->GetGameSequence() == GameSequence::BOSS_DOOR_OPEN)
+		{
+			LoadLevel(11, 101);
+			seq->SetStateSequence(StateSequence::IDLE);
+			seq->SetSequence(GameSequence::BOSS_DOOR_OPEN, { {0, 0}, 0, 0 }, 10);
+			player->BlockMovement(false);
+			player->MoveAuto(false);
+			player->LookAhead(false);
+		}
+	}
 
+	if (seq->GetCont() == 120 && seq->GetGameSequence() == GameSequence::BOSS_DOOR_OPEN)
+	{
+		player->MoveAuto(true);
+		player->ChangeLook(Look::LEFT);
 	}
 
 	CheckCollisions();
@@ -401,9 +422,21 @@ void Scene::Render()
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		player->DrawDebug(GREEN);
 
+	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
+	{
+		DrawText(TextFormat("Go to a level (1-9)"), 16 * 9, 16 * 1, 1, LIGHTGRAY);
+		DrawText(TextFormat("Spawn a Item (I)"), 16 * 9, 16 * 2, 1, LIGHTGRAY);
+		DrawText(TextFormat("Spawn a Enemy (E)"), 16 * 9, 16 * 3, 1, LIGHTGRAY);
+	}
+
+	if (lvlList->GetLvl() == 8)
+		DrawTexture(door, 14, seq->GetY(), WHITE);
+
 	//False Tile
 	if (lvlList->GetLvl() == 4)
 		DrawTexture(falseTile, 224, 112, WHITE);
+	else if (lvlList->GetLvl() == 8)
+		DrawTexture(falseTile, 0, -5, WHITE);
 
 	RenderGUI();
 
@@ -517,10 +550,25 @@ void Scene::CheckCollisions()
 	{
 		seq->SetStateSequence(StateSequence::SEQUENCE);
 		player->BlockMovement(true);
+		player->Stop();
 
 		if (player->GetPos().y == 143)
 		{
 			player->MoveAuto(true);
+			seq->StartWaiting();
+		}
+	}
+
+	//Boss Door
+	if (lvlList->GetLvl() == 8 && seq->GetGameSequence() == GameSequence::BOSS_DOOR_OPEN && player_box.TestAABB(seq->GetHitBox()))
+	{
+		seq->SetStateSequence(StateSequence::SEQUENCE);
+		player->BlockMovement(true);
+		player->Stop();
+		player->ChangeLook(Look::LEFT);
+
+		if (player->GetPos().y == 63)
+		{
 			seq->StartWaiting();
 		}
 	}
