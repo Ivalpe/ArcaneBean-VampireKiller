@@ -571,9 +571,25 @@ void Player::Damaged(EnemyType enemy)
 		break;
 	}
 }
+void Player::Healed()
+{
+	life += 1;
+}
 int Player::GetLife()
 {
 	return life;
+}
+void Player::ClampLife()
+{
+	if (life > 16)
+	{
+		life = 16;
+	}
+}
+void Player::UpDamage() 
+{
+	dmg+= 1;
+
 }
 void Player::StartInvincibility() {
 	invincibility = 1;

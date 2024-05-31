@@ -160,20 +160,22 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 				player->SetPos(pos);
 			}
 			else if (tile == Tile::ITEM_FIRE_HEART || tile == Tile::ITEM_FIRE_HEART_BIG || tile == Tile::ITEM_FIRE_WHIPE || tile == Tile::ITEM_CANDLE_HEART || tile == Tile::ITEM_CANDLE_HEART_BIG 
-				|| tile == Tile::ITEM_CANDLE_BLUE_ORB || tile == Tile::ITEM_CANDLE_RING || tile == Tile::ITEM_CANDLE_KEY)
+				|| tile == Tile::ITEM_CANDLE_BLUE_ORB || tile == Tile::ITEM_CANDLE_RING || tile == Tile::ITEM_CANDLE_KEY || tile == Tile::ITEM_CANDLE_RED_ORB)
 			{
 				if (tile == Tile::ITEM_FIRE_HEART)
 					ent = new Fire(pos, 16, 16, i, ObjectType::HEART, FireType::FIRE);
 				else if (tile == Tile::ITEM_FIRE_HEART_BIG)
 					ent = new Fire(pos, 16, 16, i, ObjectType::HEART_BIG, FireType::FIRE);
 				else if (tile == Tile::ITEM_FIRE_WHIPE)
-					ent = new Fire(pos, 16, 16, i, ObjectType::WHIPE, FireType::FIRE);
+					ent = new Fire(pos, 16, 16, i, ObjectType::WHIP, FireType::FIRE);
 				else if (tile == Tile::ITEM_CANDLE_BLUE_ORB)
 					ent = new Fire(pos, 16, 16, i, ObjectType::BLUE_ORB, FireType::CANDLE);
 				else if (tile == Tile::ITEM_CANDLE_RING)
 					ent = new Fire(pos, 16, 16, i, ObjectType::RING, FireType::CANDLE);
 				else if (tile == Tile::ITEM_CANDLE_KEY)
 					ent = new Fire(pos, 16, 16, i, ObjectType::KEY, FireType::CANDLE);
+				else if (tile == Tile::ITEM_CANDLE_RED_ORB)
+					ent = new Fire(pos, 16, 16, i, ObjectType::RED_ORB, FireType::CANDLE);
 				else
 					ent = new Fire(pos, 16, 16, i, ObjectType::HEART, FireType::CANDLE);
 				ent->Initialise();
@@ -436,14 +438,29 @@ void Scene::CheckCollisions()
 	player_box = player->GetHitbox().first;
 	whip_hitbox = player->GetHitbox().second;
 
-	//Collision Heart
+	//Collision Items
 	auto itObj = objects.begin();
 	while (itObj != objects.end())
 	{
 		obj_box = (*itObj)->GetHitbox();
 		if (player_box.TestAABB(obj_box) && (*itObj)->GetHeartState() == ItemAnim::IDLE)
 		{
-			player->IncrScore((*itObj)->Points());
+			
+			ObjectType objType = (*itObj)->GetType();
+			if (objType == ObjectType::RED_ORB)
+			{
+				player->Healed();  // Heal the player
+				player->ClampLife();
+				playerBar->changeBar(player->GetLife());
+			}
+			if (objType == ObjectType::WHIP)
+			{
+				player->UpDamage();
+
+
+
+			}
+			//player->IncrScore((*itObj)->Points());
 			//Delete the object
 			delete* itObj;
 			//Erase the object from the vector and get the iterator to the next valid element
