@@ -59,6 +59,30 @@ AppStatus Object::Initialise()
 		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
 		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE * 2, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
 		break;
+	case ObjectType::BLUE_ORB:
+		sprite->SetAnimationDelay((int)ItemAnim::IDLE, 0);
+		sprite->AddKeyFrame((int)ItemAnim::IDLE, { OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE * 2, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->SetAnimationDelay((int)ItemAnim::FALLING, 10);
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { 0, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE * 2, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		break;
+	case ObjectType::RING:
+		sprite->SetAnimationDelay((int)ItemAnim::IDLE, 0);
+		sprite->AddKeyFrame((int)ItemAnim::IDLE, { OBJECT_FRAME_SIZE * 2, OBJECT_FRAME_SIZE * 2, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->SetAnimationDelay((int)ItemAnim::FALLING, 10);
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { 0, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE * 2, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		break;
+	case ObjectType::KEY:
+		sprite->SetAnimationDelay((int)ItemAnim::IDLE, 0);
+		sprite->AddKeyFrame((int)ItemAnim::IDLE, { OBJECT_FRAME_SIZE * 3, OBJECT_FRAME_SIZE * 2, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->SetAnimationDelay((int)ItemAnim::FALLING, 10);
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { 0, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		sprite->AddKeyFrame((int)ItemAnim::FALLING, { OBJECT_FRAME_SIZE * 2, 0, OBJECT_FRAME_SIZE, OBJECT_FRAME_SIZE });
+		break;
 	default:
 		break;
 	}

@@ -166,7 +166,8 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 			{
 				player->SetPos(pos);
 			}
-			else if (tile == Tile::ITEM_FIRE_HEART || tile == Tile::ITEM_FIRE_HEART_BIG || tile == Tile::ITEM_FIRE_WHIPE || tile == Tile::ITEM_CANDLE_HEART)
+			else if (tile == Tile::ITEM_FIRE_HEART || tile == Tile::ITEM_FIRE_HEART_BIG || tile == Tile::ITEM_FIRE_WHIPE || tile == Tile::ITEM_CANDLE_HEART || tile == Tile::ITEM_CANDLE_HEART_BIG 
+				|| tile == Tile::ITEM_CANDLE_BLUE_ORB || tile == Tile::ITEM_CANDLE_RING || tile == Tile::ITEM_CANDLE_KEY)
 			{
 				if (tile == Tile::ITEM_FIRE_HEART)
 					ent = new Fire(pos, 16, 16, i, ObjectType::HEART, FireType::FIRE);
@@ -174,6 +175,12 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 					ent = new Fire(pos, 16, 16, i, ObjectType::HEART_BIG, FireType::FIRE);
 				else if (tile == Tile::ITEM_FIRE_WHIPE)
 					ent = new Fire(pos, 16, 16, i, ObjectType::WHIPE, FireType::FIRE);
+				else if (tile == Tile::ITEM_CANDLE_BLUE_ORB)
+					ent = new Fire(pos, 16, 16, i, ObjectType::BLUE_ORB, FireType::CANDLE);
+				else if (tile == Tile::ITEM_CANDLE_RING)
+					ent = new Fire(pos, 16, 16, i, ObjectType::RING, FireType::CANDLE);
+				else if (tile == Tile::ITEM_CANDLE_KEY)
+					ent = new Fire(pos, 16, 16, i, ObjectType::KEY, FireType::CANDLE);
 				else
 					ent = new Fire(pos, 16, 16, i, ObjectType::HEART, FireType::CANDLE);
 				ent->Initialise();
