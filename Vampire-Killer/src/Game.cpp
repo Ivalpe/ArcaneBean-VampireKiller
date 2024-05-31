@@ -11,7 +11,7 @@ Game::Game()
 	img_menu = nullptr;
 	img_mscreen = nullptr;
 	img_gameover = nullptr;
-
+	posYCredits = WINDOW_HEIGHT;
 
 	target = {};
 	src = {};
@@ -85,6 +85,18 @@ AppStatus Game::LoadResources()
 	}
 	img_gameover = data.GetTexture(Resource::IMG_GAMEOVER);
 
+	if (data.LoadTexture(Resource::IMG_ENDING, "Assets/GameWin.png") != AppStatus::OK)
+	{
+		return AppStatus::ERROR;
+	}
+	img_ending = data.GetTexture(Resource::IMG_ENDING);
+
+	if (data.LoadTexture(Resource::IMG_CREDITS, "Assets/Ending.png") != AppStatus::OK)
+	{
+		return AppStatus::ERROR;
+	}
+	img_credits = data.GetTexture(Resource::IMG_CREDITS);
+
 	return AppStatus::OK;
 }
 
@@ -115,7 +127,7 @@ void Game::FinishPlay()
 AppStatus Game::Update()
 {
 	//Only sum if there is in the main screen or the game over the screen
-	if (state == GameState::MAIN_SCREEN || state == GameState::GAME_OVER)	frameCount++;
+	if (state == GameState::MAIN_SCREEN || state == GameState::GAME_OVER || state == GameState::GAME_WIN)	frameCount++;
 
 	//Check if user attempts to close the window, either by clicking the close button or by pressing Alt+F4
 	if (WindowShouldClose()) return AppStatus::QUIT;
@@ -138,9 +150,11 @@ AppStatus Game::Update()
 		break;
 
 	case GameState::PLAYING:
-		if (scene->getLevelOver()) {
+		if (scene->getLevelOver())
 			state = GameState::GAME_OVER;
-		}
+
+		if (scene->getLevelWin())
+			state = GameState::GAME_WIN;
 
 		if (IsKeyPressed(KEY_ESCAPE))
 		{
@@ -160,7 +174,14 @@ AppStatus Game::Update()
 			frameCount = 0;
 		}
 		break;
+	case GameState::GAME_WIN:
+		if (frameCount >= HOLD_FRAMES * 2) {
+			state = GameState::MAIN_MENU;
+			frameCount = 0;
+		}
+		break;
 	}
+
 	return AppStatus::OK;
 }
 void Game::Render()
@@ -188,6 +209,10 @@ void Game::Render()
 	case GameState::GAME_OVER:
 		DrawTexture(*img_gameover, 0, 0, WHITE);
 		break;
+	case GameState::GAME_WIN:
+		DrawTexture(*img_ending, 0, 0, WHITE);
+		DrawTexture(*img_credits, (WINDOW_WIDTH - 193) / 2 , posYCredits-- , WHITE);
+		break;
 	}
 
 	EndTextureMode();
@@ -207,6 +232,8 @@ void Game::UnloadResources()
 	ResourceManager& data = ResourceManager::Instance();
 	data.ReleaseTexture(Resource::IMG_MENU);
 	data.ReleaseTexture(Resource::IMG_MSCREEN);
+	data.ReleaseTexture(Resource::IMG_CREDITS);
+	data.ReleaseTexture(Resource::IMG_ENDING);
 
 	UnloadRenderTexture(target);
 }

@@ -19,6 +19,8 @@ enum class Resource {
     IMG_MEDUSA_HEAD,
     IMG_BAT,
     IMG_BAR,
+    IMG_ENDING,
+    IMG_CREDITS
 };
 
 enum class MusicResource {
