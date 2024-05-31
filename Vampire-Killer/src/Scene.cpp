@@ -246,6 +246,8 @@ void Scene::Update()
 	UpdateMusicStream(musicStage0);
 	UpdateMusicStream(musicStage2);
 
+	player->GetPos().x;
+
 	//Change level if player gets off the screen
 	LoadNextLevel();
 
@@ -340,7 +342,7 @@ void Scene::Update()
 		{
 			LoadLevel(5, 103);
 			seq->SetStateSequence(StateSequence::IDLE);
-			seq->SetSequence(GameSequence::BOSS_DOOR_OPEN, { {29, 16}, 3, 48 }, 240);
+			seq->SetSequence(GameSequence::BOSS_DOOR_OPEN, { {27, 16}, 3, 48 }, 240);
 			seq->SetY(16);
 			falseTile = LoadTexture("Assets/FalseWall.png");	//Change the texture for the wall
 			player->BlockMovement(false);

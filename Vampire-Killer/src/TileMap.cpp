@@ -135,8 +135,9 @@ void TileMap::InitTileDictionary()
 	dict_rect[(int)Tile::CASTLE17] = { n * 9 ,  n * 5, n, n };
 	dict_rect[(int)Tile::CASTLE18] = { n * 11,  n * 5, n, n };
 	dict_rect[(int)Tile::CASTLE19] = { n * 12,  n * 5, n, n };
-	dict_rect[(int)Tile::CASTLELADER1] = { n * 9,  n * 6, n, n };
-	dict_rect[(int)Tile::CASTLELADER2] = { n * 9,  n * 7, n, n };
+	dict_rect[(int)Tile::CASTLELADDER1] = { n * 9,  n * 6, n, n };
+	dict_rect[(int)Tile::CASTLELADDER2] = { n * 9,  n * 7, n, n };
+	dict_rect[(int)Tile::CASTLELADDERTOP] = { n * 9,  n * 8, n, n };
 	dict_rect[(int)Tile::GLASS1] = { n * 10,  n * 6, n, n };
 	dict_rect[(int)Tile::GLASS2] = { n * 11,  n * 6, n, n };
 	dict_rect[(int)Tile::GLASS3] = { n * 10,  n * 7, n, n };
@@ -150,8 +151,6 @@ void TileMap::InitTileDictionary()
 	dict_rect[(int)Tile::ARCH2] = { n * 8,  n * 9, n, n };
 	dict_rect[(int)Tile::ARCH3] = { n * 9,  n * 9, n, n };
 	dict_rect[(int)Tile::ARCH4] = { n * 10,  n * 9, n, n };
-	
-		
 
 
 	dict_rect[(int)Tile::BLOCK_GROUND] = { 0,  n * 9, n, n };
@@ -214,11 +213,11 @@ bool TileMap::IsTileSolid(Tile tile) const
 }
 bool TileMap::IsTileLadderTop(Tile tile) const
 {
-	return tile == Tile::LADDER_TOP_L || tile == Tile::LADDER_TOP_R;
+	return tile == Tile::CASTLELADDERTOP;
 }
 bool TileMap::IsTileLadder(Tile tile) const
 {
-	return tile == Tile::LADDER_L || tile == Tile::LADDER_R;
+	return tile == Tile::CASTLELADDER1 || tile == Tile::CASTLELADDER2;
 }
 bool TileMap::TestCollisionWallLeft(const AABB& box) const
 {
@@ -295,29 +294,36 @@ bool TileMap::CollisionY(const Point& p, int distance) const
 }
 bool TileMap::TestOnLadder(const AABB& box, int* px) const
 {
-	int left, right, bottom;
-	int tx1, tx2, ty;
-	Tile tile1, tile2;
+	int left, right, bottom, top;
+	int tx1, tx2, ty1, ty2;
+	Tile tile1, tile2, tile3, tile4;
 
-	//Control points
+	// Puntos de control
 	left = box.pos.x;
 	right = box.pos.x + box.width - 1;
 	bottom = box.pos.y + box.height - 1;
+	top = box.pos.y;
 
-	//Calculate the tile coordinates
+	// Calcular las coordenadas de los tiles
 	tx1 = left / TILE_SIZE;
 	tx2 = right / TILE_SIZE;
-	ty = bottom / TILE_SIZE;
+	ty1 = top / TILE_SIZE;
+	ty2 = bottom / TILE_SIZE;
 
-	//To be able to climb up or down, both control points must be on ladder
-	tile1 = GetTileIndex(tx1, ty);
-	tile2 = GetTileIndex(tx2, ty);
-	if (IsTileLadder(tile1) && IsTileLadder(tile2))
+	// Para poder subir o bajar, todos los puntos de control deben estar en la escalera
+	tile1 = GetTileIndex(tx1, ty1);
+	tile2 = GetTileIndex(tx2, ty1);
+	tile3 = GetTileIndex(tx1, ty2);
+	tile4 = GetTileIndex(tx2, ty2);
+
+	if (IsTileLadder(tile1) || IsTileLadder(tile2) || IsTileLadder(tile3) || IsTileLadder(tile4))
 	{
 		*px = GetLadderCenterPos(left, bottom) - box.width / 2;
 		return true;
 	}
 	return false;
+
+
 }
 bool TileMap::TestOnLadderTop(const AABB& box, int* px) const
 {
@@ -370,8 +376,7 @@ int TileMap::GetLadderCenterPos(int pixel_x, int pixel_y) const
 	ty = pixel_y / TILE_SIZE;
 	Tile tile = GetTileIndex(tx, ty);
 
-	if (tile == Tile::LADDER_L || tile == Tile::LADDER_TOP_L)		return tx * TILE_SIZE + TILE_SIZE;
-	else if (tile == Tile::LADDER_R || tile == Tile::LADDER_TOP_R)	return tx * TILE_SIZE;
+	if (tile == Tile::CASTLELADDER1 || tile == Tile::CASTLELADDER2 || tile == Tile::CASTLELADDERTOP)	return tx * TILE_SIZE;
 	else
 	{
 		LOG("Internal error, tile should be a LADDER, coord: (%d,%d), tile type: %d", pixel_x, pixel_y, (int)tile);
