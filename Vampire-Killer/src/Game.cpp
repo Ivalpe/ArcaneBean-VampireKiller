@@ -132,6 +132,7 @@ AppStatus Game::Update()
 	//Check if user attempts to close the window, either by clicking the close button or by pressing Alt+F4
 	if (WindowShouldClose()) return AppStatus::QUIT;
 	
+	//Change FullScreen
 	if (IsKeyPressed(KEY_ENTER) && IsKeyDown(KEY_LEFT_ALT))
 	{
 		ToggleFullscreen();

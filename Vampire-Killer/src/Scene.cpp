@@ -168,7 +168,7 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 			{
 				player->SetPos(pos);
 			}
-			else if (tile == Tile::ITEM_FIRE_HEART || tile == Tile::ITEM_FIRE_HEART_BIG || tile == Tile::ITEM_FIRE_WHIPE || tile == Tile::ITEM_CANDLE_HEART || tile == Tile::ITEM_CANDLE_HEART_BIG 
+			else if (tile == Tile::ITEM_FIRE_HEART || tile == Tile::ITEM_FIRE_HEART_BIG || tile == Tile::ITEM_FIRE_WHIPE || tile == Tile::ITEM_CANDLE_HEART || tile == Tile::ITEM_CANDLE_HEART_BIG
 				|| tile == Tile::ITEM_CANDLE_BLUE_ORB || tile == Tile::ITEM_CANDLE_RING || tile == Tile::ITEM_CANDLE_KEY || tile == Tile::ITEM_CANDLE_RED_ORB)
 			{
 				if (tile == Tile::ITEM_FIRE_HEART)
@@ -322,6 +322,36 @@ void Scene::Update()
 				LoadLevel(i - KEY_ZERO, 103);
 			}
 		}
+
+		if (IsKeyPressed(KEY_E) || IsKeyPressed(KEY_R) || IsKeyPressed(KEY_T))
+		{
+			for (size_t i = 0; i < enemies.size(); i++)
+			{
+				if (!enemies[i]->IsAlive())
+				{
+					Point p = { player->GetPos().x + 16, player->GetPos().y };
+
+					if (IsKeyPressed(KEY_E))
+						enemies[i]->Initialise(p, EnemyType::KNIGHT, EnemyState::WALKING, EnemyLook::LEFT, level, 16, 32);
+					else if (IsKeyPressed(KEY_R))
+						enemies[i]->Initialise(p, EnemyType::MEDUSA_HEAD, EnemyState::WALKING, EnemyLook::LEFT, level, 16, 16);
+					else if (IsKeyPressed(KEY_T))
+						enemies[i]->Initialise(p, EnemyType::BAT, EnemyState::IDLE, EnemyLook::RIGHT, level, 16, 16);
+					break;
+				}
+			}
+		}
+		else if (IsKeyPressed(KEY_Y))
+		{
+			Point p = { player->GetPos().x + 16, player->GetPos().y };
+			objects.push_back(new Object(p, ObjectType::HEART_BIG, level));
+
+		}
+		else if (IsKeyPressed(KEY_U))
+		{
+			Point p = { player->GetPos().x + 16, player->GetPos().y };
+			objects.push_back(new Object(p, ObjectType::BLUE_ORB, level));
+		}
 	}
 
 	seq->Update();
@@ -466,7 +496,7 @@ void Scene::Render()
 		DrawLine(0, TP_TILE, WINDOW_WIDTH, TP_TILE, RED);
 		DrawLine(0, WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y, WINDOW_WIDTH, WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y, RED);
 		if ((seq->GetGameSequence() == GameSequence::GAME_START && lvlList->GetLvl() == 1) || (seq->GetGameSequence() == GameSequence::CASTLE_ENTRY && lvlList->GetLvl() == 4) || (seq->GetGameSequence() == GameSequence::BOSS_DOOR_OPEN && lvlList->GetLvl() == 8))
-		DrawRectangle(seq->GetHitBox().pos.x, seq->GetHitBox().pos.y, seq->GetHitBox().width, seq->GetHitBox().height, YELLOW);
+			DrawRectangle(seq->GetHitBox().pos.x, seq->GetHitBox().pos.y, seq->GetHitBox().width, seq->GetHitBox().height, YELLOW);
 	}
 
 	//Player
@@ -524,7 +554,7 @@ void Scene::CheckCollisions()
 		obj_box = (*itObj)->GetHitbox();
 		if (player_box.TestAABB(obj_box) && (*itObj)->GetHeartState() == ItemAnim::IDLE)
 		{
-			
+
 			ObjectType objType = (*itObj)->GetType();
 			if (objType == ObjectType::RED_ORB)
 			{

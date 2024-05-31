@@ -59,7 +59,7 @@ AppStatus Enemy::Initialise(Point& p, EnemyType et, EnemyState s, EnemyLook view
 		}
 
 		sprite = dynamic_cast<Sprite*>(render);
-		sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS - 2);
+		sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS - 1);
 
 		sprite->SetAnimationDelay((int)EnemyAnim::WALKING_RIGHT, ANIM_DELAY * 2);
 		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { 0, 0, -w, h });
@@ -88,7 +88,7 @@ AppStatus Enemy::Initialise(Point& p, EnemyType et, EnemyState s, EnemyLook view
 		}
 
 		sprite = dynamic_cast<Sprite*>(render);
-		sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS - 2);
+		sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS - 1);
 
 		sprite->SetAnimationDelay((int)EnemyAnim::WALKING_RIGHT, ANIM_DELAY * 2);
 		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { 0, 0, -w, h });
@@ -340,6 +340,7 @@ void Enemy::RestartMedusa()
 {
 	pos.x = initialX;
 	pos.y = initialY;
+	life = 1;
 }
 void Enemy::SetState(EnemyState es)
 {
