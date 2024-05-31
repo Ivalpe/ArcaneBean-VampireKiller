@@ -565,10 +565,18 @@ void Scene::CheckCollisions()
 			if (objType == ObjectType::WHIP)
 			{
 				player->UpDamage();
-
-
-
 			}
+			if (objType == ObjectType::HEART)
+			{
+				score += 1;
+			}
+			if (objType == ObjectType::HEART_BIG)
+			{
+				score += 5;
+			}
+
+
+
 			//player->IncrScore((*itObj)->Points());
 			//Delete the object
 			delete* itObj;
@@ -628,10 +636,12 @@ void Scene::CheckCollisions()
 				enemies[i]->StartInvincibility();
 				if (enemies[i]->getLife() <= 0)
 				{
-					if (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT)
+					if (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT){
 						enemies[i]->Die();
-					else
+					score += 100;}
+					else {
 						enemies[i]->MedusaSpawn(false);
+					}
 				}
 			}
 
