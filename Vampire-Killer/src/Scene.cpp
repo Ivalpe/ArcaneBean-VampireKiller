@@ -7,6 +7,7 @@ Scene::Scene()
 	player = nullptr;
 	level = nullptr;
 	levelOver = false;
+	gameWin = false;
 	playerBar = nullptr;
 	bossBar = nullptr;
 
@@ -16,6 +17,7 @@ Scene::Scene()
 	camera.zoom = 1.0f;						//Default zoom
 
 	medusaSpawnRate = 120;
+	contDie = 120;
 
 	debug = DebugMode::OFF;
 	score = 0,
@@ -258,6 +260,10 @@ void Scene::Update()
 	{
 		levelOver = true;
 	}
+	if (IsKeyPressed(KEY_F3))
+	{
+		gameWin = true;
+	}
 
 	level->Update();
 	player->Update();
@@ -344,7 +350,7 @@ void Scene::Update()
 		//Sequence for Boss Door
 		else if (seq->GetGameSequence() == GameSequence::BOSS_DOOR_OPEN)
 		{
-			LoadLevel(11, 101);
+			gameWin = true;
 			seq->SetStateSequence(StateSequence::IDLE);
 			seq->SetSequence(GameSequence::BOSS_DOOR_OPEN, { {0, 0}, 0, 0 }, 10);
 			player->BlockMovement(false);
@@ -357,6 +363,23 @@ void Scene::Update()
 	{
 		player->MoveAuto(true);
 		player->ChangeLook(Look::LEFT);
+	}
+
+	if (player->GetLife() <= 0)
+	{
+		contDie--;
+	}
+
+	if (contDie == 0)
+	{
+		LoadLevel(lvlList->GetStage() == 0 ? 1 : 5, 103);
+		contDie == 120;
+		life -= 3;
+
+		if (life == 0)
+		{
+			levelOver = true;
+		}
 	}
 
 	CheckCollisions();
@@ -440,6 +463,7 @@ void Scene::Render()
 		DrawLine(WINDOW_WIDTH - TP_TILE, 0, WINDOW_WIDTH - TP_TILE, WINDOW_HEIGHT, RED);
 		DrawLine(0, TP_TILE, WINDOW_WIDTH, TP_TILE, RED);
 		DrawLine(0, WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y, WINDOW_WIDTH, WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y, RED);
+		if ((seq->GetGameSequence() == GameSequence::GAME_START && lvlList->GetLvl() == 1) || (seq->GetGameSequence() == GameSequence::CASTLE_ENTRY && lvlList->GetLvl() == 4) || (seq->GetGameSequence() == GameSequence::BOSS_DOOR_OPEN && lvlList->GetLvl() == 8))
 		DrawRectangle(seq->GetHitBox().pos.x, seq->GetHitBox().pos.y, seq->GetHitBox().width, seq->GetHitBox().height, YELLOW);
 	}
 
@@ -641,10 +665,14 @@ void Scene::RenderGUI() const
 	playerBar->Draw();
 	bossBar->Draw();
 	DrawText(TextFormat("%06d", score), 58, -32, 10, WHITE);
-	DrawText(TextFormat("%02d",  stage), 157, -32, 10, WHITE);
-	DrawText(TextFormat("%02d",  hearts), 193, -32, 10, WHITE);
-	DrawText(TextFormat("%02d",  life), 229, -32, 10, WHITE);
+	DrawText(TextFormat("%02d", lvlList->GetStage()), 157, -32, 10, WHITE);
+	DrawText(TextFormat("%02d", hearts), 193, -32, 10, WHITE);
+	DrawText(TextFormat("%02d", life), 229, -32, 10, WHITE);
 }
 bool Scene::getLevelOver() const {
 	return levelOver;
+}
+
+bool Scene::getLevelWin() const {
+	return gameWin;
 }

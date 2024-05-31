@@ -23,6 +23,7 @@ public:
     void Render();
     void Release();
     bool getLevelOver() const;
+    bool getLevelWin() const;
 
 private:
     AppStatus LoadLevel(int stage, int direction);
@@ -45,12 +46,12 @@ private:
 
     DebugMode debug;
 
-    bool levelOver;
+    bool levelOver, gameWin;
     Levels* lvlList;
     Bar* playerBar;
     Bar* bossBar;
     Texture2D ui, gameStart, falseTile, door;
     int medusaSpawnRate;
     Sequence* seq;
-    int score, stage, hearts, life;
+    int score, stage, hearts, life, contDie;
 };

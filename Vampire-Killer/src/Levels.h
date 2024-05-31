@@ -19,8 +19,9 @@ public:
 	int GetLvl();
 	void SetLvl(int level);
 	void SetEnt(int pos);
+	int GetStage();
 
 private:
-	int level;
+	int level, stage;
 	std::vector<std::vector<int>> entities;
 };

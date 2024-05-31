@@ -7,6 +7,7 @@ Levels::Levels() {}
 AppStatus Levels::Initialise() {
 
 	level = 1;
+	stage = 0;
 	std::vector<int> mapEnt;
 
 	mapEnt =  //stage 0.0
@@ -94,8 +95,8 @@ AppStatus Levels::Initialise() {
 		0 ,0 ,0 ,0 ,0 ,203 ,100 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,143 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,143 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
-		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,200 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
+		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,143 ,0 ,0 ,0 ,0 ,143 ,0 ,0 ,0 ,0 ,0 ,0,
 		0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,
@@ -377,6 +378,14 @@ std::vector<int> Levels::getEnt() {
 
 void Levels::SetEnt(int pos) {
 	entities[level - 1][pos] = 0;
+}
+
+int Levels::GetStage()
+{
+	if (level <= 4)
+		return 0;
+	else
+		return 4;
 }
 
 posTp Levels::getTp() {
