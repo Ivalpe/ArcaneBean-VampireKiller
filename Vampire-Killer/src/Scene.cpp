@@ -604,10 +604,12 @@ void Scene::CheckCollisions()
 				enemies[i]->StartInvincibility();
 				if (enemies[i]->getLife() <= 0)
 				{
-					if (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT)
+					if (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT){
 						enemies[i]->Die();
-					else
+					score += 100;}
+					else {
 						enemies[i]->MedusaSpawn(false);
+					}
 				}
 			}
 
