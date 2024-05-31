@@ -18,6 +18,10 @@ Scene::Scene()
 	medusaSpawnRate = 120;
 
 	debug = DebugMode::OFF;
+	score = 0,
+		stage = 0,
+		hearts = 0,
+		life = 3;
 }
 Scene::~Scene()
 {
@@ -91,6 +95,9 @@ AppStatus Scene::Init()
 
 	//False Tile
 	falseTile = LoadTexture("Assets/FalseTile.png");
+
+	//Door
+	door = LoadTexture("Assets/Door.png");
 
 	Point pos = Point(61, -18);
 	playerBar = new Bar(16, { 255, 192, 150, 255 }, pos, 64, 4);
@@ -206,6 +213,17 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 					}
 				}
 			}
+			else if (tile == Tile::ENEMY_BAT)
+			{
+				for (size_t i = 0; i < enemies.size(); i++)
+				{
+					if (!enemies[i]->IsAlive())
+					{
+						enemies[i]->Initialise(pos, EnemyType::BAT, EnemyState::IDLE, EnemyLook::RIGHT, level, 16, 16);
+						break;
+					}
+				}
+			}
 			++i;
 		}
 	}
@@ -240,17 +258,6 @@ void Scene::Update()
 	{
 		levelOver = true;
 	}
-	else if (IsKeyPressed(KEY_F3))
-	{
-		LoadLevel(5, 103);
-		StopMusicStream(musicStage0);
-		PlayMusicStream(musicStage2);
-
-	}
-	else if (IsKeyPressed(KEY_F4))
-	{
-		LoadLevel(11, 101);
-	}
 
 	level->Update();
 	player->Update();
@@ -277,7 +284,7 @@ void Scene::Update()
 	int middle = (WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y) / 2;
 	for (size_t i = 0; i < enemies.size(); i++)
 	{
-		if (enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::KNIGHT)
+		if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT))
 			enemies[i]->Update();
 
 		if (medusaSpawnRate == 0 && enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && !enemies[i]->IsMedusaSpawn())
@@ -291,15 +298,29 @@ void Scene::Update()
 
 		if (enemies[i]->GetPos().x <= -16 || enemies[i]->GetPos().x >= WINDOW_WIDTH)
 		{
-			enemies[i]->MedusaSpawn(false);
+			if (enemies[i]->getType() == EnemyType::MEDUSA_HEAD)
+				enemies[i]->MedusaSpawn(false);
+			else
+				enemies[i]->Die();
 		}
 
+	}
+
+	//Debug Level
+	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
+	{
+		for (int i = KEY_ONE; i <= KEY_NINE; i++) {
+			if (IsKeyDown(i)) {
+				LoadLevel(i - KEY_ZERO, 103);
+			}
+		}
 	}
 
 	seq->Update();
 
 	if (seq->GetCont() == 0)
 	{
+		//Sequence for Game Start
 		if (seq->GetGameSequence() == GameSequence::GAME_START)
 		{
 			LoadLevel(2, 103);
@@ -308,16 +329,34 @@ void Scene::Update()
 			player->BlockMovement(false);
 			player->LookAhead(false);
 		}
+		//Sequence for Castle Entry
 		else if (seq->GetGameSequence() == GameSequence::CASTLE_ENTRY)
 		{
 			LoadLevel(5, 103);
 			seq->SetStateSequence(StateSequence::IDLE);
-			seq->SetSequence(GameSequence::BOSS_DOOR_OPEN, { {0, 0}, 0, 0 }, 0);
+			seq->SetSequence(GameSequence::BOSS_DOOR_OPEN, { {29, 16}, 3, 48 }, 240);
+			seq->SetY(16);
+			falseTile = LoadTexture("Assets/FalseWall.png");	//Change the texture for the wall
 			player->BlockMovement(false);
 			player->MoveAuto(false);
 			player->LookAhead(false);
 		}
+		//Sequence for Boss Door
+		else if (seq->GetGameSequence() == GameSequence::BOSS_DOOR_OPEN)
+		{
+			LoadLevel(11, 101);
+			seq->SetStateSequence(StateSequence::IDLE);
+			seq->SetSequence(GameSequence::BOSS_DOOR_OPEN, { {0, 0}, 0, 0 }, 10);
+			player->BlockMovement(false);
+			player->MoveAuto(false);
+			player->LookAhead(false);
+		}
+	}
 
+	if (seq->GetCont() == 120 && seq->GetGameSequence() == GameSequence::BOSS_DOOR_OPEN)
+	{
+		player->MoveAuto(true);
+		player->ChangeLook(Look::LEFT);
 	}
 
 	CheckCollisions();
@@ -361,13 +400,13 @@ void Scene::Render()
 	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
 		for (size_t i = 0; i < enemies.size(); i++)
 		{
-			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
 				enemies[i]->Draw();
 		}
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		for (size_t i = 0; i < enemies.size(); i++)
 		{
-			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
 				enemies[i]->DrawDebug(GREEN);
 		}
 
@@ -410,9 +449,21 @@ void Scene::Render()
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		player->DrawDebug(GREEN);
 
+	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
+	{
+		DrawText(TextFormat("Go to a level (1-9)"), 16 * 9, 16 * 1, 1, LIGHTGRAY);
+		DrawText(TextFormat("Spawn a Item (I)"), 16 * 9, 16 * 2, 1, LIGHTGRAY);
+		DrawText(TextFormat("Spawn a Enemy (E)"), 16 * 9, 16 * 3, 1, LIGHTGRAY);
+	}
+
+	if (lvlList->GetLvl() == 8)
+		DrawTexture(door, 14, seq->GetY(), WHITE);
+
 	//False Tile
 	if (lvlList->GetLvl() == 4)
 		DrawTexture(falseTile, 224, 112, WHITE);
+	else if (lvlList->GetLvl() == 8)
+		DrawTexture(falseTile, 0, -5, WHITE);
 
 	RenderGUI();
 
@@ -438,7 +489,9 @@ void Scene::CheckCollisions()
 	player_box = player->GetHitbox().first;
 	whip_hitbox = player->GetHitbox().second;
 
+
 	//Collision Items
+
 	auto itObj = objects.begin();
 	while (itObj != objects.end())
 	{
@@ -519,12 +572,15 @@ void Scene::CheckCollisions()
 				enemies[i]->StartInvincibility();
 				if (enemies[i]->getLife() <= 0)
 				{
-					if (enemies[i]->getType() == EnemyType::KNIGHT)
+					if (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT)
 						enemies[i]->Die();
 					else
 						enemies[i]->MedusaSpawn(false);
 				}
 			}
+
+			if (player_box.TestAABB(enemies[i]->GetAttackRadius()) && enemies[i]->GetState() == EnemyState::IDLE)
+				enemies[i]->SetState(EnemyState::WALKING);
 		}
 	}
 
@@ -541,10 +597,25 @@ void Scene::CheckCollisions()
 	{
 		seq->SetStateSequence(StateSequence::SEQUENCE);
 		player->BlockMovement(true);
+		player->Stop();
 
 		if (player->GetPos().y == 143)
 		{
 			player->MoveAuto(true);
+			seq->StartWaiting();
+		}
+	}
+
+	//Boss Door
+	if (lvlList->GetLvl() == 8 && seq->GetGameSequence() == GameSequence::BOSS_DOOR_OPEN && player_box.TestAABB(seq->GetHitBox()))
+	{
+		seq->SetStateSequence(StateSequence::SEQUENCE);
+		player->BlockMovement(true);
+		player->Stop();
+		player->ChangeLook(Look::LEFT);
+
+		if (player->GetPos().y == 63)
+		{
 			seq->StartWaiting();
 		}
 	}
@@ -569,6 +640,10 @@ void Scene::RenderGUI() const
 	DrawTexture(ui, 0, -35, WHITE);
 	playerBar->Draw();
 	bossBar->Draw();
+	DrawText(TextFormat("%06d", score), 58, -32, 10, WHITE);
+	DrawText(TextFormat("%02d",  stage), 157, -32, 10, WHITE);
+	DrawText(TextFormat("%02d",  hearts), 193, -32, 10, WHITE);
+	DrawText(TextFormat("%02d",  life), 229, -32, 10, WHITE);
 }
 bool Scene::getLevelOver() const {
 	return levelOver;

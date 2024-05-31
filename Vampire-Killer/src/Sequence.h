@@ -19,6 +19,8 @@ public:
     void Update();
     int GetCont();
     void SetSequence(GameSequence gs, AABB hitbox, int contNext);
+    void SetY(int posy);
+    int GetY();
 
 private:
     GameSequence gameSeq;
@@ -26,4 +28,6 @@ private:
     AABB hitboxEnd;
     int cont;
     bool wait;
+    int y;
+
 };
