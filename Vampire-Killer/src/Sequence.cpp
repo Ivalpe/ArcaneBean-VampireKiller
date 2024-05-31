@@ -6,6 +6,7 @@ Sequence::Sequence(GameSequence game, AABB hitbox)
 	stateSeq = StateSequence::IDLE;
 	hitboxEnd = hitbox;
 	cont = 120;
+	y = 0;
 	wait = false;
 }
 
@@ -43,6 +44,9 @@ void Sequence::Update()
 {
 	if (wait)
 		cont--;
+
+	if (gameSeq == GameSequence::BOSS_DOOR_OPEN && stateSeq == StateSequence::SEQUENCE)
+		y--;
 }
 
 int Sequence::GetCont()
@@ -58,3 +62,15 @@ void Sequence::SetSequence(GameSequence gs, AABB hitbox, int contNext)
 	cont = contNext;
 	wait = false;
 }
+
+void Sequence::SetY(int posy)
+{
+	y = posy;
+}
+
+int Sequence::GetY()
+{
+	return y;
+}
+
+

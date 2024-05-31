@@ -59,7 +59,7 @@ AppStatus Enemy::Initialise(Point& p, EnemyType et, EnemyState s, EnemyLook view
 		}
 
 		sprite = dynamic_cast<Sprite*>(render);
-		sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS);
+		sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS - 2);
 
 		sprite->SetAnimationDelay((int)EnemyAnim::WALKING_RIGHT, ANIM_DELAY * 2);
 		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { 0, 0, -w, h });
@@ -88,7 +88,7 @@ AppStatus Enemy::Initialise(Point& p, EnemyType et, EnemyState s, EnemyLook view
 		}
 
 		sprite = dynamic_cast<Sprite*>(render);
-		sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS);
+		sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS - 2);
 
 		sprite->SetAnimationDelay((int)EnemyAnim::WALKING_RIGHT, ANIM_DELAY * 2);
 		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { 0, 0, -w, h });
@@ -104,24 +104,52 @@ AppStatus Enemy::Initialise(Point& p, EnemyType et, EnemyState s, EnemyLook view
 
 		life = 1;
 		break;
+	case EnemyType::BAT:
+		if (data.LoadTexture(Resource::IMG_MEDUSA_HEAD, "Assets/Sprites/Bat.png") != AppStatus::OK)
+		{
+			return AppStatus::ERROR;
+		}
+
+		render = new Sprite(data.GetTexture(Resource::IMG_MEDUSA_HEAD));
+		if (render == nullptr)
+		{
+			LOG("Failed to allocate memory for player sprite");
+			return AppStatus::ERROR;
+		}
+
+		sprite = dynamic_cast<Sprite*>(render);
+		sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS);
+
+		sprite->SetAnimationDelay((int)EnemyAnim::WALKING_RIGHT, ANIM_DELAY * 2);
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w, 0, -w, h });
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w * 2, 0, -w, h });
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w * 3, 0, -w, h });
+		sprite->SetAnimationDelay((int)EnemyAnim::WALKING_LEFT, ANIM_DELAY * 2);
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w, 0, w, h });
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w * 2, 0, w, h });
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w * 3, 0, w, h });
+		sprite->SetAnimationDelay((int)EnemyAnim::IDLE, ANIM_DELAY);
+		sprite->AddKeyFrame((int)EnemyAnim::IDLE, { 0, 0, w, h });
+
+		sprite->SetAnimation((int)EnemyAnim::IDLE);
+
+		life = 1;
+		break;
 	default:
 		LOG("Failed to load Enemy");
 		return AppStatus::ERROR;
 		break;
 	}
-
-
-
 }
 void Enemy::Update()
 {
-	if (type == EnemyType::KNIGHT || (type == EnemyType::MEDUSA_HEAD && medusaSpawn))
+	if (type == EnemyType::KNIGHT || type == EnemyType::BAT || (type == EnemyType::MEDUSA_HEAD && medusaSpawn))
 	{
 		Sprite* sprite = dynamic_cast<Sprite*>(render);
 		sprite->Update();
 
 		MoveY();
-		if (type != EnemyType::MEDUSA_HEAD)
+		if (type == EnemyType::KNIGHT)
 			map->TestCollisionGround(GetHitbox(), &pos.y);
 
 		MoveX();
@@ -136,7 +164,7 @@ void Enemy::MoveY()
 {
 	if (type == EnemyType::KNIGHT)
 		pos.y += ENEMY_SPEED;
-	else
+	else if (type == EnemyType::MEDUSA_HEAD || (type == EnemyType::BAT && GetAnimation() != EnemyAnim::IDLE))
 		pos.y = initialY + 20 * sin(time);
 }
 void Enemy::MoveX()
@@ -182,6 +210,15 @@ void Enemy::MoveX()
 
 		time += 0.1;
 		break;
+	case EnemyType::BAT:
+		if (GetAnimation() != EnemyAnim::IDLE)
+		{
+			if (look == EnemyLook::LEFT)	pos.x -= ENEMY_SPEED;
+			else							pos.x += ENEMY_SPEED;
+		}
+
+		time += 0.1;
+		break;
 	default:
 		break;
 	}
@@ -198,6 +235,15 @@ void Enemy::DrawDebug(const Color& col) const
 	AABB box = GetHitbox();
 	DrawRectangle(box.pos.x + box.width, box.pos.y + box.height + 2, 1, 1, BLACK);
 
+	if (type == EnemyType::BAT)
+	{
+		Color c = RED;
+		c.a = 128;
+		AABB box = GetAttackRadius();
+		DrawRectangle(box.pos.x, box.pos.y, box.width, box.height, c);
+	}
+
+
 	DrawText(TextFormat("%d", getLife()), box.pos.x + (box.width / 2), box.pos.y + (box.height / 2), 1, WHITE);
 }
 void Enemy::Release()
@@ -205,8 +251,10 @@ void Enemy::Release()
 	ResourceManager& data = ResourceManager::Instance();
 	if (type == EnemyType::KNIGHT)
 		data.ReleaseTexture(Resource::IMG_KNIGHT);
-	else
+	else if (type == EnemyType::MEDUSA_HEAD)
 		data.ReleaseTexture(Resource::IMG_MEDUSA_HEAD);
+	else
+		data.ReleaseTexture(Resource::IMG_BAT);
 }
 bool Enemy::IsLookingRight() const
 {
@@ -272,6 +320,12 @@ AABB Enemy::GetHitbox() const
 	}
 
 }
+AABB Enemy::GetAttackRadius() const
+{
+	Point p(pos.x - 50, pos.y - (height - 1) - 50);
+	AABB hitbox(p, width + 100, height + 100);
+	return hitbox;
+}
 void Enemy::MedusaSpawn(bool spawn)
 {
 	medusaSpawn = spawn;
@@ -286,4 +340,14 @@ void Enemy::RestartMedusa()
 {
 	pos.x = initialX;
 	pos.y = initialY;
+}
+void Enemy::SetState(EnemyState es)
+{
+	state = es;
+	look == EnemyLook::RIGHT;
+	SetAnimation((int)EnemyAnim::WALKING_RIGHT);
+}
+EnemyState Enemy::GetState()
+{
+	return state;
 }

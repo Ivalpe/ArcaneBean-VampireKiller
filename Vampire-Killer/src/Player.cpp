@@ -373,7 +373,7 @@ void Player::Move(Look l, AABB box, int prev_x)
 		if (l == Look::RIGHT && IsLookingLeft()) ChangeAnimRight();
 	}
 
-	if ((l == Look::LEFT && map->TestCollisionWallLeft(box) || pos.x <= 0) || (l == Look::RIGHT && map->TestCollisionWallRight(box) || pos.x >= WINDOW_WIDTH - PLAYER_PHYSICAL_WIDTH))
+	if (!move && ((l == Look::LEFT && map->TestCollisionWallLeft(box) || pos.x <= 0) || (l == Look::RIGHT && map->TestCollisionWallRight(box) || pos.x >= WINDOW_WIDTH - PLAYER_PHYSICAL_WIDTH)))
 	{
 		pos.x = prev_x;
 		if (state == State::WALKING) Stop();
@@ -391,6 +391,10 @@ void Player::LookAhead(bool trigger)
 	{ 
 		SetAnimation((int)PlayerAnim::IDLE_RIGHT);
 	}
+}
+void Player::ChangeLook(Look l)
+{
+	look = l;
 }
 void Player::BlockMovement(bool m)
 {
@@ -567,6 +571,8 @@ void Player::Damaged(EnemyType enemy)
 	case EnemyType::MEDUSA_HEAD:
 		life -= 1;
 		break;
+	case EnemyType::BAT:
+		life -= 1;
 	default:
 		break;
 	}

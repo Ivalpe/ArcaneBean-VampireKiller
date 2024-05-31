@@ -4,9 +4,9 @@
 
 enum class EnemyLook { RIGHT, LEFT};
 
-enum class EnemyType { KNIGHT, MEDUSA_HEAD };
-enum class EnemyState { WALKING };
-enum class EnemyAnim { WALKING_LEFT, WALKING_RIGHT, NUM_ANIMATIONS };
+enum class EnemyType { KNIGHT, MEDUSA_HEAD, BAT};
+enum class EnemyState { WALKING, IDLE};
+enum class EnemyAnim { WALKING_LEFT, WALKING_RIGHT, IDLE, NUM_ANIMATIONS };
 
 #define ENEMY_SPEED			1
 
@@ -32,9 +32,11 @@ public:
 	bool IsAlive() const;
 	void Die();
 	AABB GetHitbox() const;
+	AABB GetAttackRadius() const;
 	void MedusaSpawn(bool spawn);
 	bool IsMedusaSpawn();
-	
+	void SetState(EnemyState es);
+	EnemyState GetState();
 
 private:
 	bool IsLookingRight() const;
