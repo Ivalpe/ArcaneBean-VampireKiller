@@ -59,7 +59,7 @@ AppStatus Game::Initialise(float scale)
 	//Disable the escape key to quit functionality
 	SetExitKey(0);
 
-	//ToggleFullscreen();
+	ToggleFullscreen();
 
 	return AppStatus::OK;
 }
@@ -131,6 +131,12 @@ AppStatus Game::Update()
 
 	//Check if user attempts to close the window, either by clicking the close button or by pressing Alt+F4
 	if (WindowShouldClose()) return AppStatus::QUIT;
+	
+	//Change FullScreen
+	if (IsKeyPressed(KEY_ENTER) && IsKeyDown(KEY_LEFT_ALT))
+	{
+		ToggleFullscreen();
+	}
 
 	switch (state)
 	{
@@ -186,8 +192,6 @@ AppStatus Game::Update()
 }
 void Game::Render()
 {
-
-
 	//Draw everything in the render texture, note this will not be rendered on screen, yet
 	BeginTextureMode(target);
 	ClearBackground(BLACK);

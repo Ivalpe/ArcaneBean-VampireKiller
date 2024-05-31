@@ -43,7 +43,7 @@ enum class PlayerAnim {
 	WALKING_LEFT, WALKING_RIGHT,
 	JUMPING_LEFT, JUMPING_RIGHT,
 	FALLING_LEFT, FALLING_RIGHT,
-	CLIMBING, CLIMBING_PRE_TOP, CLIMBING_TOP,
+	CLIMBING,
 	CROUCHING_LEFT, CROUCHING_RIGHT,
 	ATTACKING_GROUND_LEFT, ATTACKING_GROUND_RIGHT,
 	ATTACKING_AIR_LEFT, ATTACKING_AIR_RIGHT,
@@ -103,8 +103,7 @@ private:
 	void StartWalkingRight();
 	void StartFalling();
 	void StartJumping();
-	void StartClimbingUp();
-	void StartClimbingDown();
+	void StartClimbing();
 	void ChangeAnimRight();
 	void ChangeAnimLeft();
 	void Move(Look l, AABB box, int prev_x);

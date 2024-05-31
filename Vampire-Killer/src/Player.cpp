@@ -71,12 +71,8 @@ AppStatus Player::Initialise()
 	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_LEFT, { 3 * nw, 0, -nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::CLIMBING, ANIM_LADDER_DELAY);
-	for (i = 0; i < 4; ++i)
-		sprite->AddKeyFrame((int)PlayerAnim::CLIMBING, { (float)i * nw, 6 * nh, nw, nh });
-	sprite->SetAnimationDelay((int)PlayerAnim::CLIMBING_PRE_TOP, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CLIMBING_PRE_TOP, { 4 * nw, 6 * nh, nw, nh });
-	sprite->SetAnimationDelay((int)PlayerAnim::CLIMBING_TOP, ANIM_DELAY);
-	sprite->AddKeyFrame((int)PlayerAnim::CLIMBING_TOP, { 5 * nw, 6 * nh, nw, nh });
+	for (i = 0; i < 3; ++i)
+		sprite->AddKeyFrame((int)PlayerAnim::CLIMBING, { (float)i * nw, 0, nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::CROUCHING_LEFT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::CROUCHING_LEFT, { 3 * nw, 0, -nw, nh });
@@ -212,19 +208,11 @@ void Player::StartJumping()
 	else					SetAnimation((int)PlayerAnim::JUMPING_LEFT);
 	jump_delay = PLAYER_JUMP_DELAY;
 }
-void Player::StartClimbingUp()
+void Player::StartClimbing()
 {
 	prev_state = state;
 	state = State::CLIMBING;
 	SetAnimation((int)PlayerAnim::CLIMBING);
-	Sprite* sprite = dynamic_cast<Sprite*>(render);
-	sprite->SetManualMode();
-}
-void Player::StartClimbingDown()
-{
-	prev_state = state;
-	state = State::CLIMBING;
-	SetAnimation((int)PlayerAnim::CLIMBING_TOP);
 	Sprite* sprite = dynamic_cast<Sprite*>(render);
 	sprite->SetManualMode();
 }
@@ -343,11 +331,11 @@ void Player::MoveX()
 		Move(look == Look::LEFT ? Look::LEFT : Look::RIGHT, box, prev_x);
 	}
 
-	if (!blockMovement && IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT) && state != State::JUMPING && state != State::FALLING)
+	if (!blockMovement && IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT) && state != State::JUMPING && state != State::FALLING && state != State::CLIMBING)
 	{
 		Move(Look::LEFT, box, prev_x);
 	}
-	else if (!blockMovement && IsKeyDown(KEY_RIGHT) && state != State::JUMPING && state != State::FALLING)
+	else if (!blockMovement && IsKeyDown(KEY_RIGHT) && state != State::JUMPING && state != State::FALLING && state != State::CLIMBING)
 	{
 		Move(Look::RIGHT, box, prev_x);
 	}
@@ -383,14 +371,9 @@ void Player::LookAhead(bool trigger)
 {
 	Stop();
 	if (trigger)
-	{ 
 		SetAnimation((int)PlayerAnim::LOOKING_AHEAD);
-
-	}
 	else
-	{ 
 		SetAnimation((int)PlayerAnim::IDLE_RIGHT);
-	}
 }
 void Player::ChangeLook(Look l)
 {
@@ -403,7 +386,6 @@ void Player::BlockMovement(bool m)
 void Player::MoveY()
 {
 	AABB box;
-
 
 	if (state == State::JUMPING)
 	{
@@ -426,7 +408,7 @@ void Player::MoveY()
 			{
 				box = GetHitbox().first;
 				if (map->TestOnLadder(box, &pos.x))
-					StartClimbingUp();
+					StartClimbing();
 				else
 					StartJumping();
 			}
@@ -444,8 +426,9 @@ void Player::MoveY()
 				box.pos.y++;
 				if (map->TestOnLadderTop(box, &pos.x))
 				{
-					StartClimbingDown();
+					StartClimbing();
 					pos.y += PLAYER_LADDER_SPEED;
+					pos.x -= PLAYER_LADDER_SPEED;
 				}
 
 			}
@@ -462,7 +445,7 @@ void Player::MoveY()
 			{
 				box = GetHitbox().first;
 				if (map->TestOnLadder(box, &pos.x))
-					StartClimbingUp();
+					StartClimbing();
 			}
 			else if (IsKeyDown(KEY_DOWN))
 			{
@@ -472,7 +455,7 @@ void Player::MoveY()
 				box.pos.y++;
 				if (map->TestOnLadderTop(box, &pos.x))
 				{
-					StartClimbingDown();
+					StartClimbing();
 					pos.y += PLAYER_LADDER_SPEED;
 				}
 
@@ -592,9 +575,9 @@ void Player::ClampLife()
 		life = 16;
 	}
 }
-void Player::UpDamage() 
+void Player::UpDamage()
 {
-	dmg+= 1;
+	dmg += 1;
 
 }
 void Player::StartInvincibility() {
@@ -669,21 +652,24 @@ void Player::LogicClimbing()
 	if (IsKeyDown(KEY_UP))
 	{
 		pos.y -= PLAYER_LADDER_SPEED;
+		pos.x += PLAYER_LADDER_SPEED;
 		sprite->NextFrame();
 	}
 	else if (IsKeyDown(KEY_DOWN))
 	{
 		pos.y += PLAYER_LADDER_SPEED;
+		pos.x -= PLAYER_LADDER_SPEED;
 		sprite->PrevFrame();
 	}
 	else if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_LEFT))
 	{
 		StartFalling();
 	}
-	else if (IsKeyDown(KEY_SPACE))
+	else if (IsKeyDown(KEY_UP))
 	{
 		StartJumping();
 	}
+
 
 	//It is important to first check LadderTop due to its condition as a collision ground.
 	//By doing so, we ensure that we don't stop climbing down immediately after starting the descent.
@@ -692,8 +678,8 @@ void Player::LogicClimbing()
 		box = GetHitbox().first;
 		if (map->TestOnLadderTop(box, &tmp))
 		{
-			if (IsInSecondHalfTile())		SetAnimation((int)PlayerAnim::CLIMBING_PRE_TOP);
-			else if (IsInFirstHalfTile())	SetAnimation((int)PlayerAnim::CLIMBING_TOP);
+			if (IsInSecondHalfTile())		SetAnimation((int)PlayerAnim::CLIMBING);
+			else if (IsInFirstHalfTile())	SetAnimation((int)PlayerAnim::CLIMBING);
 			else					LOG("Internal error, tile should be a LADDER_TOP, coord: (%d,%d)", box.pos.x, box.pos.y);
 		}
 		else if (map->TestCollisionGround(box, &pos.y))
