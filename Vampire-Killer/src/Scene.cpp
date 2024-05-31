@@ -533,10 +533,18 @@ void Scene::CheckCollisions()
 			if (objType == ObjectType::WHIP)
 			{
 				player->UpDamage();
-
-
-
 			}
+			if (objType == ObjectType::HEART)
+			{
+				score += 1;
+			}
+			if (objType == ObjectType::HEART_BIG)
+			{
+				score += 5;
+			}
+
+
+
 			//player->IncrScore((*itObj)->Points());
 			//Delete the object
 			delete* itObj;
