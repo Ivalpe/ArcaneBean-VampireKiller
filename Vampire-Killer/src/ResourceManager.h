@@ -17,6 +17,7 @@ enum class Resource {
     IMG_CANDLE,
     IMG_KNIGHT,
     IMG_MEDUSA_HEAD,
+    IMG_BAT,
     IMG_BAR,
 };
 

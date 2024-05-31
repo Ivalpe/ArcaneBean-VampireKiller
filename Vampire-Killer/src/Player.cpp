@@ -571,6 +571,8 @@ void Player::Damaged(EnemyType enemy)
 	case EnemyType::MEDUSA_HEAD:
 		life -= 1;
 		break;
+	case EnemyType::BAT:
+		life -= 1;
 	default:
 		break;
 	}

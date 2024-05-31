@@ -18,6 +18,10 @@ Scene::Scene()
 	medusaSpawnRate = 120;
 
 	debug = DebugMode::OFF;
+	score = 0,
+		stage = 0,
+		hearts = 0,
+		life = 3;
 }
 Scene::~Scene()
 {
@@ -200,6 +204,17 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 					}
 				}
 			}
+			else if (tile == Tile::ENEMY_BAT)
+			{
+				for (size_t i = 0; i < enemies.size(); i++)
+				{
+					if (!enemies[i]->IsAlive())
+					{
+						enemies[i]->Initialise(pos, EnemyType::BAT, EnemyState::IDLE, EnemyLook::RIGHT, level, 16, 16);
+						break;
+					}
+				}
+			}
 			++i;
 		}
 	}
@@ -260,7 +275,7 @@ void Scene::Update()
 	int middle = (WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y) / 2;
 	for (size_t i = 0; i < enemies.size(); i++)
 	{
-		if (enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::KNIGHT)
+		if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT))
 			enemies[i]->Update();
 
 		if (medusaSpawnRate == 0 && enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && !enemies[i]->IsMedusaSpawn())
@@ -274,7 +289,10 @@ void Scene::Update()
 
 		if (enemies[i]->GetPos().x <= -16 || enemies[i]->GetPos().x >= WINDOW_WIDTH)
 		{
-			enemies[i]->MedusaSpawn(false);
+			if (enemies[i]->getType() == EnemyType::MEDUSA_HEAD)
+				enemies[i]->MedusaSpawn(false);
+			else
+				enemies[i]->Die();
 		}
 
 	}
@@ -373,13 +391,13 @@ void Scene::Render()
 	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
 		for (size_t i = 0; i < enemies.size(); i++)
 		{
-			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
 				enemies[i]->Draw();
 		}
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		for (size_t i = 0; i < enemies.size(); i++)
 		{
-			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
 				enemies[i]->DrawDebug(GREEN);
 		}
 
@@ -462,7 +480,7 @@ void Scene::CheckCollisions()
 	player_box = player->GetHitbox().first;
 	whip_hitbox = player->GetHitbox().second;
 
-	//Collision Heart
+	//Collision Item
 	auto itObj = objects.begin();
 	while (itObj != objects.end())
 	{
@@ -528,12 +546,15 @@ void Scene::CheckCollisions()
 				enemies[i]->StartInvincibility();
 				if (enemies[i]->getLife() <= 0)
 				{
-					if (enemies[i]->getType() == EnemyType::KNIGHT)
+					if (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT)
 						enemies[i]->Die();
 					else
 						enemies[i]->MedusaSpawn(false);
 				}
 			}
+
+			if (player_box.TestAABB(enemies[i]->GetAttackRadius()) && enemies[i]->GetState() == EnemyState::IDLE)
+				enemies[i]->SetState(EnemyState::WALKING);
 		}
 	}
 
@@ -593,6 +614,10 @@ void Scene::RenderGUI() const
 	DrawTexture(ui, 0, -35, WHITE);
 	playerBar->Draw();
 	bossBar->Draw();
+	DrawText(TextFormat("%06d", score), 58, -32, 10, WHITE);
+	DrawText(TextFormat("%02d",  stage), 157, -32, 10, WHITE);
+	DrawText(TextFormat("%02d",  hearts), 193, -32, 10, WHITE);
+	DrawText(TextFormat("%02d",  life), 229, -32, 10, WHITE);
 }
 bool Scene::getLevelOver() const {
 	return levelOver;

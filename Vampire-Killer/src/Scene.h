@@ -52,4 +52,5 @@ private:
     Texture2D ui, gameStart, falseTile, door;
     int medusaSpawnRate;
     Sequence* seq;
+    int score, stage, hearts, life;
 };
