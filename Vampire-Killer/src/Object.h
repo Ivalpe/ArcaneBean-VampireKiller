@@ -10,7 +10,7 @@
 
 #define SPEED_FALLING	2
 
-enum class ObjectType { HEART, HEART_BIG, WHIPE, BLUE_ORB, RING, KEY };
+enum class ObjectType { HEART, HEART_BIG, WHIP, BLUE_ORB, RED_ORB, RING, KEY };
 
 enum class ItemAnim { BREAKING, FALLING, IDLE, NUM_ANIMATIONS };
 
@@ -28,7 +28,7 @@ public:
 	void Update();
 	AABB GetHitbox() const;
 	void Release();
-
+	ObjectType GetType() const;
 private:
 	void SetAnimation(int id);
 
