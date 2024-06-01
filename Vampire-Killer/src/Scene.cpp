@@ -558,10 +558,9 @@ void Scene::Render()
 
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 	{
-		DrawText(TextFormat("Go to a level (1-9)"), 16 * 9, 16 * 1, 1, LIGHTGRAY);
-		DrawText(TextFormat("Spawn a Item (I)"), 16 * 9, 16 * 2, 1, LIGHTGRAY);
-		DrawText(TextFormat("Spawn a Enemy (E)"), 16 * 9, 16 * 3, 1, LIGHTGRAY);
-		DrawText(TextFormat("Medusa %d", medusaSpawnRate), 16 * 9, 16 * 7, 1, LIGHTGRAY);
+		DrawText(TextFormat("Go to a level (1-9)"), 16 * 8, 16 * 1, 1, WHITE);
+		DrawText(TextFormat("Spawn a Item (Y, U)"), 16 * 8, 16 * 2, 1, WHITE);
+		DrawText(TextFormat("Spawn a Enemy (E, R, T)"), 16 * 8, 16 * 3, 1, WHITE);
 	}
 
 	if (lvlList->GetLvl() == 8)
