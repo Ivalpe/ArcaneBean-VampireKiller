@@ -28,7 +28,7 @@ Controls:
 - Left arrow: Move left.
 - Space: Attack.
 - F1: Enter debug mode.
-    -In debug mode:
+- -In debug mode:
     -E Knight, R medusa, T Bat, Y Big heart, U Blue orb.
 
 To play, move around the screen collecting objects.
