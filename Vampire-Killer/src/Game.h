@@ -24,6 +24,7 @@ private:
 
     GameState state;
     Scene *scene;
+    Music musicGame;
     const Texture2D *img_menu;
     const Texture2D *img_mscreen;
     const Texture2D *img_gameover;

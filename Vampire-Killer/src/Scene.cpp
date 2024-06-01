@@ -10,6 +10,8 @@ Scene::Scene()
 	gameWin = false;
 	playerBar = nullptr;
 	bossBar = nullptr;
+	moveCloud = 4;
+	posCloud = 16 * 12;
 
 	camera.target = { 0, 0 };				//Center of the screen
 	camera.offset = { 0, MARGIN_GUI_Y };	//Offset from the target (center of the screen)
@@ -49,8 +51,7 @@ AppStatus Scene::Init()
 	lvlList->Initialise();
 
 	ResourceManager& rm = ResourceManager::Instance();
-	musicStage0 = rm.GetMusic(MusicResource::MUSIC_STAGE0);
-	musicStage2 = rm.GetMusic(MusicResource::MUSIC_STAGE2);
+	musicStage = rm.GetMusic(MusicResource::MUSIC_INTRO);
 	hurt = rm.GetSound(SoundResource::HURT);
 	
 	enter = rm.GetSound(SoundResource::ENTERCASTLE);
@@ -70,6 +71,11 @@ AppStatus Scene::Init()
 		LOG("Failed to initialise Player");
 		return AppStatus::ERROR;
 	}
+
+	//Init Enemies
+	enemies = std::vector<Enemy*>(5);
+	for (size_t i = 0; i < enemies.size(); i++)
+		enemies[i] = new Enemy(16, 16);
 
 	//Create level 
 	level = new TileMap();
@@ -106,15 +112,13 @@ AppStatus Scene::Init()
 	//Door
 	door = LoadTexture("Assets/Door.png");
 
+	//Cloud
+	cloud = LoadTexture("Assets/Cloud.png");
+
 	Point pos = Point(61, -18);
 	playerBar = new Bar(16, { 255, 192, 150, 255 }, pos, 64, 4);
 	pos = Point(61, -9);
 	bossBar = new Bar(16, { 251, 31, 46, 255 }, pos, 64, 4);
-
-	//Init Enemies
-	enemies = std::vector<Enemy*>(5);
-	for (size_t i = 0; i < enemies.size(); i++)
-		enemies[i] = new Enemy(16, 16);
 
 	player->MoveAuto(true);
 	player->BlockMovement(true);
@@ -231,11 +235,40 @@ AppStatus Scene::LoadLevel(int stage, int direction)
 					}
 				}
 			}
+			else if (tile == Tile::ENEMY_BATINTRO_RIGHT || tile == Tile::ENEMY_BATINTRO_LEFT)
+			{
+				for (size_t i = 0; i < enemies.size(); i++)
+				{
+					if (!enemies[i]->IsAlive())
+					{
+						if (tile == Tile::ENEMY_BATINTRO_RIGHT)
+							enemies[i]->Initialise(pos, EnemyType::BATINTRO, EnemyState::IDLE, EnemyLook::RIGHT, level, 8, 8);
+						else
+							enemies[i]->Initialise(pos, EnemyType::BATINTRO, EnemyState::IDLE, EnemyLook::LEFT, level, 8, 8);
+						break;
+					}
+				}
+			}
 			++i;
 		}
 	}
 
-	PlayMusicStream(musicStage0);
+	ResourceManager& rm = ResourceManager::Instance();
+	if (lvlList->GetLvl() == 1)
+	{
+		StopMusicStream(musicStage);
+		musicStage = rm.GetMusic(MusicResource::MUSIC_INTRO);
+	}
+	else if (lvlList->GetLvl() <= 4)
+	{
+		musicStage = rm.GetMusic(MusicResource::MUSIC_STAGE0);
+	}
+	else if (lvlList->GetLvl() >= 5)
+	{
+		musicStage = rm.GetMusic(MusicResource::MUSIC_STAGE2);
+	}
+
+	PlayMusicStream(musicStage);
 
 	//Tile map
 	posTp posTp = lvlList->getTp();
@@ -248,10 +281,15 @@ void Scene::Update()
 	Point p1, p2;
 	AABB box;
 
-	UpdateMusicStream(musicStage0);
-	UpdateMusicStream(musicStage2);
+	UpdateMusicStream(musicStage);
 
-	player->GetPos().x;
+	//Move Cloud
+	if (lvlList->GetLvl() == 1)
+	{
+		if (moveCloud == 0) posCloud--;
+
+		moveCloud = moveCloud == 0 ? 4 : moveCloud - 1;
+	}
 
 	//Change level if player gets off the screen
 	LoadNextLevel();
@@ -305,7 +343,7 @@ void Scene::Update()
 	int middle = (WINDOW_HEIGHT - TP_TILE - MARGIN_GUI_Y) / 2;
 	for (size_t i = 0; i < enemies.size(); i++)
 	{
-		if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT))
+		if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO))
 			enemies[i]->Update();
 
 		if (medusaSpawnRate == 0 && enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && !enemies[i]->IsMedusaSpawn())
@@ -457,8 +495,6 @@ void Scene::Render()
 {
 	BeginMode2D(camera);
 
-
-
 	level->Render();
 
 	//Draw Castle
@@ -468,13 +504,13 @@ void Scene::Render()
 	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
 		for (size_t i = 0; i < enemies.size(); i++)
 		{
-			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
 				enemies[i]->Draw();
 		}
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 		for (size_t i = 0; i < enemies.size(); i++)
 		{
-			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
 				enemies[i]->DrawDebug(GREEN);
 		}
 
@@ -533,6 +569,8 @@ void Scene::Render()
 		DrawTexture(falseTile, 224, 112, WHITE);
 	else if (lvlList->GetLvl() == 8)
 		DrawTexture(falseTile, 0, -5, WHITE);
+
+	if (lvlList->GetLvl() == 1) DrawTexture(cloud, posCloud, 16 * 1, WHITE);;
 
 	RenderGUI();
 
@@ -651,9 +689,10 @@ void Scene::CheckCollisions()
 				enemies[i]->StartInvincibility();
 				if (enemies[i]->getLife() <= 0)
 				{
-					if (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT){
+					if (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT) {
 						enemies[i]->Die();
-					score += 100;}
+						score += 100;
+					}
 					else {
 						enemies[i]->MedusaSpawn(false);
 					}

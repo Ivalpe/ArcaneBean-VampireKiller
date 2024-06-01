@@ -20,6 +20,7 @@ public:
     void SetNumberAnimations(int num);
     void SetAnimationDelay(int id, int delay);
     void AddKeyFrame(int id, const Rectangle& rect);
+    void FreeKey(int id);
     void SetAnimation(int id);
     int GetAnimation();
 

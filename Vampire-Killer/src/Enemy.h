@@ -4,7 +4,7 @@
 
 enum class EnemyLook { RIGHT, LEFT};
 
-enum class EnemyType { KNIGHT, MEDUSA_HEAD, BAT};
+enum class EnemyType { KNIGHT, MEDUSA_HEAD, BAT, BATINTRO};
 enum class EnemyState { WALKING, IDLE};
 enum class EnemyAnim { WALKING_LEFT, WALKING_RIGHT, IDLE, NUM_ANIMATIONS };
 
@@ -53,5 +53,5 @@ private:
 	TileMap* map;
 	float time;
 	int life, invincibility, initialX, initialY;
-	bool alive, medusaSpawn;
+	bool alive, medusaSpawn, moveBatIntro;
 };

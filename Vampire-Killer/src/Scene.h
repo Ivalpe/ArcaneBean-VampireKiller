@@ -42,7 +42,7 @@ private:
     std::vector<Enemy*> enemies;
 
     Camera2D camera;
-    Music musicStage0, musicStage2;
+    Music musicStage;
     Sound hurt, enter, lati, pick;
 
     DebugMode debug;
@@ -51,8 +51,8 @@ private:
     Levels* lvlList;
     Bar* playerBar;
     Bar* bossBar;
-    Texture2D ui, gameStart, falseTile, door;
-    int medusaSpawnRate;
+    Texture2D ui, gameStart, falseTile, door, cloud;
     Sequence* seq;
-    int score, stage, hearts, life, contDie;
+    int score, stage, hearts, life, contDie, medusaSpawnRate, posCloud;
+    int moveCloud;
 };
