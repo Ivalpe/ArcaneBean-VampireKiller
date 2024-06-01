@@ -457,7 +457,7 @@ void Scene::Update()
 	{
 		LoadLevel(lvlList->GetStage() == 0 ? 1 : 5, 103);
 		contDie == 120;
-		life -= 3;
+		life -= 1;
 
 		if (life == 0)
 		{
@@ -619,11 +619,11 @@ void Scene::CheckCollisions()
 			}
 			if (objType == ObjectType::HEART)
 			{
-				score += 1;
+				hearts += 1;
 			}
 			if (objType == ObjectType::HEART_BIG)
 			{
-				score += 5;
+				hearts += 5;
 			}
 
 			PlaySound(pick);
