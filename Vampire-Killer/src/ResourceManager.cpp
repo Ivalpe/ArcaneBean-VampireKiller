@@ -14,7 +14,11 @@ ResourceManager::~ResourceManager()
 
 void ResourceManager::LoadSounds() 
 {
-    soundList[(int)SoundResource::SOUND_ATTACK] = LoadSound("");
+    soundList[(int)SoundResource::ENTERCASTLE] = LoadSound("Assets/Sound effects/entercastle.wav");
+    soundList[(int)SoundResource::HURT] = LoadSound("Assets/Sound effects/hurt.wav");
+    soundList[(int)SoundResource::LATIGO] = LoadSound("Assets/Sound effects/latigo.wav");
+    soundList[(int)SoundResource::PICKUP] = LoadSound("Assets/Sound effects/pickup.wav");
+        
 }
 void ResourceManager::LoadMusic()
 {

@@ -43,6 +43,7 @@ private:
 
     Camera2D camera;
     Music musicStage0, musicStage2;
+    Sound hurt, enter, lati, pick;
 
     DebugMode debug;
 

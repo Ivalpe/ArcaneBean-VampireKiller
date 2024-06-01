@@ -51,6 +51,11 @@ AppStatus Scene::Init()
 	ResourceManager& rm = ResourceManager::Instance();
 	musicStage0 = rm.GetMusic(MusicResource::MUSIC_STAGE0);
 	musicStage2 = rm.GetMusic(MusicResource::MUSIC_STAGE2);
+	hurt = rm.GetSound(SoundResource::HURT);
+	
+	enter = rm.GetSound(SoundResource::ENTERCASTLE);
+	lati = rm.GetSound(SoundResource::LATIGO);
+	pick = rm.GetSound(SoundResource::PICKUP);
 
 	//Create player
 	player = new Player({ 0,0 }, State::IDLE, Look::LEFT);
@@ -251,6 +256,13 @@ void Scene::Update()
 	//Change level if player gets off the screen
 	LoadNextLevel();
 
+	if (IsKeyPressed(KEY_SPACE))
+	{
+		PlaySound(lati);
+	}
+
+
+
 	//Switch between the different debug modes: off, on (sprites & hitboxes), on (hitboxes) 
 	if (IsKeyPressed(KEY_F1))
 	{
@@ -273,6 +285,7 @@ void Scene::Update()
 	for (size_t i = 0; i < objects.size(); i++)
 	{
 		objects[i]->Update();
+
 	}
 
 	for (size_t i = 0; i < fires.size(); i++)
@@ -575,7 +588,7 @@ void Scene::CheckCollisions()
 				score += 5;
 			}
 
-
+			PlaySound(pick);
 
 			//player->IncrScore((*itObj)->Points());
 			//Delete the object
@@ -628,6 +641,8 @@ void Scene::CheckCollisions()
 				player->Damaged(et);
 				playerBar->changeBar(player->GetLife());
 				player->StartInvincibility();
+
+				PlaySound(hurt);
 			}
 			//Collision Whip with Enemy
 			else if (whip_hitbox.TestAABB(obj_box) && enemies[i]->GetInvincibility() == 0)

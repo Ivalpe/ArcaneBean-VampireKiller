@@ -256,6 +256,7 @@ void Player::Update()
 
 	if (!move && GetAnimation() != PlayerAnim::LOOKING_AHEAD && IsKeyPressed(KEY_SPACE))
 	{
+
 		if (state == State::JUMPING || state == State::FALLING)
 		{
 			if (look == Look::LEFT)		SetAnimation((int)PlayerAnim::ATTACKING_AIR_LEFT);
