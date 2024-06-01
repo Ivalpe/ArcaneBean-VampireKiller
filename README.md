@@ -27,6 +27,7 @@ Controls:
 - Right arrow: Move right.
 - Left arrow: Move left.
 - Space: Attack.
+- -F1: Enter debug mode.
 
 To play, move around the screen collecting objects.
 
