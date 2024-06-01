@@ -71,8 +71,8 @@ AppStatus Player::Initialise()
 	sprite->AddKeyFrame((int)PlayerAnim::JUMPING_LEFT, { 3 * nw, 0, -nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::CLIMBING, ANIM_LADDER_DELAY);
-	for (i = 0; i < 3; ++i)
-		sprite->AddKeyFrame((int)PlayerAnim::CLIMBING, { (float)i * nw, 0, nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::CLIMBING, { nw * 4, 0, nw, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::CLIMBING, { nw * 5, 0, nw, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::CROUCHING_LEFT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::CROUCHING_LEFT, { 3 * nw, 0, -nw, nh });
