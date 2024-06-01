@@ -16,6 +16,7 @@ enum class Resource {
     IMG_FIRE,
     IMG_CANDLE,
     IMG_KNIGHT,
+    IMG_BATINTRO,
     IMG_MEDUSA_HEAD,
     IMG_BAT,
     IMG_BAR,
@@ -24,8 +25,11 @@ enum class Resource {
 };
 
 enum class MusicResource {
+    MUSIC_INTRO,
     MUSIC_STAGE0,
     MUSIC_STAGE2,
+    MUSIC_ENDING,
+    MUSIC_GAMEOVER,
     NUM_MUSIC
 };
 

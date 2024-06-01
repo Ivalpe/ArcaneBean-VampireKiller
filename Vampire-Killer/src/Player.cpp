@@ -79,7 +79,7 @@ AppStatus Player::Initialise()
 	sprite->SetAnimationDelay((int)PlayerAnim::CROUCHING_RIGHT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::CROUCHING_RIGHT, { 3 * nw, 0, nw, nh });
 
-	//Charging
+	//Attack
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_LEFT, 0);
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { 0,	nw * 2,	-nw * 4, nh });
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { nw * 4, nw * 2, -nw * 4, nh });
@@ -95,7 +95,6 @@ AppStatus Player::Initialise()
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_RIGHT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { nw * 4, nw * 6, nw * 4, nh });
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { nw * 8, nw * 6, nw * 4, nh });
-	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { nw * 8, nw * 6, nw * 4, nh });
 
 	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_LEFT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { nw * 4, nw * 4, -nw * 4, nh });
@@ -104,7 +103,6 @@ AppStatus Player::Initialise()
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { nw * 4, nw * 4, nw * 4, nh });
 	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { nw * 8, nw * 4, nw * 4, nh });
 
-	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, ANIM_DELAY);
 	sprite->AddKeyFrame((int)PlayerAnim::LOOKING_AHEAD, { nw * 16, 0, nw, nh });
 
 	sprite->SetAnimation(look == Look::LEFT ? (int)PlayerAnim::IDLE_LEFT : (int)PlayerAnim::IDLE_RIGHT);
@@ -519,7 +517,10 @@ std::pair<AABB, AABB> Player::GetHitbox() const
 
 			//Whip
 			Point whipPoint(pos.x + (IsLookingLeft() ? -(width * 2) - 3 : width), (pos.y - 8));
-			whipHitbox.Set(whipPoint, width * 2.3f, height - 20);
+			if (GetDmg() == 3)
+				whipHitbox.Set(whipPoint, width * 2.3f, height - 20);
+			else
+				whipHitbox.Set(whipPoint, width * 3.9f, height - 20);
 		}
 		else
 		{
@@ -527,8 +528,16 @@ std::pair<AABB, AABB> Player::GetHitbox() const
 			playerHitbox.Set(p, width, height);
 
 			//Whip
-			Point whipPoint(pos.x + (IsLookingLeft() ? -(width * 2) - 3 : width), (pos.y - 15));
-			whipHitbox.Set(whipPoint, width * 2.3f, height - 20);
+			if (GetDmg() == 2)
+			{
+				Point whipPoint(pos.x + (IsLookingLeft() ? -(width * 2) - 3 : width), (pos.y - 15));
+				whipHitbox.Set(whipPoint, width * 2.3f, height - 20);
+			}
+			else
+			{
+				Point whipPoint(pos.x + (IsLookingLeft() ? -(width * 2) - 10 : width), (pos.y - 15));
+				whipHitbox.Set(whipPoint, width * 2.9f, height - 20);
+			}
 		}
 	}
 	else if (state == State::CROUCHING)
@@ -577,7 +586,40 @@ void Player::ClampLife()
 }
 void Player::UpDamage()
 {
+
 	dmg += 1;
+	const int nw = PLAYER_FRAME_SIZE_WIDTH, nh = PLAYER_FRAME_SIZE_HEIGHT;
+
+	Sprite* sprite = dynamic_cast<Sprite*>(render);
+	//Attack
+	sprite->FreeKey((int)PlayerAnim::ATTACKING_GROUND_LEFT);
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_LEFT, 0);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { nw * 12,	nw * 2,	-nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { nw * 16, nw * 2, -nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_LEFT, { nw * 20, nw * 2, -nw * 4, nh });
+	sprite->FreeKey((int)PlayerAnim::ATTACKING_GROUND_RIGHT);
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_GROUND_RIGHT, 0);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { nw * 12,	nw * 2,	nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { nw * 16, nw * 2, nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_GROUND_RIGHT, { nw * 20, nw * 2, nw * 4, nh });
+
+	sprite->FreeKey((int)PlayerAnim::ATTACKING_AIR_LEFT);
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_LEFT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { nw * 16, nw * 6, -nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_LEFT, { nw * 20, nw * 6, -nw * 4, nh });
+	sprite->FreeKey((int)PlayerAnim::ATTACKING_AIR_RIGHT);
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_AIR_RIGHT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { nw * 16, nw * 6, nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_AIR_RIGHT, { nw * 20, nw * 6, nw * 4, nh });
+
+	sprite->FreeKey((int)PlayerAnim::ATTACKING_CROUCH_LEFT);
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_LEFT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { nw * 16, nw * 4, -nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_LEFT, { nw * 20, nw * 4, -nw * 4, nh });
+	sprite->FreeKey((int)PlayerAnim::ATTACKING_CROUCH_RIGHT);
+	sprite->SetAnimationDelay((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, ANIM_DELAY);
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { nw * 16, nw * 4, nw * 4, nh });
+	sprite->AddKeyFrame((int)PlayerAnim::ATTACKING_CROUCH_RIGHT, { nw * 20, nw * 4, nw * 4, nh });
 
 }
 void Player::StartInvincibility() {

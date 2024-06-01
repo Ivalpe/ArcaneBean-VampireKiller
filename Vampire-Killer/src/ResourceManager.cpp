@@ -18,8 +18,11 @@ void ResourceManager::LoadSounds()
 }
 void ResourceManager::LoadMusic()
 {
+    musicList[(int)MusicResource::MUSIC_INTRO] = LoadMusicStream("Assets/Music/Prologue.ogg");
     musicList[(int)MusicResource::MUSIC_STAGE0] = LoadMusicStream("Assets/Music/Vampire Killer.ogg");
     musicList[(int)MusicResource::MUSIC_STAGE2] = LoadMusicStream("Assets/Music/Stalker.ogg");
+    musicList[(int)MusicResource::MUSIC_ENDING] = LoadMusicStream("Assets/Music/Ending.ogg");
+    musicList[(int)MusicResource::MUSIC_GAMEOVER] = LoadMusicStream("Assets/Music/Game Over.ogg");
 }
 //Load a texture from a file and associate it with the key id
 AppStatus ResourceManager::LoadTexture(Resource id, const std::string& file_path)

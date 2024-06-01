@@ -5,7 +5,7 @@ Sequence::Sequence(GameSequence game, AABB hitbox)
 	gameSeq = game;
 	stateSeq = StateSequence::IDLE;
 	hitboxEnd = hitbox;
-	cont = 120;
+	cont = 300;
 	y = 0;
 	wait = false;
 }

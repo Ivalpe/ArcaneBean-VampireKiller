@@ -29,7 +29,7 @@ AppStatus Enemy::Initialise(Point& p, EnemyType et, EnemyState s, EnemyLook view
 	pos.y = p.y;
 	initialY = p.y;
 	initialX = p.x;
-
+	moveBatIntro = 60;
 
 	Entity::SetWidth(width);
 	Entity::SetHeight(height);
@@ -136,6 +136,33 @@ AppStatus Enemy::Initialise(Point& p, EnemyType et, EnemyState s, EnemyLook view
 		life = 1;
 		break;
 	default:
+	case EnemyType::BATINTRO:
+		if (data.LoadTexture(Resource::IMG_BATINTRO, "Assets/Sprites/BatIntro.png") != AppStatus::OK)
+		{
+			return AppStatus::ERROR;
+		}
+
+		render = new Sprite(data.GetTexture(Resource::IMG_BATINTRO));
+		if (render == nullptr)
+		{
+			LOG("Failed to allocate memory for player sprite");
+			return AppStatus::ERROR;
+		}
+
+		sprite = dynamic_cast<Sprite*>(render);
+		sprite->SetNumberAnimations((int)EnemyAnim::NUM_ANIMATIONS - 1);
+
+		sprite->SetAnimationDelay((int)EnemyAnim::WALKING_RIGHT, ANIM_DELAY);
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { 0, 0, -w, h });
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_RIGHT, { w, 0, -w, h });
+		sprite->SetAnimationDelay((int)EnemyAnim::WALKING_LEFT, ANIM_DELAY);
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { 0, 0, w, h });
+		sprite->AddKeyFrame((int)EnemyAnim::WALKING_LEFT, { w, 0, w, h });
+
+		sprite->SetAnimation((int)EnemyAnim::WALKING_LEFT);
+
+		life = 1;
+		break;
 		LOG("Failed to load Enemy");
 		return AppStatus::ERROR;
 		break;
@@ -143,7 +170,7 @@ AppStatus Enemy::Initialise(Point& p, EnemyType et, EnemyState s, EnemyLook view
 }
 void Enemy::Update()
 {
-	if (type == EnemyType::KNIGHT || type == EnemyType::BAT || (type == EnemyType::MEDUSA_HEAD && medusaSpawn))
+	if (type == EnemyType::KNIGHT || type == EnemyType::BAT || type == EnemyType::BATINTRO || (type == EnemyType::MEDUSA_HEAD && medusaSpawn))
 	{
 		Sprite* sprite = dynamic_cast<Sprite*>(render);
 		sprite->Update();
@@ -218,6 +245,18 @@ void Enemy::MoveX()
 		}
 
 		time += 0.1;
+		break;
+	case EnemyType::BATINTRO:
+		if (look == EnemyLook::LEFT && moveBatIntro == 0)
+		{
+			pos.x -= ENEMY_SPEED;
+		}
+		else if (look == EnemyLook::RIGHT && moveBatIntro == 0)
+		{
+			pos.x += ENEMY_SPEED;
+			pos.y -= ENEMY_SPEED;
+		}
+		moveBatIntro = moveBatIntro == 0 ? 60 : moveBatIntro - 1;
 		break;
 	default:
 		break;

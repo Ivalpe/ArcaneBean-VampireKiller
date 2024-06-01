@@ -30,6 +30,10 @@ void Sprite::AddKeyFrame(int id, const Rectangle& rect)
 		animations[id].frames.push_back(rect);
 	}
 }
+void Sprite::FreeKey(int id)
+{
+	animations[id].frames.clear();
+}
 void Sprite::SetAnimation(int id)
 {
 	if (id >= 0 && id < animations.size())

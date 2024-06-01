@@ -97,6 +97,8 @@ AppStatus Game::LoadResources()
 	}
 	img_credits = data.GetTexture(Resource::IMG_CREDITS);
 
+	musicGame = data.GetMusic(MusicResource::MUSIC_GAMEOVER);
+
 	return AppStatus::OK;
 }
 
@@ -126,12 +128,14 @@ void Game::FinishPlay()
 }
 AppStatus Game::Update()
 {
+	UpdateMusicStream(musicGame);
+
 	//Only sum if there is in the main screen or the game over the screen
 	if (state == GameState::MAIN_SCREEN || state == GameState::GAME_OVER || state == GameState::GAME_WIN)	frameCount++;
 
 	//Check if user attempts to close the window, either by clicking the close button or by pressing Alt+F4
 	if (WindowShouldClose()) return AppStatus::QUIT;
-	
+
 	//Change FullScreen
 	if (IsKeyPressed(KEY_ENTER) && IsKeyDown(KEY_LEFT_ALT))
 	{
@@ -157,10 +161,21 @@ AppStatus Game::Update()
 
 	case GameState::PLAYING:
 		if (scene->getLevelOver())
+		{
 			state = GameState::GAME_OVER;
+			ResourceManager& data = ResourceManager::Instance();
+			musicGame = data.GetMusic(MusicResource::MUSIC_GAMEOVER);
+			PlayMusicStream(musicGame);
+		}
 
 		if (scene->getLevelWin())
+		{
+			posYCredits = WINDOW_HEIGHT;
+			ResourceManager& data = ResourceManager::Instance();
+			musicGame = data.GetMusic(MusicResource::MUSIC_ENDING);
+			PlayMusicStream(musicGame);
 			state = GameState::GAME_WIN;
+		}
 
 		if (IsKeyPressed(KEY_ESCAPE))
 		{
@@ -176,12 +191,14 @@ AppStatus Game::Update()
 
 	case GameState::GAME_OVER:
 		if (frameCount >= HOLD_FRAMES) {
+			StopMusicStream(musicGame);
 			state = GameState::MAIN_MENU;
 			frameCount = 0;
 		}
 		break;
 	case GameState::GAME_WIN:
 		if (frameCount >= HOLD_FRAMES * 2) {
+			StopMusicStream(musicGame);
 			state = GameState::MAIN_MENU;
 			frameCount = 0;
 		}
@@ -215,7 +232,7 @@ void Game::Render()
 		break;
 	case GameState::GAME_WIN:
 		DrawTexture(*img_ending, 0, 0, WHITE);
-		DrawTexture(*img_credits, (WINDOW_WIDTH - 193) / 2 , posYCredits-- , WHITE);
+		DrawTexture(*img_credits, (WINDOW_WIDTH - 193) / 2, posYCredits--, WHITE);
 		break;
 	}
 
