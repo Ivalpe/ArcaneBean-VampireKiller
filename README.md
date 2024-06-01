@@ -40,3 +40,4 @@ Features implemented:
 - Stroke.
 - Screen change.
 - Items, and collection thereof.
+- Item functionality.
