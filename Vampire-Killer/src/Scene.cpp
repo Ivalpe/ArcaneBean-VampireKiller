@@ -503,19 +503,6 @@ void Scene::Render()
 	if (lvlList->GetLvl() == 1)
 		DrawTexture(gameStart, 0, -35, WHITE);
 
-	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
-		for (size_t i = 0; i < enemies.size(); i++)
-		{
-			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
-				enemies[i]->Draw();
-		}
-	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
-		for (size_t i = 0; i < enemies.size(); i++)
-		{
-			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
-				enemies[i]->DrawDebug(GREEN);
-		}
-
 	//Objects
 	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
 		for (size_t i = 0; i < objects.size(); i++)
@@ -538,6 +525,19 @@ void Scene::Render()
 		for (size_t i = 0; i < fires.size(); i++)
 		{
 			fires[i]->DrawDebug(GREEN);
+		}
+
+	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
+		for (size_t i = 0; i < enemies.size(); i++)
+		{
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+				enemies[i]->Draw();
+		}
+	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
+		for (size_t i = 0; i < enemies.size(); i++)
+		{
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+				enemies[i]->DrawDebug(GREEN);
 		}
 
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
