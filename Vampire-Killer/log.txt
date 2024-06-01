@@ -1,20 +1,4 @@
-Project executed on 01-06-2024 at 13:21:15.
+Project executed on 01-06-2024 at 13:23:51.
 main.cpp(13): Application start
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (17, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (17, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (17, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (17, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (17, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (17, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (17, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
 main.cpp(34): Application finish
 main.cpp(37): Bye :)
