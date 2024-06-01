@@ -34,7 +34,10 @@ enum class MusicResource {
 };
 
 enum class SoundResource {
-    SOUND_ATTACK,
+    ENTERCASTLE,
+    HURT,
+    LATIGO,
+    PICKUP,
     NUM_SOUNDS
 };
 
