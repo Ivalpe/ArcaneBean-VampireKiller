@@ -27,6 +27,13 @@ Controls:
 - Right arrow: Move right.
 - Left arrow: Move left.
 - Space: Attack.
+- F1: Debug mode.
+- In debug mode, use numnbers to go to the diferent levels.
+- Use E to summon a knight(enemy).
+- Use R to summon a medusa head(enemy).
+- Use T to summon a bat(enemy).
+- Use Y to summon a big heart(item).
+- Use U to summon a blue orb(item).
 
 To play, move around the screen collecting objects.
 
@@ -37,6 +44,15 @@ Features implemented:
 - Horizontal movement.
 - Leap.
 - Crouch.
-- Stroke.
+- Attack.
 - Screen change.
 - Items, and collection thereof.
+- Climbing stairs.
+- Attack while jumping and crouching.
+- 3 enemys.
+- fire and candles.
+- Sound effects and music.
+- End credits.
+- Stages o and 2.
+- Item effects (Heart gives points, whip gives more attack)
+- Death of the player and game over screen.
