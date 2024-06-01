@@ -53,7 +53,7 @@ AppStatus Scene::Init()
 	ResourceManager& rm = ResourceManager::Instance();
 	musicStage = rm.GetMusic(MusicResource::MUSIC_INTRO);
 	hurt = rm.GetSound(SoundResource::HURT);
-	
+
 	enter = rm.GetSound(SoundResource::ENTERCASTLE);
 	lati = rm.GetSound(SoundResource::LATIGO);
 	pick = rm.GetSound(SoundResource::PICKUP);
@@ -346,11 +346,13 @@ void Scene::Update()
 		if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO))
 			enemies[i]->Update();
 
-		if (medusaSpawnRate == 0 && enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && !enemies[i]->IsMedusaSpawn())
+		if (medusaSpawnRate <= 0 && enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && !enemies[i]->IsMedusaSpawn())
 		{
 			if ((enemies[i]->GetPos().y >= middle && player->GetPos().y >= middle) || (enemies[i]->GetPos().y <= middle && player->GetPos().y <= middle))
+			{
 				enemies[i]->MedusaSpawn(true);
-			medusaSpawnRate = 120;
+				medusaSpawnRate = 120;
+			}
 		}
 		if (enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())
 			enemies[i]->Update();
@@ -559,6 +561,7 @@ void Scene::Render()
 		DrawText(TextFormat("Go to a level (1-9)"), 16 * 9, 16 * 1, 1, LIGHTGRAY);
 		DrawText(TextFormat("Spawn a Item (I)"), 16 * 9, 16 * 2, 1, LIGHTGRAY);
 		DrawText(TextFormat("Spawn a Enemy (E)"), 16 * 9, 16 * 3, 1, LIGHTGRAY);
+		DrawText(TextFormat("Medusa %d", medusaSpawnRate), 16 * 9, 16 * 7, 1, LIGHTGRAY);
 	}
 
 	if (lvlList->GetLvl() == 8)
@@ -628,7 +631,6 @@ void Scene::CheckCollisions()
 
 			PlaySound(pick);
 
-			//player->IncrScore((*itObj)->Points());
 			//Delete the object
 			delete* itObj;
 			//Erase the object from the vector and get the iterator to the next valid element
