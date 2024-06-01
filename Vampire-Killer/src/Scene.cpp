@@ -53,7 +53,7 @@ AppStatus Scene::Init()
 	ResourceManager& rm = ResourceManager::Instance();
 	musicStage = rm.GetMusic(MusicResource::MUSIC_INTRO);
 	hurt = rm.GetSound(SoundResource::HURT);
-	
+
 	enter = rm.GetSound(SoundResource::ENTERCASTLE);
 	lati = rm.GetSound(SoundResource::LATIGO);
 	pick = rm.GetSound(SoundResource::PICKUP);
@@ -346,11 +346,13 @@ void Scene::Update()
 		if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO))
 			enemies[i]->Update();
 
-		if (medusaSpawnRate == 0 && enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && !enemies[i]->IsMedusaSpawn())
+		if (medusaSpawnRate <= 0 && enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && !enemies[i]->IsMedusaSpawn())
 		{
 			if ((enemies[i]->GetPos().y >= middle && player->GetPos().y >= middle) || (enemies[i]->GetPos().y <= middle && player->GetPos().y <= middle))
+			{
 				enemies[i]->MedusaSpawn(true);
-			medusaSpawnRate = 120;
+				medusaSpawnRate = 120;
+			}
 		}
 		if (enemies[i]->IsAlive() && enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())
 			enemies[i]->Update();
@@ -457,7 +459,7 @@ void Scene::Update()
 	{
 		LoadLevel(lvlList->GetStage() == 0 ? 1 : 5, 103);
 		contDie == 120;
-		life -= 3;
+		life -= 1;
 
 		if (life == 0)
 		{
@@ -501,19 +503,6 @@ void Scene::Render()
 	if (lvlList->GetLvl() == 1)
 		DrawTexture(gameStart, 0, -35, WHITE);
 
-	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
-		for (size_t i = 0; i < enemies.size(); i++)
-		{
-			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
-				enemies[i]->Draw();
-		}
-	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
-		for (size_t i = 0; i < enemies.size(); i++)
-		{
-			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
-				enemies[i]->DrawDebug(GREEN);
-		}
-
 	//Objects
 	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
 		for (size_t i = 0; i < objects.size(); i++)
@@ -538,6 +527,19 @@ void Scene::Render()
 			fires[i]->DrawDebug(GREEN);
 		}
 
+	if (debug == DebugMode::OFF || debug == DebugMode::SPRITES_AND_HITBOXES)
+		for (size_t i = 0; i < enemies.size(); i++)
+		{
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+				enemies[i]->Draw();
+		}
+	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
+		for (size_t i = 0; i < enemies.size(); i++)
+		{
+			if (enemies[i]->IsAlive() && (enemies[i]->getType() == EnemyType::KNIGHT || enemies[i]->getType() == EnemyType::BAT || enemies[i]->getType() == EnemyType::BATINTRO || (enemies[i]->getType() == EnemyType::MEDUSA_HEAD && enemies[i]->IsMedusaSpawn())))
+				enemies[i]->DrawDebug(GREEN);
+		}
+
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 	{
 		DrawLine(TP_TILE, 0, TP_TILE, WINDOW_HEIGHT, RED);
@@ -556,9 +558,9 @@ void Scene::Render()
 
 	if (debug == DebugMode::SPRITES_AND_HITBOXES || debug == DebugMode::ONLY_HITBOXES)
 	{
-		DrawText(TextFormat("Go to a level (1-9)"), 16 * 9, 16 * 1, 1, LIGHTGRAY);
-		DrawText(TextFormat("Spawn a Item (I)"), 16 * 9, 16 * 2, 1, LIGHTGRAY);
-		DrawText(TextFormat("Spawn a Enemy (E)"), 16 * 9, 16 * 3, 1, LIGHTGRAY);
+		DrawText(TextFormat("Go to a level (1-9)"), 16 * 8, 16 * 1, 1, WHITE);
+		DrawText(TextFormat("Spawn a Item (Y, U)"), 16 * 8, 16 * 2, 1, WHITE);
+		DrawText(TextFormat("Spawn a Enemy (E, R, T)"), 16 * 8, 16 * 3, 1, WHITE);
 	}
 
 	if (lvlList->GetLvl() == 8)
@@ -619,16 +621,15 @@ void Scene::CheckCollisions()
 			}
 			if (objType == ObjectType::HEART)
 			{
-				score += 1;
+				hearts += 1;
 			}
 			if (objType == ObjectType::HEART_BIG)
 			{
-				score += 5;
+				hearts += 5;
 			}
 
 			PlaySound(pick);
 
-			//player->IncrScore((*itObj)->Points());
 			//Delete the object
 			delete* itObj;
 			//Erase the object from the vector and get the iterator to the next valid element

@@ -1,4 +1,4 @@
-Project executed on 01-06-2024 at 13:08:26.
+Project executed on 01-06-2024 at 15:35:05.
 main.cpp(13): Application start
 TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
 TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (17, 10)
@@ -15,92 +15,5 @@ TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given 
 TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
 TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (17, 10)
 TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
-TileMap.cpp(205): Error: Index out of bounds. Tile map dimensions: 16x11. Given index: (16, 10)
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (43,158), tile type: 112
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (44,157), tile type: 112
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (45,156), tile type: 112
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (46,155), tile type: 112
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (47,154), tile type: 112
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (58,143), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (59,142), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (60,141), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (61,140), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (62,139), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (63,138), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (74,127), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (75,126), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (76,125), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (77,124), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (78,123), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (79,122), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (90,111), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (91,110), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (92,109), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (93,108), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (94,107), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (95,106), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (106,95), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (107,94), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (108,93), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (109,92), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (110,91), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (110,91), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (110,91), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (110,91), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (110,91), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (110,91), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (110,91), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (110,91), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (110,91), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (110,91), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (110,91), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (109,92), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (108,93), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (107,94), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (106,95), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (95,106), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (94,107), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (93,108), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (92,109), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (91,110), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (90,111), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (79,122), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (78,123), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (77,124), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (76,125), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (75,126), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (74,127), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (63,138), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (62,139), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (61,140), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (60,141), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (59,142), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (58,143), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (58,143), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (59,142), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (60,141), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (61,140), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (62,139), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (63,138), tile type: 113
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (74,127), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (75,126), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (76,125), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (77,124), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (78,123), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (79,122), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (90,111), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (91,110), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (92,109), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (93,108), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (94,107), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (95,106), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (106,95), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (107,94), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (108,93), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (109,92), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (110,91), tile type: 111
-TileMap.cpp(382): Internal error, tile should be a LADDER, coord: (111,90), tile type: 111
 main.cpp(34): Application finish
 main.cpp(37): Bye :)

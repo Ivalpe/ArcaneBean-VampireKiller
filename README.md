@@ -27,6 +27,9 @@ Controls:
 - Right arrow: Move right.
 - Left arrow: Move left.
 - Space: Attack.
+- F1: Enter debug mode.
+- -In debug mode:
+    -E Knight, R medusa, T Bat, Y Big heart, U Blue orb.
 
 To play, move around the screen collecting objects.
 
@@ -35,8 +38,21 @@ To play, move around the screen collecting objects.
 Features implemented:
 - Starting screen.
 - Horizontal movement.
-- Leap.
+- Jump.
 - Crouch.
-- Stroke.
+- Attack.
 - Screen change.
 - Items, and collection thereof.
+- Item functionality (red orb = heals, heart = currency).
+- Music and sound effects.
+- Stages 0 and 2.
+- 3 enemy.
+- Character death and game over screen.
+- Ending tittles.
+- Climb stairs.
+- Attack while jumping and crouching.
+- Fire and candles.
+- Full screen.
+- Debug mode.
+  
+
