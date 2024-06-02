@@ -760,7 +760,7 @@ void Player::DrawDebug(const Color& col) const
 	DrawText(TextFormat("Attack: %d", attacking), 16, 16 * 4, 1, WHITE);
 	DrawText(TextFormat("Invincibility: %d", invincibility), 16, 16 * 5, 1, WHITE);
 	DrawText(TextFormat("State: %d", state), 16, 16 * 6, 1, WHITE);
-	DrawText(TextFormat("Previus State: %d", prev_state), 16, 16 * 7, 1, WHITE);
+	DrawText(TextFormat("Previous State: %d", prev_state), 16, 16 * 7, 1, WHITE);
 
 	DrawPixel(pos.x, pos.y, WHITE);
 }
