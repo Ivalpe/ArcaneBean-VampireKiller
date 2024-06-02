@@ -8,7 +8,7 @@ Sure, I can help you improve your README file. Here's a revised version in Engli
 
 -------------------------------------
 
-**Demo Video:** [Watch Here](https://www.youtube.com/watch?v=r7lXTLfv9Mk)
+**Demo Video:** [Watch Here](https://www.youtube.com/watch?v=kk8TIfsi0kI)
 
 ------------------------------------
 
@@ -39,7 +39,7 @@ Sure, I can help you improve your README file. Here's a revised version in Engli
         - **Y:** Spawn Big Heart
         - **U:** Spawn Blue Orb
 
-In “Vampire Killer”, players navigate through the screen and collect items to progress in the game. Collected items can be used to enhance the character’s abilities or as in-game currency.
+In Vampire Killer, players navigate through the screen and collect items to progress in the game. Collected items can be used to enhance the character abilities or as in-game currency.
 
 The primary goal is to defeat enemies, using the whip. Players need to be strategic in their approach, choosing when to attack, jump, or crouch to evade enemy attacks.
 
